@@ -1,0 +1,15 @@
+<h4>Ai Prompt</h4>
+<div class="inputBlock">
+  <textarea [(ngModel)]="prompt" (keyup.enter)="submit()"  
+  class="form-control mb-3" id="aiPrompt" 
+  placeholder="Prompt the AI" 
+  rows="3"></textarea>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
+      <i [class]="btnConfigSig().iconClass"></i>
+    </button> 
+  </div>
+
+  
+</div>
