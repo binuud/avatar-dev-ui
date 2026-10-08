@@ -1,7 +1,8 @@
-import { Service, Signal, signal, WritableSignal } from "@angular/core";
+import { inject, Service, Signal, signal, WritableSignal } from "@angular/core";
 import OpenAI from 'openai';
 import { Chat, Model } from "openai/resources";
 import { Stream } from "openai/streaming";
+import { LocalStorageService } from "../../../core/services/local-storage-service";
 
 
 
@@ -60,6 +61,9 @@ export interface OpenAiServiceState {
 @Service()
 export class OpenAiService {
   
+  localStorageSvc = inject(LocalStorageService);
+
+  public  static STORAGE_KEY = "OpenAiService";
   private  OPENAI_API_ENDPOINT = 'http://127.0.0.1:11434/v1';
 
   private openAiClient: OpenAI;
@@ -100,7 +104,26 @@ export class OpenAiService {
       dangerouslyAllowBrowser: true 
     });
     
+    this.loadState();
     this.getModels();
+  }
+
+  saveState() {
+    this.localStorageSvc.setItem(OpenAiService.STORAGE_KEY, JSON.stringify(this.state()));
+  }
+
+  loadState() {
+
+    const value = this.localStorageSvc.getItem(OpenAiService.STORAGE_KEY);
+    
+    if (value != "undefined" && value && value?.length ) {
+      this.updateState(JSON.parse(value));
+    } 
+    console.log('OpenAiService service load state');
+    
+    // connection state has to be from live data
+    this.updateState({connected: false});
+    console.dir(this.state);
   }
 
   updateState(newState: Partial<OpenAiServiceState>) {
@@ -108,6 +131,7 @@ export class OpenAiService {
       ...state, 
       ...newState
     }));
+    this.saveState();
   }
 
   selectModel(model: Model) {
