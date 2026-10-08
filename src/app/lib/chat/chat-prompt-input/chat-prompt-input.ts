@@ -1,8 +1,7 @@
 import { Component, computed, inject, signal, Signal, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { MultiStateButton } from "../../../shared/ui/multi-state-button/multi-state-button";
-import { count } from "rxjs";
-import { OpenAiService } from "../services/open-ai-service";
+import { v4 as uuidv4 } from 'uuid';
+import { OpenAiService, PromptInterface } from "../services/open-ai-service";
 
 export interface MultiStateButtonConfig {
   id: string;          // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -11,6 +10,15 @@ export interface MultiStateButtonConfig {
   disabled: boolean;  // Whether the button should be disabled in this state
   title?: string;       // title shown on hover
 }
+
+// for tracking current chat inference
+export interface ChatEntity {
+  uuid: string;
+  prompt?: PromptInterface;
+  response: string;
+  reasoning: string;
+}
+
 
 @Component({
   imports: [FormsModule],
@@ -28,7 +36,7 @@ export class ChatPromptInput {
 
   btnConfigMap = new Map<string, MultiStateButtonConfig>([
     ["new",       { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
-    ["submitted_wait", { id: "submitted", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: true }],
+    ["submitted_wait", { id: "submitted", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
     ["submitted", { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
   ]);
 
@@ -36,15 +44,98 @@ export class ChatPromptInput {
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
+  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: ""});
+
   constructor() {
 
   }
+
+  updateCurrentChatSig(newState: Partial<ChatEntity>) {
+    this.currentChatSig.update(state => ({ 
+      ...state, 
+      ...newState
+    }));
+    
+  }
   
+  /**
+   * getChatResponse()
+   * calls the streaming response api, and updates response signal on this component
+   */
+  getChatResponse() {
 
+   
+    let model = this.aiChatSvc.state().prompt.model;
+    if (this.prompt && model) {
+      console.log("Sending chat request");
+      this.btnStateSig.set("submitted_wait");
+      this.currentChatSig.set({
+        uuid: uuidv4(),
+        prompt: {
+          role: "",
+          mode: "Query",
+          userPrompt: this.prompt,
+          systemPrompt: "",
+          model: this.aiChatSvc.state().prompt.model,
+          options: {
+            seed: 0,
+            num_predict: 0,
+            temperature: 0
+          },
+          control: ""
+        },
+        response: "",
+        reasoning: ""
+      });
 
+      this.processChatResponseStream(this.prompt, model);
+      this.prompt = ""
+    }
+  }
+
+  async processChatResponseStream(prompt: string, model: string) {
+
+    try {
+      const stream = await this.aiChatSvc.getStreamingCompletion(this.prompt, model);
+      for await (const chunk of stream) {
+        const delta = chunk.choices[0]?.delta;
+        const content = delta.content || '';
+        let reasoning = ""
+        if (delta && 'reasoning' in delta && delta.reasoning) {
+          reasoning = "" + delta.reasoning;
+        }
+         if (delta && 'reasoning_content' in delta && delta.reasoning_content) {
+          reasoning = "" + delta.reasoning_content;
+         }
+        
+        if (content) {
+          const response = this.currentChatSig().response + content;
+          this.updateCurrentChatSig({
+            response: response 
+          })
+        } else if (reasoning) {
+          reasoning = this.currentChatSig().reasoning + reasoning;
+          this.updateCurrentChatSig({
+            reasoning: reasoning 
+          })
+        }
+
+      }
+    } catch (error) {
+      // this.response = 'An error occurred while streaming data.';
+    } finally {
+      // this.loading = false;
+      this.btnStateSig.set("new");
+    }
+  } 
+
+  /**
+   * submit()
+   * when user submits on the chat interface
+   */
   submit() {
     if (this.btnStateSig() == "new" ) {
-      this.btnStateSig.set("submitted_wait");
+      this.getChatResponse();
     }
   }
 }
