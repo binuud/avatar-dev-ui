@@ -2,7 +2,7 @@ import { Component, computed, ElementRef, inject, signal, Signal, ViewChild, Wri
 import { FormsModule } from "@angular/forms";
 import { v4 as uuidv4 } from 'uuid';
 import { MarkdownModule, MarkdownService } from 'ngx-markdown';
-import { ChatEntity, OpenAiService, PromptInterface } from "../services/open-ai-service";
+import { ChatEntity, ChatOperation, OpenAiService, PromptInterface } from "../services/open-ai-service";
 import { ChatResponse } from "../chat-response/chat-response";
 
 export interface MultiStateButtonConfig {
@@ -29,11 +29,14 @@ export class ChatPromptInput {
   aiChatSvc = inject(OpenAiService);
 
   prompt: string = "";
+  imageUrl: WritableSignal<string> = signal("");
+  chatMode: WritableSignal<ChatOperation> = signal("Query");  
 
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
   btnConfigMap = new Map<string, MultiStateButtonConfig>([
-    ["new",       { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
+    ["Query",       { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
+    ["Image",       { id: "new", iconClass: "fa-solid fa-image", disabled: false }],
     ["submitted_wait", { id: "submitted", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
     ["submitted", { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
   ]);
@@ -42,7 +45,7 @@ export class ChatPromptInput {
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
-  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: "", prompt: this.aiChatSvc.getEmptyPrompt(),});
+  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: "", image: "", prompt: this.aiChatSvc.getEmptyPrompt(),});
 
   constructor() {
 
@@ -55,6 +58,22 @@ export class ChatPromptInput {
     }));
     
   }
+
+  /**
+   * setMode()
+   * allow generation mode to be selected
+   * it can be query or image generation
+   * @param mode all
+   */
+  setMode(mode: ChatOperation) {
+    this.chatMode.set(mode)
+    if (mode == 'Query') {
+      this.btnStateSig.set('Query');
+    } else if (mode == 'Image') {
+      this.btnStateSig.set('Image');
+    }
+  }
+  
 
   private scrollToBottom(): void {
     setTimeout(() => {
@@ -91,7 +110,8 @@ export class ChatPromptInput {
           control: ""
         },
         response: "",
-        reasoning: ""
+        reasoning: "",
+        image: ""
       });
 
       this.processChatResponseStream(this.prompt, model);
@@ -140,6 +160,51 @@ export class ChatPromptInput {
     }
   } 
 
+  async generateImage() {
+
+    this.currentChatSig.set({
+        uuid: uuidv4(),
+        prompt: {
+          role: "",
+          mode: "Image",
+          userPrompt: this.prompt,
+          systemPrompt: "",
+          model: this.aiChatSvc.state().prompt.model,
+          options: {
+            seed: 0,
+            num_predict: 0,
+            temperature: 0
+          },
+          control: ""
+        },
+        response: "",
+        reasoning: "",
+        image: ""
+      });
+
+    try {
+      const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
+      if (base64Data) {
+        console.log("Setting image");
+        const imageUrl = `data:image/png;base64,${base64Data}`;
+        this.updateCurrentChatSig({
+          image: imageUrl 
+        });
+      }
+      this.prompt = ""
+
+    } catch (error) {
+      alert('Failed to generate image. Check console for details.');
+      this.updateCurrentChatSig({
+        response: 'Failed to generate image. Check console for details.'
+      })
+      this.prompt = ""
+      this.addToHistory();
+    } finally {
+      this.addToHistory();
+    }  
+  }
+
   /**
    *  this.loading = false;
    *  update history
@@ -147,19 +212,33 @@ export class ChatPromptInput {
    */
   addToHistory() {
     this.aiChatSvc.addToHistory(this.currentChatSig());
-    this.btnStateSig.set("new");
-    this.currentChatSig.set({uuid: "", response: "", reasoning: "", prompt: this.aiChatSvc.getEmptyPrompt()});
+    const mode = this.chatMode();
+    this.btnStateSig.set(mode);
+    this.currentChatSig.set({uuid: "", response: "", reasoning: "", image: "", prompt: this.aiChatSvc.getEmptyPrompt()});
   }
+
 
   /**
    * submit()
    * when user submits on the chat interface
+   * checks the current mode, if it is query, then invoke chat completion
+   * if the mode is image generation, calls the image generate function
    */
-  submit() {
-    if (this.btnStateSig() == "new" ) {
+  async submit() {
+
+    const mode = this.chatMode();
+    if (mode == "Query" ) {
       console.log("new chat");
       this.getChatResponse();
+      this.btnStateSig.set("submitted");
+    } else if (mode == "Image" ) {
+      console.log("new image generation");
+      this.generateImage();
+      this.btnStateSig.set("submitted");
     }
+    
     this.scrollToBottom();
+
   }
+
 }

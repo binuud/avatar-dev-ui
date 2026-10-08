@@ -7,7 +7,7 @@ import { LocalStorageService } from "../../../core/services/local-storage-servic
 
 
 
-type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' | 'Video'; 
+export type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' | 'Video'; 
 
 // for tracking current chat inference
 export interface ChatEntity {
@@ -15,6 +15,7 @@ export interface ChatEntity {
   prompt: PromptInterface;
   response: string;
   reasoning: string;
+  image: string;
 }
 
 export interface PromptInterface  {
@@ -165,11 +166,11 @@ export class OpenAiService {
     });
   
   }
-
   
-  // Initiates a streaming chat completion
-  // @param prompt The user input text
-  // @param model the ai model to be used
+  /**
+   * getStreamingCompletion()
+   * Initiates a streaming chat completion
+   */
   async getStreamingCompletion(prompt: string, model : string): Promise<Stream<OpenAI.Chat.Completions.ChatCompletionChunk>> {
     try {
       return await this.openAiClient.chat.completions.create({
@@ -179,6 +180,34 @@ export class OpenAiService {
       });
     } catch (error) {
       console.error('Error initiating OpenAI stream:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * addToHistory()
+   * add current chatEntity to history of  State
+   */
+  async generateImage(prompt: string, model : string): Promise<string | undefined> {
+    try {
+      const response = await this.openAiClient.images.generate({
+        model: model, // Or 'dall-e-3' / 'gpt-image-2.5-sunburst'
+        prompt: prompt,
+        n: 1,
+        // size: '256x256',
+        size: '1024x1024',
+        response_format: 'b64_json'  // Safe approach for rendering base64
+      });
+      const responseJson = JSON.parse(String(response));
+      if (responseJson && responseJson.data && responseJson.data[0].b64_json) {
+        // Returns the base64 string or the URL depending on your response_format configuration
+        console.log("Got image data");
+        return responseJson.data[0].b64_json; 
+      }
+      return "";
+
+    } catch (error) {
+      console.error('Error generating image via OpenAI:', error);
       throw error;
     }
   }

@@ -1,7 +1,7 @@
-<div class="d-grid row-gap-3">
+<div class="row">
   @for (item of aiChatSvc.state().history; track $index) {
     
-    <div class="mb-3">
+    <div class="col-sm-12 mb-3">
       <app-chat-response [chatEntity]="item" type="HISTORY"></app-chat-response>
     </div>
 
