@@ -4,48 +4,66 @@
 }
 
 <div class="inputBlock mt-3">
+
   <textarea [(ngModel)]="prompt" (keyup.enter)="submit()"  
   class="form-control mb-3" id="aiPrompt" 
   placeholder="Prompt the AI" 
   rows="3"></textarea>
 
-  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+  <div class="row">
+    <div class="col-sm-2">
 
-    <div class="dropdown">
       <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" (click)="setMode('Query')">Generate Chat</a></li>
+        <li><a class="dropdown-item" (click)="setMode('Image')">Generate Image</a></li>
+      </ul>
+
+    </div>
+    <div class="col-sm-10">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            
+            @if (aiChatSvc.state().prompt.model == "") {
+              Select Model
+            } @else {
+              {{ aiChatSvc.state().prompt.model }}
+            }
+          
+          </button>
+
+          <ul class="dropdown-menu">
+
+            @for (item of aiChatSvc.state().modelList; track item.id) {
+              <li><a class="dropdown-item" (click)="aiChatSvc.selectModel(item)">{{ item.id }}</a></li>
+            }
+
+          </ul>
+        </div>
         
-        @if (aiChatSvc.state().prompt.model == "") {
-          Select Model
-        } @else {
-          {{ aiChatSvc.state().prompt.model }}
-        }
-       
-      </button>
-      <ul class="dropdown-menu">
+        <div class="dropdown">
+          
+          <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-regular fa-floppy-disk"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" (click)="aiChatSvc.clearMemory()">Clear Memory</a></li>
+            <li><a class="dropdown-item" (click)="aiChatSvc.clearChatHistory()">Clear All History</a></li>
+          </ul>
 
-        @for (item of aiChatSvc.state().modelList; track item.id) {
-            <li><a class="dropdown-item" (click)="aiChatSvc.selectModel(item)">{{ item.id }}</a></li>
-        }
-
-      </ul>
+        </div>
+        
+        <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
+          <i [class]="btnConfigSig().iconClass"></i>
+        </button> 
+      </div>
     </div>
-    
-    <div class="dropdown">
-      
-      <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-regular fa-floppy-disk"></i>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" (click)="aiChatSvc.clearMemory()">Clear Memory</a></li>
-        <li><a class="dropdown-item" (click)="aiChatSvc.clearChatHistory()">Clear All History</a></li>
-      </ul>
-
-    </div>
-    
-    <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
-      <i [class]="btnConfigSig().iconClass"></i>
-    </button> 
   </div>
+
 
   
 </div>

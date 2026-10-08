@@ -1,33 +1,44 @@
+<div class="row">
 
-  <div class="mt-3 mb-3 responseBlock">
-    <div class="card-body justify-content-md-end text-end">
-      
-      <span class="text-bg-primary p-3 rounded">
-        @if (type() == 'ACTIVE') {
-          <i class="fa-solid fa-circle-notch fa-spin fa-fw pe-2 "></i>
-        } 
-        {{ chatEntity().prompt?.userPrompt }} 
-      </span>
-    </div>
-  </div>
-  <div class="mt-3 responseBlock">
-    <div class="card-body">
-        <div markdown
-          class="card-text responseText"
-          [data]="chatEntity().reasoning"
-          [disableSanitizer]="true">
+  <div class="d-flex  mt-3 mb-3 responseBlock justify-content-end">
+      <!-- Prompt Card -->
+      <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
+        <div class="fw-semibold small mb-1 text-white-50">You</div>
+        <div class="message-content">
+          @if (type() == 'ACTIVE') {
+            <i class="fa-solid fa-circle-notch fa-spin fa-fw pe-2 "></i>
+          } 
+          {{ chatEntity().prompt?.userPrompt }}
+        </div>
       </div>
-
-    </div>
   </div>
-  <div class=" mt-3 responseBlock">
-    <div class="card-body">
+
+  @if (chatEntity().reasoning) {
+    <div class="col-sm-12 mt-3 responseBlock">
       <div markdown
-          class="card-text responseText"
-          [data]="chatEntity().response"
-          [disableSanitizer]="true">
+        class="card-text responseText"
+        [data]="chatEntity().reasoning"
+        [disableSanitizer]="true">
       </div>
-
     </div>
-  </div>
+  }
 
+  @if (chatEntity().response) {
+    <div class="col-sm-12 mt-3 responseBlock">
+      <div markdown
+        class="card-text responseText"
+        [data]="chatEntity().response"
+        [disableSanitizer]="true">
+      </div>
+    </div>
+  }
+
+  @if (chatEntity().image) {
+    <div class="col-sm-12 mt-3 responseBlock">
+      <div class="">
+        <img [src]="chatEntity().image" class="rounded img-fluid" alt="AI Generated Graphic" />
+      </div>
+    </div>
+  }
+
+</div>
