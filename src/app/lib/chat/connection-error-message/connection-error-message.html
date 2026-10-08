@@ -1,0 +1,25 @@
+<div class="alert alert-info" role="alert">
+      <i class="fa-solid fa-triangle-exclamation"></i> Please run llm in your local machine, using llama.cpp, Ollama or docker model runner.<br/><br/>
+      <p>
+        To utilize this feature, your local machine must host an LLM that's compatible with the OpenAI API. 
+        Please note that Safari may prevent access to http resources from https domains without a 
+        valid SSL certificate for your local LLM server.
+      </p>
+      <p>
+        For using this tool, you might want to try Google Chrome or Firefox instead.
+      </p>
+      <p>
+        If you are using ollama, set the environment variable to allow cors.<br/>
+        And then start ollama server (port 11434), with below command<br/><br/>
+        On Linux/Mac<br/><br/>
+        export OLLAMA_ORIGINS="[YOUR URL]"<br/>
+        ollama serve<br/><br/>
+        On Windows<br/><br/>
+        setx OLLAMA_ORIGINS "[YOUR URL]"<br/>
+        ollama serve<br/><br/><br/>
+      </p>
+      <p>
+        <a href="https://binuud.com/project/aichat/" target="_blank">Llama.cpp, Ollama, Docker Model Runner detailed instructions.</a><br/><br/>
+        Click to <a (click)="aiChatSvc.getModels()">Retry Connection</a>
+      </p>
+  </div>

@@ -1,11 +1,39 @@
 <h4>Ai Prompt</h4>
-<div class="inputBlock">
+<div class="card mt-3 responseBlock">
+  <div class="card-body">
+    {{ currentChatSig().reasoning}}
+  </div>
+</div>
+<div class="card mt-3 responseBlock">
+  <div class="card-body">
+    {{ currentChatSig().response}}
+  </div>
+</div>
+<div class="inputBlock mt-3">
   <textarea [(ngModel)]="prompt" (keyup.enter)="submit()"  
   class="form-control mb-3" id="aiPrompt" 
   placeholder="Prompt the AI" 
   rows="3"></textarea>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <div class="dropdown">
+      <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        
+        @if (aiChatSvc.state().prompt.model == "") {
+          Select Model
+        } @else {
+          {{ aiChatSvc.state().prompt.model }}
+        }
+       
+      </button>
+      <ul class="dropdown-menu">
+
+        @for (item of aiChatSvc.state().modelList; track item.id) {
+            <li><a class="dropdown-item" (click)="aiChatSvc.selectModel(item)">{{ item.id }}</a></li>
+        }
+
+      </ul>
+    </div>
     <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
       <i [class]="btnConfigSig().iconClass"></i>
     </button> 
