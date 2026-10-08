@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal, Signal, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { v4 as uuidv4 } from 'uuid';
+import { MarkdownModule, MarkdownService } from 'ngx-markdown';
 import { OpenAiService, PromptInterface } from "../services/open-ai-service";
 
 export interface MultiStateButtonConfig {
@@ -21,7 +22,7 @@ export interface ChatEntity {
 
 
 @Component({
-  imports: [FormsModule],
+  imports: [FormsModule, MarkdownModule],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
