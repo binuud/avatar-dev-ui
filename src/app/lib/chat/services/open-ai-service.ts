@@ -1,12 +1,20 @@
-import { Service, signal, WritableSignal } from "@angular/core";
+import { Service, Signal, signal, WritableSignal } from "@angular/core";
 import OpenAI from 'openai';
-import { Model } from "openai/resources";
+import { Chat, Model } from "openai/resources";
 import { Stream } from "openai/streaming";
 
 
 
 
 type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' | 'Video'; 
+
+// for tracking current chat inference
+export interface ChatEntity {
+  uuid: string;
+  prompt?: PromptInterface;
+  response: string;
+  reasoning: string;
+}
 
 export interface PromptInterface  {
   role: string;
@@ -45,6 +53,8 @@ export interface OpenAiServiceState {
 
   // current prompt
   prompt: PromptInterface;
+
+  history: ChatEntity[]
 }
 
 @Service()
@@ -53,11 +63,20 @@ export class OpenAiService {
   private  OPENAI_API_ENDPOINT = 'http://127.0.0.1:11434/v1';
 
   private openAiClient: OpenAI;
+
+  // history: Signal<OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = [
+  //   { role: 'system', content: 'You are a helpful and concise coding assistant.' }
+  // ];
+
+  messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: 'system', content: 'You are a helpful and concise coding assistant.' }
+  ];
   
   state: WritableSignal<OpenAiServiceState> =  signal({
     connected: false,
     loading: false,
     modelList: [],
+    history: [],
     prompt: {
       role: "user",
       mode: "Chat",
@@ -131,6 +150,18 @@ export class OpenAiService {
       console.error('Error initiating OpenAI stream:', error);
       throw error;
     }
+  }
+
+  /**
+   * addToHistory()
+   * add current chatEntity to history of  State
+   */
+  addToHistory(chatEntity: ChatEntity) {
+    let history = this.state().history;
+    history.push(chatEntity);
+    this.updateState({
+      history: history
+    });
   }
 
 }
