@@ -1,0 +1,10 @@
+<div class="d-grid row-gap-3">
+  @for (item of aiChatSvc.state().history; track $index) {
+    
+    <div class="mb-3">
+      <app-chat-response [chatEntity]="item"></app-chat-response>
+    </div>
+
+  }
+</div>
+

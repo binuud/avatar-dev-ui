@@ -1,8 +1,9 @@
-import { Component, computed, inject, signal, Signal, WritableSignal } from "@angular/core";
+import { Component, computed, ElementRef, inject, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { v4 as uuidv4 } from 'uuid';
 import { MarkdownModule, MarkdownService } from 'ngx-markdown';
-import { OpenAiService, PromptInterface } from "../services/open-ai-service";
+import { ChatEntity, OpenAiService, PromptInterface } from "../services/open-ai-service";
+import { ChatResponse } from "../chat-response/chat-response";
 
 export interface MultiStateButtonConfig {
   id: string;          // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -12,23 +13,19 @@ export interface MultiStateButtonConfig {
   title?: string;       // title shown on hover
 }
 
-// for tracking current chat inference
-export interface ChatEntity {
-  uuid: string;
-  prompt?: PromptInterface;
-  response: string;
-  reasoning: string;
-}
+
 
 
 @Component({
-  imports: [FormsModule, MarkdownModule],
+  imports: [FormsModule, MarkdownModule, ChatResponse],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
 })
 export class ChatPromptInput {
 
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  
   aiChatSvc = inject(OpenAiService);
 
   prompt: string = "";
@@ -57,6 +54,14 @@ export class ChatPromptInput {
       ...newState
     }));
     
+  }
+
+  private scrollToBottom(): void {
+    setTimeout(() => {
+      try {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+      } catch (err) {}
+    }, 50);
   }
   
   /**
@@ -123,12 +128,28 @@ export class ChatPromptInput {
 
       }
     } catch (error) {
-      // this.response = 'An error occurred while streaming data.';
+      this.updateCurrentChatSig({
+        response: 'An error occurred while streaming response. Please try again after some time.'
+      })
+      this.addToHistory();
     } finally {
       // this.loading = false;
-      this.btnStateSig.set("new");
+      // update history
+      // clear the current chat entity
+      this.addToHistory();
     }
   } 
+
+  /**
+   *  this.loading = false;
+   *  update history
+   *  clear the current chat entity
+   */
+  addToHistory() {
+    this.aiChatSvc.addToHistory(this.currentChatSig());
+    this.btnStateSig.set("new");
+    this.currentChatSig.set({uuid: "", response: "", reasoning: ""});
+  }
 
   /**
    * submit()
