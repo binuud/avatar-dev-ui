@@ -1,6 +1,6 @@
 
 @if (currentChatSig().uuid) {
-  <app-chat-response [chatEntity]="currentChatSig()"></app-chat-response>
+  <app-chat-response [chatEntity]="currentChatSig()" type="ACTIVE" #scrollContainer></app-chat-response>
 }
 
 <div class="inputBlock mt-3">
@@ -10,6 +10,7 @@
   rows="3"></textarea>
 
   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
     <div class="dropdown">
       <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         
@@ -28,6 +29,19 @@
 
       </ul>
     </div>
+    
+    <div class="dropdown">
+      
+      <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-regular fa-floppy-disk"></i>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" (click)="aiChatSvc.clearMemory()">Clear Memory</a></li>
+        <li><a class="dropdown-item" (click)="aiChatSvc.clearChatHistory()">Clear All History</a></li>
+      </ul>
+
+    </div>
+    
     <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
       <i [class]="btnConfigSig().iconClass"></i>
     </button> 

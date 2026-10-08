@@ -1,7 +1,11 @@
 
   <div class="mt-3 mb-3 responseBlock">
     <div class="card-body justify-content-md-end text-end">
+      
       <span class="text-bg-primary p-3 rounded">
+        @if (type() == 'ACTIVE') {
+          <i class="fa-solid fa-circle-notch fa-spin fa-fw pe-2 "></i>
+        } 
         {{ chatEntity().prompt?.userPrompt }} 
       </span>
     </div>

@@ -11,4 +11,5 @@ import { ChatEntity } from "../services/open-ai-service";
 })
 export class ChatResponse {
   chatEntity = input.required<ChatEntity>();
+  type = input.required<'HISTORY' | 'ACTIVE'>();
 }

@@ -1,6 +1,6 @@
 import { inject, Service, Signal, signal, WritableSignal } from "@angular/core";
 import OpenAI from 'openai';
-import { Chat, Model } from "openai/resources";
+import { Chat, ChatCompletionMessageParam, Model } from "openai/resources";
 import { Stream } from "openai/streaming";
 import { LocalStorageService } from "../../../core/services/local-storage-service";
 
@@ -12,7 +12,7 @@ type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' 
 // for tracking current chat inference
 export interface ChatEntity {
   uuid: string;
-  prompt?: PromptInterface;
+  prompt: PromptInterface;
   response: string;
   reasoning: string;
 }
@@ -55,7 +55,13 @@ export interface OpenAiServiceState {
   // current prompt
   prompt: PromptInterface;
 
-  history: ChatEntity[]
+  // history maintained for display purpose
+  history: ChatEntity[];
+
+  // message History is sent in each chat request
+  // this allows inference to maintian status of previous chats
+  messageHistory: ChatCompletionMessageParam[];
+
 }
 
 @Service()
@@ -68,10 +74,6 @@ export class OpenAiService {
 
   private openAiClient: OpenAI;
 
-  // history: Signal<OpenAI.Chat.Completions.ChatCompletionMessageParam[]> = [
-  //   { role: 'system', content: 'You are a helpful and concise coding assistant.' }
-  // ];
-
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: 'system', content: 'You are a helpful and concise coding assistant.' }
   ];
@@ -81,19 +83,8 @@ export class OpenAiService {
     loading: false,
     modelList: [],
     history: [],
-    prompt: {
-      role: "user",
-      mode: "Chat",
-      userPrompt: "",
-      systemPrompt: "",
-      model: "",
-      options: {
-        seed: 0,
-        temperature: 0.8,
-        num_predict: 5000,
-      },
-      control: "",
-    }
+    messageHistory: [],
+    prompt: this.getEmptyPrompt(),
   });
 
   constructor() {
@@ -124,6 +115,22 @@ export class OpenAiService {
     // connection state has to be from live data
     this.updateState({connected: false});
     console.dir(this.state);
+  }
+
+  getEmptyPrompt(): PromptInterface {
+    return({
+      role: "user",
+      mode: "Chat",
+      userPrompt: "",
+      systemPrompt: "",
+      model: "",
+      options: {
+        seed: 0,
+        temperature: 0.8,
+        num_predict: 5000,
+      },
+      control: "",
+    });
   }
 
   updateState(newState: Partial<OpenAiServiceState>) {
@@ -167,7 +174,7 @@ export class OpenAiService {
     try {
       return await this.openAiClient.chat.completions.create({
         model: model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [...this.state().messageHistory, { role: 'user', content: prompt }],
         stream: true, // Must be true for streaming
       });
     } catch (error) {
@@ -181,11 +188,39 @@ export class OpenAiService {
    * add current chatEntity to history of  State
    */
   addToHistory(chatEntity: ChatEntity) {
-    let history = this.state().history;
-    history.push(chatEntity);
+
+    let messages: ChatCompletionMessageParam[] = [
+      {role: 'user', content: chatEntity.prompt.userPrompt},
+      {role: 'assistant', content: chatEntity.response}
+    ];
     this.updateState({
-      history: history
+      history: [...this.state().history, chatEntity],
+      messageHistory: [...this.state().messageHistory, ...messages]
     });
+  }
+
+
+  /**
+   * clearMemory()
+   * clears the memory, subsequent chat request
+   * do not send the saved history or previous chat messagse
+   * but messages can still be displayed for user
+   */
+  clearMemory() {
+    this.updateState({
+      messageHistory: [],
+    })
+  }
+
+  /**
+   * clearChatHistory()
+   * clears the memory, and history used for displaying previous chat messages
+   */
+  clearChatHistory() {
+    this.updateState({
+      history: [],
+      messageHistory: [],
+    })
   }
 
 }
