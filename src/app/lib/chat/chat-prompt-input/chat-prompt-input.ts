@@ -42,7 +42,7 @@ export class ChatPromptInput {
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
-  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: ""});
+  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: "", prompt: this.aiChatSvc.getEmptyPrompt(),});
 
   constructor() {
 
@@ -148,7 +148,7 @@ export class ChatPromptInput {
   addToHistory() {
     this.aiChatSvc.addToHistory(this.currentChatSig());
     this.btnStateSig.set("new");
-    this.currentChatSig.set({uuid: "", response: "", reasoning: ""});
+    this.currentChatSig.set({uuid: "", response: "", reasoning: "", prompt: this.aiChatSvc.getEmptyPrompt()});
   }
 
   /**
@@ -157,7 +157,9 @@ export class ChatPromptInput {
    */
   submit() {
     if (this.btnStateSig() == "new" ) {
+      console.log("new chat");
       this.getChatResponse();
     }
+    this.scrollToBottom();
   }
 }
