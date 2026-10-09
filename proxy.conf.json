@@ -1,0 +1,11 @@
+{
+  "/v1": {
+    "target": "http://host.docker.internal:9080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/v1": "/llmHandler/v1"
+    }
+  }
+}
