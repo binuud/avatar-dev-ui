@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { Chat, ChatCompletionMessageParam, Model } from "openai/resources";
 import { Stream } from "openai/streaming";
 import { LocalStorageService } from "../../../core/services/local-storage-service";
+import { GlobalConfig } from "../../../config/global-config";
 
 
 
@@ -71,7 +72,7 @@ export class OpenAiService {
   localStorageSvc = inject(LocalStorageService);
 
   public  static STORAGE_KEY = "OpenAiService";
-  private  OPENAI_API_ENDPOINT = 'http://127.0.0.1:11434/v1';
+  private  OPENAI_API_ENDPOINT = GlobalConfig.LLM_HOST +  '/v1/';
 
   private openAiClient: OpenAI;
 
