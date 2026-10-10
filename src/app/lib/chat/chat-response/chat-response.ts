@@ -1,7 +1,8 @@
 import { Component, input } from "@angular/core";
 
 import { MarkdownModule } from "ngx-markdown";
-import { ChatEntity } from "../services/open-ai-service";
+import { ChatEntity } from "../../../core/models/ai-interfaces";
+
 
 @Component({
   imports: [MarkdownModule],

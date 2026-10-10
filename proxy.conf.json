@@ -5,7 +5,19 @@
     "changeOrigin": true,
     "logLevel": "debug",
     "pathRewrite": {
-      "^/v1": "/llmHandler/v1"
+      "^/v1": "/v1"
     }
+  },
+  "/api/chat": {
+    "target": "http://host.docker.internal:9080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/v1": {
+    "target": "http://host.docker.internal:9080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

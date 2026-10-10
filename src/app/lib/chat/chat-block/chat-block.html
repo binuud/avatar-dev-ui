@@ -1,7 +1,7 @@
 
 <app-chat-history></app-chat-history>
 
-@if (aiChatSvc.state().connected) {
+@if (aiSvc.state().connected) {
   <app-chat-prompt-input></app-chat-prompt-input>
 } @else {
   <app-connection-error-message></app-connection-error-message>

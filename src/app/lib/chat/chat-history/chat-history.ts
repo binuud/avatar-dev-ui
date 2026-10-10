@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { ChatResponse } from "../chat-response/chat-response";
-import { OpenAiService } from "../services/open-ai-service";
+import { ConsciousService } from "../../../core/services/conscious-service";
 
 @Component({
   imports: [ChatResponse],
@@ -10,6 +10,6 @@ import { OpenAiService } from "../services/open-ai-service";
 })
 export class ChatHistory {
 
-  aiChatSvc = inject(OpenAiService);
+  aiSvc = inject(ConsciousService);
 
 }

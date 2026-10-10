@@ -1,9 +1,10 @@
 import { Component, computed, ElementRef, inject, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { v4 as uuidv4 } from 'uuid';
-import { MarkdownModule, MarkdownService } from 'ngx-markdown';
-import { ChatEntity, ChatOperation, OpenAiService, PromptInterface } from "../services/open-ai-service";
 import { ChatResponse } from "../chat-response/chat-response";
+import { contextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
+import { ConsciousService } from "../../../core/services/conscious-service";
+import { Model } from "../../../gen/v1/conscious/common.pb";
+import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 
 export interface MultiStateButtonConfig {
   id: string;          // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -13,24 +14,30 @@ export interface MultiStateButtonConfig {
   title?: string;       // title shown on hover
 }
 
-
-
+export interface ChatPromptInputState {
+  userPrompt: string;
+  model: string;
+  mode: string;
+  contextMesssage?: contextMesssage;
+  reasoning?: string;
+  response?: string;
+  disabled: boolean;
+}
 
 @Component({
-  imports: [FormsModule, MarkdownModule, ChatResponse],
+  imports: [FormsModule, ChatResponse],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
 })
+
 export class ChatPromptInput {
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   
-  aiChatSvc = inject(OpenAiService);
+  aiSvc = inject(ConsciousService);
+  // aiChatSvc = inject(OpenAiService);
 
-  prompt: string = "";
-  imageUrl: WritableSignal<string> = signal("");
-  chatMode: WritableSignal<ChatOperation> = signal("Query");  
 
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
@@ -42,21 +49,37 @@ export class ChatPromptInput {
   ]);
 
 
+  state: WritableSignal<ChatPromptInputState> = signal({
+    userPrompt: "",
+    model: "",
+    mode: "Query",
+    disabled: false
+  });
+
+  chatStreamResponse: WritableSignal<string> = signal("");
+  imageUrl: WritableSignal<string> = signal("");
+  chatMode: WritableSignal<string> = signal("Query"); 
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
-  currentChatSig:  WritableSignal<ChatEntity> = signal({uuid: "", response: "", reasoning: "", image: "", prompt: this.aiChatSvc.getEmptyPrompt(),});
+  currentChat:  WritableSignal<ChatEntity> = signal(AiInterfaces.NewChatEntity("",""));
 
   constructor() {
 
   }
 
-  updateCurrentChatSig(newState: Partial<ChatEntity>) {
-    this.currentChatSig.update(state => ({ 
+  updateCurrentChat(newState: Partial<ChatEntity>) {
+    this.currentChat.update(state => ({ 
       ...state, 
       ...newState
     }));
-    
+  }
+
+  updateState(newState: Partial<ChatPromptInputState>) {
+    this.state.update(state => ({ 
+      ...state, 
+      ...newState
+    }));
   }
 
   /**
@@ -65,7 +88,7 @@ export class ChatPromptInput {
    * it can be query or image generation
    * @param mode all
    */
-  setMode(mode: ChatOperation) {
+  setMode(mode: string) {
     this.chatMode.set(mode)
     if (mode == 'Query') {
       this.btnStateSig.set('Query');
@@ -74,6 +97,9 @@ export class ChatPromptInput {
     }
   }
   
+  selectModel(model: Model) {
+    this.updateState({model: model.id});
+  }
 
   private scrollToBottom(): void {
     setTimeout(() => {
@@ -83,127 +109,51 @@ export class ChatPromptInput {
     }, 50);
   }
   
-  /**
-   * getChatResponse()
-   * calls the streaming response api, and updates response signal on this component
-   */
-  getChatResponse() {
 
-   
-    let model = this.aiChatSvc.state().prompt.model;
-    if (this.prompt && model) {
-      console.log("Sending chat request");
-      this.btnStateSig.set("submitted_wait");
-      this.currentChatSig.set({
-        uuid: uuidv4(),
-        prompt: {
-          role: "",
-          mode: "Query",
-          userPrompt: this.prompt,
-          systemPrompt: "",
-          model: this.aiChatSvc.state().prompt.model,
-          options: {
-            seed: 0,
-            num_predict: 0,
-            temperature: 0
-          },
-          control: ""
-        },
-        response: "",
-        reasoning: "",
-        image: ""
-      });
+  // async generateImage() {
 
-      this.processChatResponseStream(this.prompt, model);
-      this.prompt = ""
-    }
-  }
+  //   this.currentChatSig.set({
+  //       uuid: uuidv4(),
+  //       prompt: {
+  //         role: "",
+  //         mode: "Image",
+  //         userPrompt: this.prompt,
+  //         systemPrompt: "",
+  //         model: this.aiChatSvc.state().prompt.model,
+  //         options: {
+  //           seed: 0,
+  //           num_predict: 0,
+  //           temperature: 0
+  //         },
+  //         control: ""
+  //       },
+  //       response: "",
+  //       reasoning: "",
+  //       image: ""
+  //     });
 
-  async processChatResponseStream(prompt: string, model: string) {
+  //   try {
+  //     const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
+  //     if (base64Data) {
+  //       console.log("Setting image");
+  //       const imageUrl = `data:image/png;base64,${base64Data}`;
+  //       this.updateCurrentChatSig({
+  //         image: imageUrl 
+  //       });
+  //     }
+  //     this.prompt = ""
 
-    try {
-      const stream = await this.aiChatSvc.getStreamingCompletion(this.prompt, model);
-      for await (const chunk of stream) {
-        const delta = chunk.choices[0]?.delta;
-        const content = delta.content || '';
-        let reasoning = ""
-        if (delta && 'reasoning' in delta && delta.reasoning) {
-          reasoning = "" + delta.reasoning;
-        }
-         if (delta && 'reasoning_content' in delta && delta.reasoning_content) {
-          reasoning = "" + delta.reasoning_content;
-         }
-        
-        if (content) {
-          const response = this.currentChatSig().response + content;
-          this.updateCurrentChatSig({
-            response: response 
-          })
-        } else if (reasoning) {
-          reasoning = this.currentChatSig().reasoning + reasoning;
-          this.updateCurrentChatSig({
-            reasoning: reasoning 
-          })
-        }
-
-      }
-    } catch (error) {
-      this.updateCurrentChatSig({
-        response: 'An error occurred while streaming response. Please try again after some time.'
-      })
-      this.addToHistory();
-    } finally {
-      // this.loading = false;
-      // update history
-      // clear the current chat entity
-      this.addToHistory();
-    }
-  } 
-
-  async generateImage() {
-
-    this.currentChatSig.set({
-        uuid: uuidv4(),
-        prompt: {
-          role: "",
-          mode: "Image",
-          userPrompt: this.prompt,
-          systemPrompt: "",
-          model: this.aiChatSvc.state().prompt.model,
-          options: {
-            seed: 0,
-            num_predict: 0,
-            temperature: 0
-          },
-          control: ""
-        },
-        response: "",
-        reasoning: "",
-        image: ""
-      });
-
-    try {
-      const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
-      if (base64Data) {
-        console.log("Setting image");
-        const imageUrl = `data:image/png;base64,${base64Data}`;
-        this.updateCurrentChatSig({
-          image: imageUrl 
-        });
-      }
-      this.prompt = ""
-
-    } catch (error) {
-      alert('Failed to generate image. Check console for details.');
-      this.updateCurrentChatSig({
-        response: 'Failed to generate image. Check console for details.'
-      })
-      this.prompt = ""
-      this.addToHistory();
-    } finally {
-      this.addToHistory();
-    }  
-  }
+  //   } catch (error) {
+  //     alert('Failed to generate image. Check console for details.');
+  //     this.updateCurrentChatSig({
+  //       response: 'Failed to generate image. Check console for details.'
+  //     })
+  //     this.prompt = ""
+  //     this.addToHistory();
+  //   } finally {
+  //     this.addToHistory();
+  //   }  
+  // }
 
   /**
    *  this.loading = false;
@@ -211,10 +161,11 @@ export class ChatPromptInput {
    *  clear the current chat entity
    */
   addToHistory() {
-    this.aiChatSvc.addToHistory(this.currentChatSig());
+    this.aiSvc.addToHistory(this.currentChat());
     const mode = this.chatMode();
     this.btnStateSig.set(mode);
-    this.currentChatSig.set({uuid: "", response: "", reasoning: "", image: "", prompt: this.aiChatSvc.getEmptyPrompt()});
+    this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
+    this.updateState({userPrompt: ""});
   }
 
 
@@ -228,12 +179,11 @@ export class ChatPromptInput {
 
     const mode = this.chatMode();
     if (mode == "Query" ) {
-      console.log("new chat");
       this.getChatResponse();
       this.btnStateSig.set("submitted");
     } else if (mode == "Image" ) {
       console.log("new image generation");
-      this.generateImage();
+      // this.generateImage();
       this.btnStateSig.set("submitted");
     }
     
@@ -241,4 +191,41 @@ export class ChatPromptInput {
 
   }
 
+
+  async getChatResponse(): Promise<void> {
+
+    const req: contextMesssage = {
+      prompt: this.state().userPrompt,
+      model: this.state().model,
+    }
+
+    this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
+  
+    try {
+      await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.addToHistory();
+    }
+
+  }
+
+  /**
+   * chatStreamCallback()
+   * callback function, for streaming llm chat completions
+   * when streaming call is done, this callback needs to be called
+   * to update the ui
+   * @param resp 
+   */  
+  chatStreamCallback = (resp: contextMesssage) => {
+    // Append the newly arrived word to our signal string instantly
+
+    const response = this.currentChat().response + resp.response;
+    this.updateCurrentChat({
+      response: response 
+    })
+  };
+
 }
+

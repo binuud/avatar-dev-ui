@@ -1,46 +1,16 @@
-import { inject, Service, Signal, signal, WritableSignal } from "@angular/core";
+import { inject, Service, signal, WritableSignal } from "@angular/core";
 import OpenAI from 'openai';
-import { Chat, ChatCompletionMessageParam, Model } from "openai/resources";
+import {  ChatCompletionMessageParam, Model } from "openai/resources";
 import { Stream } from "openai/streaming";
 import { LocalStorageService } from "../../../core/services/local-storage-service";
 import { GlobalConfig } from "../../../config/global-config";
+import { Conscious } from "../../../gen/v1/conscious/consciousService.pb";
+import { contextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
+import { InitReq } from "../../../gen/fetch.pb";
+import { PromptInterface, ChatEntity, AiInterfaces } from "../../../core/models/ai-interfaces";
 
 
 
-
-export type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' | 'Video'; 
-
-// for tracking current chat inference
-export interface ChatEntity {
-  uuid: string;
-  prompt: PromptInterface;
-  response: string;
-  reasoning: string;
-  image: string;
-}
-
-export interface PromptInterface  {
-  role: string;
-  mode: ChatOperation;
-  userPrompt: string;
-  systemPrompt: string;
-  model: string;
-  options: PromptOptions;
-  control: string;
-}
-
-
-export interface PromptOptions {
-
-  // seed sets the initial random tensor
-  // use same seed for deterministic output
-  seed: number;
-
-  num_predict: number;
-
-  // how close the prompt has to be adhered to
-  temperature: number;
-}
 
 export interface OpenAiServiceState {
 
@@ -71,6 +41,7 @@ export class OpenAiService {
   
   localStorageSvc = inject(LocalStorageService);
 
+
   public  static STORAGE_KEY = "OpenAiService";
   private  OPENAI_API_ENDPOINT = GlobalConfig.LLM_HOST +  '/v1/';
 
@@ -86,7 +57,7 @@ export class OpenAiService {
     modelList: [],
     history: [],
     messageHistory: [],
-    prompt: this.getEmptyPrompt(),
+    prompt: AiInterfaces.GetEmptyPrompt(),
   });
 
   constructor() {
@@ -96,9 +67,7 @@ export class OpenAiService {
       apiKey:"ollama", 
       dangerouslyAllowBrowser: true 
     });
-    
-    this.loadState();
-    this.getModels();
+
   }
 
   saveState() {
@@ -117,22 +86,6 @@ export class OpenAiService {
     // connection state has to be from live data
     this.updateState({connected: false});
     console.dir(this.state);
-  }
-
-  getEmptyPrompt(): PromptInterface {
-    return({
-      role: "user",
-      mode: "Chat",
-      userPrompt: "",
-      systemPrompt: "",
-      model: "",
-      options: {
-        seed: 0,
-        temperature: 0.8,
-        num_predict: 5000,
-      },
-      control: "",
-    });
   }
 
   updateState(newState: Partial<OpenAiServiceState>) {
@@ -162,7 +115,7 @@ export class OpenAiService {
       this.updateState({connected: true, modelList: response.data});
       
     }).catch(err => {
-      this.updateState({connected: false});
+      this.updateState({connected: true});
       console.error("Error in model listing ", err);
     });
   
@@ -253,4 +206,29 @@ export class OpenAiService {
     })
   }
 
+  async streamChat(prompt: string, model : string): Promise<Response> {
+    const url = `/api/chat?prompt=${encodeURIComponent(prompt)}`;
+    try {
+      return await fetch(url);
+    } catch (error) {
+      console.error('Error initiating streamChat stream:', error);
+      throw error;
+    }
+  }
+
+  async newStreamChat(prompt: string,  myCallback: (resp: contextMesssage) => void, model : string): Promise<void> {
+    const req: contextMesssage = {
+      prompt: prompt,
+      model: model
+    }
+    const initReq: InitReq = {
+      pathPrefix: "/api"
+    }
+
+    return await Conscious.InStream(req, myCallback, initReq).then((resp) => {
+      
+    });
+  }
+
+ 
 }

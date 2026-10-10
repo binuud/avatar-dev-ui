@@ -1,5 +1,6 @@
 import { Component, inject } from "@angular/core";
-import { OpenAiService } from "../services/open-ai-service";
+import { ConsciousService } from "../../../core/services/conscious-service";
+
 
 @Component({
   imports: [],
@@ -9,6 +10,6 @@ import { OpenAiService } from "../services/open-ai-service";
 })
 export class ConnectionErrorMessage {
 
-  aiChatSvc = inject(OpenAiService);
+  aiSvc = inject(ConsciousService);
 
 }
