@@ -7,6 +7,7 @@ export interface ChatEntity {
   prompt: PromptInterface;
   mode: contextMesssageContextType;
   response: string;
+  responseImage: string;
   reasoning: string;
   image: string;
 }
@@ -71,6 +72,7 @@ export class AiInterfaces {
         },
         mode: contextMesssageContextType.LLM_QUERY,
         response: "",
+        responseImage: "",
         reasoning: "",
         image: ""
     });

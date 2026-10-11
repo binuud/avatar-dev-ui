@@ -5,6 +5,8 @@ import { contextMesssage, contextMesssageContextType } from "../../../gen/v1/con
 import { ConsciousService } from "../../../core/services/conscious-service";
 import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
+import { v4 as uuidv4 } from 'uuid';
+import { LocalStorageService } from "../../../core/services/local-storage-service";
 
 export interface MultiStateButtonConfig {
   id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -34,11 +36,13 @@ export interface ChatPromptInputState {
 export class ChatPromptInput {
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  localStorageSvc = inject(LocalStorageService);
+  
+  public  static STORAGE_KEY = "ChatPromptInput";
+
   chatModes = contextMesssageContextType;
 
   aiSvc = inject(ConsciousService);
-  // aiChatSvc = inject(OpenAiService);
-
 
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
@@ -63,7 +67,25 @@ export class ChatPromptInput {
   currentChat:  WritableSignal<ChatEntity> = signal(AiInterfaces.NewChatEntity("",""));
 
   constructor() {
+    this.loadState();
+  }
 
+  loadState() {
+
+    const value = this.localStorageSvc.getItem(ChatPromptInput.STORAGE_KEY);
+    if (value != "undefined" && value && value?.length ) {
+      this.updateState(JSON.parse(value));
+    } 
+    this.setMode(this.state().mode);
+    console.dir(this.state);
+  }
+
+  saveState() {
+    this.localStorageSvc.setItem(ChatPromptInput.STORAGE_KEY, JSON.stringify(this.state()));
+  }
+
+  closeCurrentChat() {
+    this.addToHistory();
   }
 
   updateCurrentChat(newState: Partial<ChatEntity>) {
@@ -78,6 +100,7 @@ export class ChatPromptInput {
       ...state, 
       ...newState
     }));
+    this.saveState();
   }
 
   /**
@@ -107,9 +130,6 @@ export class ChatPromptInput {
     }, 50);
   }
   
-
-  
-
   /**
    *  this.loading = false;
    *  update history
@@ -117,7 +137,7 @@ export class ChatPromptInput {
    */
   addToHistory() {
     this.aiSvc.addToHistory(this.currentChat());
-    this.btnStateSig.set(this.currentChat().mode);
+    this.setMode(this.state().mode);
     this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
     this.updateState({userPrompt: ""});
   }
@@ -146,14 +166,19 @@ export class ChatPromptInput {
 
   }
 
+  createNewContextMessage():contextMesssage {
+    return {
+      uuid: uuidv4(),
+      prompt: this.state().userPrompt,
+      model: this.state().model,
+      type: this.state().mode
+    }
+  }
+
 
   async getChatResponse(): Promise<void> {
 
-    const req: contextMesssage = {
-      prompt: this.state().userPrompt,
-      model: this.state().model,
-      type: contextMesssageContextType.LLM_STREAM_QUERY
-    }
+    const req = this.createNewContextMessage();
 
     this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
   
@@ -189,48 +214,30 @@ export class ChatPromptInput {
    */ 
   async generateImage() {
 
-    const req: contextMesssage = {
-      prompt: this.state().userPrompt,
-      model: this.state().model,
-      type: contextMesssageContextType.IMAGE_GENERATION
-    }
-
-    this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
-    
+    const req = this.createNewContextMessage();
     this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
   
     try {
       await this.aiSvc.inRequest(req).then(response => {
+        this.updateCurrentChat({
+          responseImage: "/static/" + response.responseImage
+        });
         console.dir(response);
       });
     } catch (error) {
+      alert(error);
       console.error(error);
+      this.updateCurrentChat({
+        response: 'Failed to generate image. Check console for details.'
+      });
+      this.addToHistory();
     } finally {
       this.addToHistory();
     }
 
-    // try {
-    //   const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
-    //   if (base64Data) {
-    //     console.log("Setting image");
-    //     const imageUrl = `data:image/png;base64,${base64Data}`;
-    //     this.updateCurrentChatSig({
-    //       image: imageUrl 
-    //     });
-    //   }
-    //   this.prompt = ""
-
-    // } catch (error) {
-    //   alert('Failed to generate image. Check console for details.');
-    //   this.updateCurrentChatSig({
-    //     response: 'Failed to generate image. Check console for details.'
-    //   })
-    //   this.prompt = ""
-    //   this.addToHistory();
-    // } finally {
-    //   this.addToHistory();
-    // }  
   }
 
 }
+
+
 

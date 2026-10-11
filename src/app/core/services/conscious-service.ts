@@ -48,11 +48,26 @@ export class ConsciousService {
   });
 
   constructor() {
+    this.loadState();
     this.getModels();
   }
 
+  loadState() {
+
+    const value = this.localStorageSvc.getItem(ConsciousService.STORAGE_KEY);
+    
+    if (value != "undefined" && value && value?.length ) {
+      this.updateState(JSON.parse(value));
+    } 
+    console.log('ConsciousService service load state');
+    
+    // connection state has to be from live data
+    // this.updateState({connected: false});
+    console.dir(this.state);
+  }
+
   saveState() {
-    this.localStorageSvc.setItem(OpenAiService.STORAGE_KEY, JSON.stringify(this.state()));
+    this.localStorageSvc.setItem(ConsciousService.STORAGE_KEY, JSON.stringify(this.state()));
   }
 
   updateState(newState: Partial<ConsciousServiceState>) {
