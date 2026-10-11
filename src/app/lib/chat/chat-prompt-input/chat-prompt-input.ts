@@ -1,23 +1,23 @@
 import { Component, computed, ElementRef, inject, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ChatResponse } from "../chat-response/chat-response";
-import { contextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
+import { contextMesssage, contextMesssageContextType } from "../../../gen/v1/conscious/contextMessage.pb";
 import { ConsciousService } from "../../../core/services/conscious-service";
 import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 
 export interface MultiStateButtonConfig {
-  id: string;          // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
+  id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
   text?: string;        // Text to display for this state
-  iconClass: string;  // Optional CSS class for the icon (FontAwesome, Material Icons, etc.)
-  disabled: boolean;  // Whether the button should be disabled in this state
+  iconClass: string;    // Optional CSS class for the icon (FontAwesome, Material Icons, etc.)
+  disabled: boolean;    // Whether the button should be disabled in this state
   title?: string;       // title shown on hover
 }
 
 export interface ChatPromptInputState {
   userPrompt: string;
   model: string;
-  mode: string;
+  mode: contextMesssageContextType;
   contextMesssage?: contextMesssage;
   reasoning?: string;
   response?: string;
@@ -34,7 +34,8 @@ export interface ChatPromptInputState {
 export class ChatPromptInput {
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
-  
+  chatModes = contextMesssageContextType;
+
   aiSvc = inject(ConsciousService);
   // aiChatSvc = inject(OpenAiService);
 
@@ -52,13 +53,10 @@ export class ChatPromptInput {
   state: WritableSignal<ChatPromptInputState> = signal({
     userPrompt: "",
     model: "",
-    mode: "Query",
+    mode: contextMesssageContextType.LLM_QUERY,
     disabled: false
   });
 
-  chatStreamResponse: WritableSignal<string> = signal("");
-  imageUrl: WritableSignal<string> = signal("");
-  chatMode: WritableSignal<string> = signal("Query"); 
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
@@ -88,11 +86,11 @@ export class ChatPromptInput {
    * it can be query or image generation
    * @param mode all
    */
-  setMode(mode: string) {
-    this.chatMode.set(mode)
-    if (mode == 'Query') {
+  setMode(mode: contextMesssageContextType) {
+    this.updateState({mode: mode})
+    if (mode == contextMesssageContextType.LLM_QUERY) {
       this.btnStateSig.set('Query');
-    } else if (mode == 'Image') {
+    } else if (contextMesssageContextType.IMAGE_GENERATION) {
       this.btnStateSig.set('Image');
     }
   }
@@ -110,50 +108,7 @@ export class ChatPromptInput {
   }
   
 
-  // async generateImage() {
-
-  //   this.currentChatSig.set({
-  //       uuid: uuidv4(),
-  //       prompt: {
-  //         role: "",
-  //         mode: "Image",
-  //         userPrompt: this.prompt,
-  //         systemPrompt: "",
-  //         model: this.aiChatSvc.state().prompt.model,
-  //         options: {
-  //           seed: 0,
-  //           num_predict: 0,
-  //           temperature: 0
-  //         },
-  //         control: ""
-  //       },
-  //       response: "",
-  //       reasoning: "",
-  //       image: ""
-  //     });
-
-  //   try {
-  //     const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
-  //     if (base64Data) {
-  //       console.log("Setting image");
-  //       const imageUrl = `data:image/png;base64,${base64Data}`;
-  //       this.updateCurrentChatSig({
-  //         image: imageUrl 
-  //       });
-  //     }
-  //     this.prompt = ""
-
-  //   } catch (error) {
-  //     alert('Failed to generate image. Check console for details.');
-  //     this.updateCurrentChatSig({
-  //       response: 'Failed to generate image. Check console for details.'
-  //     })
-  //     this.prompt = ""
-  //     this.addToHistory();
-  //   } finally {
-  //     this.addToHistory();
-  //   }  
-  // }
+  
 
   /**
    *  this.loading = false;
@@ -162,8 +117,7 @@ export class ChatPromptInput {
    */
   addToHistory() {
     this.aiSvc.addToHistory(this.currentChat());
-    const mode = this.chatMode();
-    this.btnStateSig.set(mode);
+    this.btnStateSig.set(this.currentChat().mode);
     this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
     this.updateState({userPrompt: ""});
   }
@@ -177,13 +131,14 @@ export class ChatPromptInput {
    */
   async submit() {
 
-    const mode = this.chatMode();
-    if (mode == "Query" ) {
+    const mode = this.state().mode;
+    if (mode == contextMesssageContextType.LLM_QUERY ) {
+      console.log("New Chat Completion");
       this.getChatResponse();
       this.btnStateSig.set("submitted");
-    } else if (mode == "Image" ) {
-      console.log("new image generation");
-      // this.generateImage();
+    } else if (mode == contextMesssageContextType.IMAGE_GENERATION ) {
+      console.log("New image generation");
+      this.generateImage();
       this.btnStateSig.set("submitted");
     }
     
@@ -197,6 +152,7 @@ export class ChatPromptInput {
     const req: contextMesssage = {
       prompt: this.state().userPrompt,
       model: this.state().model,
+      type: contextMesssageContextType.LLM_STREAM_QUERY
     }
 
     this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
@@ -226,6 +182,55 @@ export class ChatPromptInput {
       response: response 
     })
   };
+
+  /**
+   * generateImage()
+   * to generate an image using the image generation feature of conscious server
+   */ 
+  async generateImage() {
+
+    const req: contextMesssage = {
+      prompt: this.state().userPrompt,
+      model: this.state().model,
+      type: contextMesssageContextType.IMAGE_GENERATION
+    }
+
+    this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
+    
+    this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
+  
+    try {
+      await this.aiSvc.inRequest(req).then(response => {
+        console.dir(response);
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.addToHistory();
+    }
+
+    // try {
+    //   const base64Data = await this.aiChatSvc.generateImage(this.prompt, this.aiChatSvc.state().prompt.model);
+    //   if (base64Data) {
+    //     console.log("Setting image");
+    //     const imageUrl = `data:image/png;base64,${base64Data}`;
+    //     this.updateCurrentChatSig({
+    //       image: imageUrl 
+    //     });
+    //   }
+    //   this.prompt = ""
+
+    // } catch (error) {
+    //   alert('Failed to generate image. Check console for details.');
+    //   this.updateCurrentChatSig({
+    //     response: 'Failed to generate image. Check console for details.'
+    //   })
+    //   this.prompt = ""
+    //   this.addToHistory();
+    // } finally {
+    //   this.addToHistory();
+    // }  
+  }
 
 }
 

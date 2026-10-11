@@ -16,8 +16,8 @@
         <i class="fa-solid fa-plus"></i>
       </button>
       <ul class="dropdown-menu">
-        <li><a class="dropdown-item" (click)="setMode('Query')">Generate Chat</a></li>
-        <li><a class="dropdown-item" (click)="setMode('Image')">Generate Image</a></li>
+        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Generate Chat</a></li>
+        <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
       </ul>
 
     </div>
