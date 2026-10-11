@@ -34,10 +34,10 @@
     </div>
   }
 
-  @if (chatEntity().image) {
+  @if (chatEntity().responseImage) {
     <div class="col-sm-12 mt-3 responseBlock">
       <div class="">
-        <img [src]="chatEntity().image" class="rounded img-fluid" alt="AI Generated Graphic" />
+        <img [src]="chatEntity().responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
       </div>
     </div>
   }

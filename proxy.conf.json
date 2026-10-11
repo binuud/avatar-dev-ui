@@ -19,5 +19,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/static": {
+    "target": "http://host.docker.internal:9080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }
