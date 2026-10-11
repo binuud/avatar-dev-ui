@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
+import { contextMesssageContextType } from '../../gen/v1/conscious/contextMessage.pb';
 
 // for tracking current chat inference
 export interface ChatEntity {
   uuid: string;
   prompt: PromptInterface;
+  mode: contextMesssageContextType;
   response: string;
   reasoning: string;
   image: string;
@@ -67,6 +69,7 @@ export class AiInterfaces {
           },
           control: ""
         },
+        mode: contextMesssageContextType.LLM_QUERY,
         response: "",
         reasoning: "",
         image: ""

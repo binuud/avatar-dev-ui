@@ -80,11 +80,11 @@ export class ConsciousService {
       this.updateState({connected: true});
       console.error("Error in model listing ", err);
     });
-    
   }
 
-  inRequest() {
-
+  
+  inRequest(req: contextMesssage): Promise <contextMesssage> {
+    return Conscious.In(req, this.initReq);
   }
   
   inStreamRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
