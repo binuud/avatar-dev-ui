@@ -7,6 +7,9 @@ import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalStorageService } from "../../../core/services/local-storage-service";
+import { SystemMetrics } from "../../../gen/v1/conscious/metrics.pb";
+import { SystemMetricsService } from "../../../core/services/system-metrics-service";
+import { DecimalPipe } from "@angular/common";
 
 export interface MultiStateButtonConfig {
   id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -27,7 +30,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse],
+  imports: [FormsModule, ChatResponse, DecimalPipe],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
@@ -43,6 +46,7 @@ export class ChatPromptInput {
   chatModes = contextMesssageContextType;
 
   aiSvc = inject(ConsciousService);
+  metricsSvc = inject(SystemMetricsService);
 
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
@@ -53,7 +57,7 @@ export class ChatPromptInput {
     ["submitted", { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
   ]);
 
-
+  metrics: WritableSignal<SystemMetrics> = signal({});
   state: WritableSignal<ChatPromptInputState> = signal({
     userPrompt: "",
     model: "",
@@ -68,6 +72,7 @@ export class ChatPromptInput {
 
   constructor() {
     this.loadState();
+    this.getMetricsStream();
   }
 
   loadState() {
@@ -188,6 +193,39 @@ export class ChatPromptInput {
       console.error(error);
     } finally {
       this.addToHistory();
+    }
+
+  }
+
+  /**
+   * metricsStreamCallback()
+   * callback function, for streaming llm chat completions
+   * when streaming call is done, this callback needs to be called
+   * to update the ui
+   * @param resp 
+   */  
+  metricsStreamCallback = (resp: SystemMetrics) => {
+    // Append the newly arrived word to our signal string instantly
+
+    this.metrics.set(resp);
+  };
+
+  /**
+   * getMetricsStream()
+   * get cpu usage, gpu usage metrics from server
+   */ 
+  async getMetricsStream() {
+
+  
+    try {
+      await this.metricsSvc.streamMetrics(this.metricsStreamCallback);
+    } catch (error) {
+      alert(error);
+      console.log("metrics server closed connection");
+      console.error(error);
+      
+    } finally {
+      console.log("metrics server closed connection");
     }
 
   }
