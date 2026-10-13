@@ -1,19 +1,21 @@
 <div class="row">
-
-  <div class="d-flex  mt-3 mb-3 responseBlock justify-content-end">
-      <!-- Prompt Card -->
-      <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
-        <div class="fw-semibold text-white-50 userName">
-          @if (type() == 'ACTIVE') {
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-          } 
-          You
+  <div class="cols-sm-12">
+    <div class="d-flex  mt-3 mb-3 responseBlock justify-content-end">
+        <!-- Prompt Card -->
+        <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
+          <div class="fw-semibold text-white-50 userName">
+            @if (type() == 'ACTIVE') {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            } 
+            You
+          </div>
+          <div class="message-content">
+            {{ chatEntity().prompt?.userPrompt }}
+          </div>
         </div>
-        <div class="message-content">
-          {{ chatEntity().prompt?.userPrompt }}
-        </div>
-      </div>
+    </div>
   </div>
+
 
   @if (chatEntity().reasoning) {
     <div class="col-sm-12 mt-3 responseBlock">
