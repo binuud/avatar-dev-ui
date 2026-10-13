@@ -3,10 +3,11 @@
   <div class="d-flex  mt-3 mb-3 responseBlock justify-content-end">
       <!-- Prompt Card -->
       <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
-        <div class="fw-semibold small mb-1 text-white-50">
+        <div class="fw-semibold text-white-50 userName">
           @if (type() == 'ACTIVE') {
-            <i class="fa-solid fa-circle-notch fa-spin fa-fw pe-2 "></i>
-          } You
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          } 
+          You
         </div>
         <div class="message-content">
           {{ chatEntity().prompt?.userPrompt }}

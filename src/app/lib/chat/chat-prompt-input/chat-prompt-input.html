@@ -4,13 +4,23 @@
 }
 
 <div class="inputBlock mt-3">
+
+  <table class="table metrics" style="width:70%;">
+    <tr>
+      <td style="width: 50px;">CPU</td><td class="text-start">{{ metrics().cpuUsage | number : '1.2-2'}} %</td>
+      <td style="width: 50px;">GPU</td><td class="text-start">{{ metrics().gpuUsage | number : '1.2-2'}} %</td>
+      <td style="width: 50px;">RAM</td><td class="text-start">{{ metrics().ramUsage | number : '1.2-2'}} %</td>
+    </tr>
+  </table>
+
+
   <textarea [(ngModel)]="state().userPrompt" (keyup.enter)="submit()"  
   class="form-control mb-3" id="aiPrompt" 
   placeholder="Prompt the AI" 
   rows="3"></textarea>
 
   <div class="row">
-    <div class="col-sm-2">
+    <div class="sm:col-2">
 
       <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fa-solid fa-plus"></i>
@@ -21,7 +31,7 @@
       </ul>
 
     </div>
-    <div class="col-sm-10">
+    <div class="sm:col-10">
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
         <div class="dropdown">
