@@ -28,7 +28,7 @@ help: ## This help.
 
 copy-protos: ## copy protos from conscious project
 	rm -rf ./src/app/gen/*
-	cp -R ../conscious/gen/web/ ./src/app/gen/
+	cp -R ../avatar-conscious/gen/web/ ./src/app/gen/
 
 run: ## run avatar-dev-ui angular workspace project
 	docker stop $(APP); docker rm $(APP);docker run --rm  --name $(APP) -p "4200:4200" -v ".:/app" $(REPO)/$(ANGULAR_CLI_DEV) npm run start
