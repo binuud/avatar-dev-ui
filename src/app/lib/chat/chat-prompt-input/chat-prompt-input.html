@@ -5,6 +5,10 @@
 
 <div class="inputBlock mt-3">
 
+  @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE) {
+    <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
+  }
+
   <table class="table metrics" style="width:70%;">
     <tr>
       <td style="width: 50px;">CPU</td><td class="text-start">{{ metrics().cpuUsage | number : '1.2-2'}} %</td>
@@ -28,6 +32,7 @@
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Generate Chat</a></li>
         <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
+        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_IMAGE_DESCRIBE)">Describe Image</a></li>
       </ul>
 
     </div>

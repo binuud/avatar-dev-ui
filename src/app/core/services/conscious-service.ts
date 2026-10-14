@@ -1,6 +1,6 @@
 import { inject, Service, signal, WritableSignal } from "@angular/core";
 import { Conscious } from "../../gen/v1/conscious/consciousService.pb";
-import { contextMesssage } from "../../gen/v1/conscious/contextMessage.pb";
+import { contextMesssage, UploadRequest, UploadResponse } from "../../gen/v1/conscious/contextMessage.pb";
 import { InitReq } from "../../gen/fetch.pb";
 import { Model } from "../../gen/v1/conscious/common.pb";
 import { OpenAiService } from "../../lib/chat/services/open-ai-service";
@@ -83,7 +83,7 @@ export class ConsciousService {
    */
   async getModels() {
 
-    Conscious.getModels({}, this.initReq).then(response => {
+    Conscious.GetModels({}, this.initReq).then(response => {
 
       console.log("Available models:", response.models);
 
@@ -104,6 +104,10 @@ export class ConsciousService {
   
   inStreamRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
     return Conscious.InStream(req, myCallback, this.initReq);
+  }
+
+  uploadFile(req: UploadRequest): Promise <UploadResponse> {
+    return Conscious.FileUpload(req, this.initReq);
   }
 
   /**

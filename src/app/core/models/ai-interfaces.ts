@@ -10,6 +10,7 @@ export interface ChatEntity {
   responseImage: string;
   reasoning: string;
   image: string;
+  fileName: string;
 }
 
 export interface PromptInterface  {
@@ -74,7 +75,8 @@ export class AiInterfaces {
         response: "",
         responseImage: "",
         reasoning: "",
-        image: ""
+        image: "",
+        fileName: "",
     });
   }
 }

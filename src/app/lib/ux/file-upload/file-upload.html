@@ -1,0 +1,23 @@
+<div class="upload-container">
+  <h2>Upload Image</h2>
+
+  <!-- File Input Picker -->
+  <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+
+  <!-- Live Image Preview -->
+  <!-- @if (imagePreview()) {
+    <div class="preview-box">
+      <img [src]="imagePreview()" alt="Image Preview" style="max-width: 300px; margin-top: 15px;" />
+    </div>
+  } -->
+
+  <!-- Upload Action Trigger -->
+  <button [disabled]="!selectedFile()" (click)="onUpload()" style="margin-top: 15px;">
+    Upload Image
+  </button>
+
+  <!-- Execution Feedback Status -->
+  @if (uploadStatus()) {
+    <p class="status-message">{{ uploadStatus() }}</p>
+  }
+</div>

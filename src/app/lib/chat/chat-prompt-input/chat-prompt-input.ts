@@ -10,6 +10,7 @@ import { LocalStorageService } from "../../../core/services/local-storage-servic
 import { SystemMetrics } from "../../../gen/v1/conscious/metrics.pb";
 import { SystemMetricsService } from "../../../core/services/system-metrics-service";
 import { DecimalPipe } from "@angular/common";
+import { FileUpload } from "../../ux/file-upload/file-upload";
 
 export interface MultiStateButtonConfig {
   id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -27,10 +28,11 @@ export interface ChatPromptInputState {
   reasoning?: string;
   response?: string;
   disabled: boolean;
+  fileName: string;
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse, DecimalPipe],
+  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
@@ -51,10 +53,11 @@ export class ChatPromptInput {
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
   btnConfigMap = new Map<string, MultiStateButtonConfig>([
-    ["Query",       { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
-    ["Image",       { id: "new", iconClass: "fa-solid fa-image", disabled: false }],
-    ["submitted_wait", { id: "submitted", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
-    ["submitted", { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
+    ["Query",             { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
+    ["Image",             { id: "Image", iconClass: "fa-solid fa-image", disabled: false }],
+    ["ImageQuery",        { id: "ImageQuery", iconClass: "fa-solid fa-circle-question", disabled: false }],
+    ["submitted_wait",    { id: "submitted_wait", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
+    ["submitted",         { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
   ]);
 
   metrics: WritableSignal<SystemMetrics> = signal({});
@@ -62,7 +65,8 @@ export class ChatPromptInput {
     userPrompt: "",
     model: "",
     mode: contextMesssageContextType.LLM_QUERY,
-    disabled: false
+    disabled: false,
+    fileName: ""
   });
 
   btnStateSig: WritableSignal<string> = signal("new");
@@ -108,6 +112,11 @@ export class ChatPromptInput {
     this.saveState();
   }
 
+  fileUploaded(event: string) {
+    console.log("received file name " + event);
+    this.updateState({fileName: event});
+  }
+
   /**
    * setMode()
    * allow generation mode to be selected
@@ -118,8 +127,10 @@ export class ChatPromptInput {
     this.updateState({mode: mode})
     if (mode == contextMesssageContextType.LLM_QUERY) {
       this.btnStateSig.set('Query');
-    } else if (contextMesssageContextType.IMAGE_GENERATION) {
+    } else if (mode == contextMesssageContextType.IMAGE_GENERATION) {
       this.btnStateSig.set('Image');
+    } else if (mode == contextMesssageContextType.LLM_IMAGE_DESCRIBE) {
+      this.btnStateSig.set('ImageQuery');
     }
   }
   
@@ -165,6 +176,10 @@ export class ChatPromptInput {
       console.log("New image generation");
       this.generateImage();
       this.btnStateSig.set("submitted");
+    } else if (mode == contextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
+      console.log("Describe image request");
+      this.describeFile();
+      this.btnStateSig.set("submitted");
     }
     
     this.scrollToBottom();
@@ -176,7 +191,8 @@ export class ChatPromptInput {
       uuid: uuidv4(),
       prompt: this.state().userPrompt,
       model: this.state().model,
-      type: this.state().mode
+      type: this.state().mode,
+      data: this.state().fileName
     }
   }
 
@@ -273,6 +289,37 @@ export class ChatPromptInput {
       this.addToHistory();
     }
 
+  }
+
+  /**
+   * describeFile()
+   * ask llm to query the uploaded image
+   */ 
+  async describeFile() {
+
+    const req = this.createNewContextMessage();
+
+    let newChatEntity = AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model);
+    newChatEntity.fileName = this.currentChat().fileName;
+    this.currentChat.set(newChatEntity);
+
+    try {
+      await this.aiSvc.inRequest(req).then(result => {
+        this.updateCurrentChat({
+          response: result.response
+        });
+        console.dir(result);
+      });
+    } catch (error) {
+      alert(error);
+      console.error(error);
+      this.updateCurrentChat({
+        response: 'Failed to generate image. Check console for details.'
+      });
+      this.addToHistory();
+    } finally {
+      this.addToHistory();
+    }
   }
 
 }
