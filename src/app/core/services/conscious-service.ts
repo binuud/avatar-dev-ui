@@ -102,6 +102,10 @@ export class ConsciousService {
     return Conscious.In(req, this.initReq);
   }
   
+  generateRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
+    return Conscious.Generate(req, myCallback, this.initReq);
+  }
+
   inStreamRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
     return Conscious.InStream(req, myCallback, this.initReq);
   }
