@@ -5,7 +5,7 @@
 
 <div class="inputBlock mt-3">
 
-  @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE) {
+  @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE || state().showFileUpload) {
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
   }
 
@@ -33,6 +33,7 @@
         <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Generate Chat</a></li>
         <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
         <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_IMAGE_DESCRIBE)">Describe Image</a></li>
+        <li><a class="dropdown-item" (click)="toggleFileUpload()">Attach Image</a></li>
       </ul>
 
     </div>

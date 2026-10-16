@@ -29,6 +29,7 @@ export interface ChatPromptInputState {
   response?: string;
   disabled: boolean;
   fileName: string;
+  showFileUpload: boolean;
 }
 
 @Component({
@@ -66,7 +67,8 @@ export class ChatPromptInput {
     model: "",
     mode: contextMesssageContextType.LLM_QUERY,
     disabled: false,
-    fileName: ""
+    fileName: "",
+    showFileUpload: false,
   });
 
   btnStateSig: WritableSignal<string> = signal("new");
@@ -95,6 +97,10 @@ export class ChatPromptInput {
 
   closeCurrentChat() {
     this.addToHistory();
+  }
+
+  toggleFileUpload() {
+    this.updateState({showFileUpload: !this.state().showFileUpload});
   }
 
   updateCurrentChat(newState: Partial<ChatEntity>) {
@@ -202,9 +208,13 @@ export class ChatPromptInput {
     const req = this.createNewContextMessage();
 
     this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
-  
+    let newChatEntity = AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model);
+    newChatEntity.fileName = this.currentChat().fileName;
+    this.currentChat.set(newChatEntity);
+
     try {
-      await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
+      // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
+      await this.aiSvc.generateRequest(req, this.chatStreamCallback);
     } catch (error) {
       console.error(error);
     } finally {
@@ -212,6 +222,29 @@ export class ChatPromptInput {
     }
 
   }
+
+  /**
+   * chatStreamCallback()
+   * callback function, for streaming llm chat completions
+   * when streaming call is done, this callback needs to be called
+   * to update the ui
+   * @param resp 
+   */  
+  chatStreamCallback = (response: contextMesssage) => {
+    // Append the newly arrived word to our signal string instantly
+
+    if (response.responseImage) {
+      this.updateCurrentChat({
+        responseImage: "/static/" + response.responseImage
+      });
+    } else {
+      const appended_response = this.currentChat().response + response.response;
+      this.updateCurrentChat({
+        response: appended_response 
+      })
+    }
+
+  };
 
   /**
    * metricsStreamCallback()
@@ -231,7 +264,6 @@ export class ChatPromptInput {
    * get cpu usage, gpu usage metrics from server
    */ 
   async getMetricsStream() {
-
   
     try {
       await this.metricsSvc.streamMetrics(this.metricsStreamCallback);
@@ -245,22 +277,6 @@ export class ChatPromptInput {
     }
 
   }
-
-  /**
-   * chatStreamCallback()
-   * callback function, for streaming llm chat completions
-   * when streaming call is done, this callback needs to be called
-   * to update the ui
-   * @param resp 
-   */  
-  chatStreamCallback = (resp: contextMesssage) => {
-    // Append the newly arrived word to our signal string instantly
-
-    const response = this.currentChat().response + resp.response;
-    this.updateCurrentChat({
-      response: response 
-    })
-  };
 
   /**
    * generateImage()
