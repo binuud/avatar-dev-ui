@@ -9,11 +9,12 @@
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
   }
 
-  <table class="table metrics" style="width:70%;">
+  <table class="table metrics" style="width:100%;">
     <tr>
-      <td style="width: 50px;">CPU</td><td class="text-start">{{ metrics().cpuUsage | number : '1.2-2'}} %</td>
-      <td style="width: 50px;">GPU</td><td class="text-start">{{ metrics().gpuUsage | number : '1.2-2'}} %</td>
-      <td style="width: 50px;">RAM</td><td class="text-start">{{ metrics().ramUsage | number : '1.2-2'}} %</td>
+      <td style="width: 30px;">CPU</td><td class="text-start">{{ metrics().cpuUsage | number : '1.2-2'}} %</td>
+      <td style="width: 30px;">GPU</td><td class="text-start">{{ metrics().gpuUsage | number : '1.2-2'}} %</td>
+      <td style="width: 30px;">RAM</td><td class="text-start">{{ metrics().ramUsage | number : '1.2-2'}} %</td>
+      <td style="width: 50px;">GPU MEM</td><td class="text-start">{{ metrics().gpuMemUsed | bytes }}</td>
     </tr>
   </table>
 

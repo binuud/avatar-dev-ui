@@ -26,6 +26,9 @@ help: ## This help.
 
 .DEFAULT_GOAL := help
 
+build: ## build watch-dog angular project
+	docker run --rm -it --name $(APP) -v ./:/app $(REPO)/$(ANGULAR_CLI_DEV)  npm run build
+
 copy-protos: ## copy protos from conscious project
 	rm -rf ./src/app/gen/*
 	cp -R ../avatar-conscious/gen/web/ ./src/app/gen/
