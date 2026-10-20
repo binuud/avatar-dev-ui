@@ -1,16 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
-import { contextMesssageContextType } from '../../gen/v1/conscious/contextMessage.pb';
+import { ContextMesssage, ContextMesssageContextType } from '../../gen/v1/conscious/contextMessage.pb';
+import { SingleContext } from '../../gen/v1/conscious/memory.pb';
 
 // for tracking current chat inference
 export interface ChatEntity {
   uuid: string;
   prompt: PromptInterface;
-  mode: contextMesssageContextType;
+  mode: ContextMesssageContextType;
   response: string;
   responseImage: string;
   reasoning: string;
   image: string;
   fileName: string;
+  currentContext: SingleContext;
 }
 
 export interface PromptInterface  {
@@ -71,12 +73,14 @@ export class AiInterfaces {
           },
           control: ""
         },
-        mode: contextMesssageContextType.LLM_QUERY,
+        mode: ContextMesssageContextType.LLM_QUERY,
         response: "",
         responseImage: "",
         reasoning: "",
         image: "",
         fileName: "",
+        currentContext: {},
+
     });
   }
 }

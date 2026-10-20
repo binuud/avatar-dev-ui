@@ -7,3 +7,9 @@
 .userBlock {
   width: 75%;
 }
+
+.responseStats {
+  font-size: 0.7rem;
+  padding: 5px 0 10px;
+  border-bottom: 1px solid rgba(var(--bs-secondary-color-rgb), 0.1);
+}

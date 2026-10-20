@@ -5,9 +5,9 @@ import { Stream } from "openai/streaming";
 import { LocalStorageService } from "../../../core/services/local-storage-service";
 import { GlobalConfig } from "../../../config/global-config";
 import { Conscious } from "../../../gen/v1/conscious/consciousService.pb";
-import { contextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
 import { InitReq } from "../../../gen/fetch.pb";
 import { PromptInterface, ChatEntity, AiInterfaces } from "../../../core/models/ai-interfaces";
+import { ContextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
 
 
 
@@ -216,8 +216,8 @@ export class OpenAiService {
     }
   }
 
-  async newStreamChat(prompt: string,  myCallback: (resp: contextMesssage) => void, model : string): Promise<void> {
-    const req: contextMesssage = {
+  async newStreamChat(prompt: string,  myCallback: (resp: ContextMesssage) => void, model : string): Promise<void> {
+    const req: ContextMesssage = {
       prompt: prompt,
       model: model
     }

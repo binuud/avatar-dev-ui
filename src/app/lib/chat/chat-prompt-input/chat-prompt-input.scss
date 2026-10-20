@@ -8,3 +8,8 @@
   width: 50px;
   font-size: 0.8rem;
 }
+.auto-expand {
+  field-sizing: content;
+  max-height: calc(5 * 1.5em + 1rem); /* Adjust multiplier based on your line-height and padding */
+  resize: none; /* Disables manual drag-resizing */
+}

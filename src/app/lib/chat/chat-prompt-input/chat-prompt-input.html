@@ -1,6 +1,8 @@
+@if (currentContext().in?.prompt) {
+  <div id="currentContext">
+    <app-chat-response [context]="currentContext()" type="ACTIVE" #scrollContainer></app-chat-response>
+  </div>
 
-@if (currentChat().prompt.userPrompt) {
-  <app-chat-response [chatEntity]="currentChat()" type="ACTIVE" #scrollContainer></app-chat-response>
 }
 
 <div class="inputBlock mt-3">
@@ -20,9 +22,10 @@
 
 
   <textarea [(ngModel)]="state().userPrompt" (keyup.enter)="submit()"  
-  class="form-control mb-3" id="aiPrompt" 
-  placeholder="Prompt the AI" 
-  rows="3"></textarea>
+    class="form-control mb-3 auto-expand" 
+    id="aiPrompt" 
+    placeholder="Prompt the AI" 
+    rows="1"></textarea>
 
   <div class="row">
     <div class="col-sm-1">

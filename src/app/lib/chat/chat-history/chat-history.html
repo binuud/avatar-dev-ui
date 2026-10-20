@@ -1,8 +1,8 @@
 <div class="row">
-  @for (item of aiSvc.state().history; track $index) {
+  @for (item of aiSvc.state().memory.contexts; track $index) {
     
     <div class="col-sm-12 mb-3">
-      <app-chat-response [chatEntity]="item" type="HISTORY"></app-chat-response>
+      <app-chat-response [context]="item" type="HISTORY"></app-chat-response>
     </div>
 
   }
