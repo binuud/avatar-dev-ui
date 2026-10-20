@@ -11,6 +11,7 @@ import { SystemMetrics } from "../../../gen/v1/conscious/metrics.pb";
 import { SystemMetricsService } from "../../../core/services/system-metrics-service";
 import { DecimalPipe } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
+import { BytesPipe } from "../../../shared/pipes/bytes-pipe";
 
 export interface MultiStateButtonConfig {
   id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -33,7 +34,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload],
+  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload, BytesPipe],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
