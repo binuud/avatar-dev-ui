@@ -1,11 +1,10 @@
 import { inject, Service, signal, WritableSignal } from "@angular/core";
 import { Conscious } from "../../gen/v1/conscious/consciousService.pb";
-import { contextMesssage, UploadRequest, UploadResponse } from "../../gen/v1/conscious/contextMessage.pb";
+import { ContextMesssage, UploadRequest, UploadResponse } from "../../gen/v1/conscious/contextMessage.pb";
 import { InitReq } from "../../gen/fetch.pb";
 import { Model } from "../../gen/v1/conscious/common.pb";
-import { OpenAiService } from "../../lib/chat/services/open-ai-service";
 import { LocalStorageService } from "./local-storage-service";
-import { ChatEntity } from "../models/ai-interfaces";
+import { Memory, SingleContext } from "../../gen/v1/conscious/memory.pb";
 
 
 export interface ConsciousServiceState {
@@ -21,7 +20,7 @@ export interface ConsciousServiceState {
   modelList: Model[];
 
   // history maintained for display purpose
-  history: ChatEntity[];
+  memory: Memory;
 
   // message History is sent in each chat request
   // this allows inference to maintian status of previous chats
@@ -43,7 +42,9 @@ export class ConsciousService {
     connected: false,
     loading: false,
     modelList: [],
-    history: [],
+    memory: {
+      contexts: [],
+    },
     messageHistory: [],
   });
 
@@ -98,15 +99,15 @@ export class ConsciousService {
   }
 
   
-  inRequest(req: contextMesssage): Promise <contextMesssage> {
+  inRequest(req: ContextMesssage): Promise <ContextMesssage> {
     return Conscious.In(req, this.initReq);
   }
   
-  generateRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
+  generateRequest(req: ContextMesssage, myCallback: (resp: ContextMesssage) => void) {
     return Conscious.Generate(req, myCallback, this.initReq);
   }
 
-  inStreamRequest(req: contextMesssage, myCallback: (resp: contextMesssage) => void) {
+  inStreamRequest(req: ContextMesssage, myCallback: (resp: ContextMesssage) => void) {
     return Conscious.InStream(req, myCallback, this.initReq);
   }
 
@@ -114,19 +115,14 @@ export class ConsciousService {
     return Conscious.FileUpload(req, this.initReq);
   }
 
-  /**
-   * addToHistory()
-   * add current chatEntity to history of  State
-   */
-  addToHistory(chatEntity: ChatEntity) {
-
-    // let messages: ChatCompletionMessageParam[] = [
-    //   {role: 'user', content: chatEntity.prompt.userPrompt},
-    //   {role: 'assistant', content: chatEntity.response}
-    // ];
+  appendContextToMemory(context: SingleContext) {
+    let memory = this.state().memory;
+    if (memory.contexts === undefined) {
+      memory.contexts = [];
+    }
+    memory.contexts.push(context);
     this.updateState({
-      history: [...this.state().history, chatEntity],
-      // messageHistory: [...this.state().messageHistory, ...messages]
+      memory : memory,
     });
   }
 
@@ -148,11 +144,9 @@ export class ConsciousService {
    */
   clearChatHistory() {
     this.updateState({
-      history: [],
+      memory: {},
       messageHistory: [],
     })
   }
-
-
 
 }

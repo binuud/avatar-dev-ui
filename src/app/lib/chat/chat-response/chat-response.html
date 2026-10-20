@@ -10,14 +10,14 @@
             You
           </div>
           <div class="message-content">
-            {{ chatEntity().prompt?.userPrompt }}
+            {{ context().in?.prompt }}
           </div>
         </div>
     </div>
   </div>
 
 
-  @if (chatEntity().reasoning) {
+  <!-- @if (chatEntity().reasoning) {
     <div class="col-sm-12 mt-3 responseBlock">
       <div markdown
         class="card-text responseText"
@@ -25,24 +25,42 @@
         [disableSanitizer]="true">
       </div>
     </div>
+  } -->
+
+  @let out = context().out;
+  @if (out) {
+    @if (out.response) {
+      <div class="col-sm-12 mt-3 responseBlock">
+        <div markdown
+          class="card-text responseText"
+          [data]="out.response"
+          [disableSanitizer]="true">
+        </div>
+      </div>
+    }
+    @if (out.responseImage) {
+      <div class="col-sm-12 mt-3 responseBlock">
+        <div class="">
+          <img [src]="out.responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
+        </div>
+      </div>
+    }
+
+    @if (out.completedAt) {
+      <div class="cols-sm-12 responseBlock">
+        <div class="row responseStats">
+          <div class="col-sm-10">
+            Model: {{ out.model }}
+          </div>
+          <div class="col-sm-2 text-end">
+            <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
+          </div>
+        </div>
+      </div>
+    }
+
   }
 
-  @if (chatEntity().response) {
-    <div class="col-sm-12 mt-3 responseBlock">
-      <div markdown
-        class="card-text responseText"
-        [data]="chatEntity().response"
-        [disableSanitizer]="true">
-      </div>
-    </div>
-  }
 
-  @if (chatEntity().responseImage) {
-    <div class="col-sm-12 mt-3 responseBlock">
-      <div class="">
-        <img [src]="chatEntity().responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
-      </div>
-    </div>
-  }
 
 </div>
