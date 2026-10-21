@@ -165,12 +165,24 @@ export class ChatPromptInput {
   }
 
   private scrollToBottom(): void {
-    setTimeout(() => {
-      try {
-        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-      } catch (err) {}
-    }, 50);
+    console.log("Scroll to bottom");
+    // setTimeout(() => {
+    //   try {
+    //     this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+    //   } catch (err) {}
+    // }, 50);
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: 'smooth' // Creates a fluid animation effect
+    });
   }
+
+  scrollToId(id: string) {
+
+    this.scroller.scrollToAnchor("chatPromptBlock");
+  }
+
   
   /**
    *  this.loading = false;
@@ -179,6 +191,7 @@ export class ChatPromptInput {
    */
   addToHistory() {
 
+    this.scrollToBottom();
     // add current context to memory
     this.aiSvc.appendContextToMemory(this.currentContext());
 
@@ -192,9 +205,6 @@ export class ChatPromptInput {
     this.updateState({userPrompt: ""});
   }
 
-  scrollToId(id: string) {
-    this.scroller.scrollToAnchor(id);
-  }
 
   /**
    * submit()
