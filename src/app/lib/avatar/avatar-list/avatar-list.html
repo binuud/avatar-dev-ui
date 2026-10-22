@@ -1,0 +1,20 @@
+
+@for (item of avatars(); track $index) {
+  <div class="card mb-3">
+    <div class="card-header">
+      {{ item.meta?.name}}
+    </div>
+    <div class="card-body">
+      <p><small>{{ item.meta?.uuid}}</small></p>
+      <p class="card-text">{{ item.meta?.description}}</p>
+      <p>Triggers: 
+        @for (tag of item.meta?.triggers; track $index) {
+          <span class="ps-2">{{ tag }}</span>
+        }
+      </p>
+      
+      <a href="#" class="btn btn-primary">Launch</a>
+
+    </div>
+  </div>
+}
