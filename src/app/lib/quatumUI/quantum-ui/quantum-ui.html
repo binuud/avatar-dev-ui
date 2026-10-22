@@ -1,0 +1,55 @@
+
+<div class="responseBlock">
+  <div class="card">
+    <div class="card-header">
+      {{ ui.title }}
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">{{ ui.description }}</h5>
+
+      <div class="row g-2">
+
+        @for (item of ui.components; track $index) {
+          <div [class]="{
+                  'col-sm-12': item.width === 100,
+                  'col-sm-6': item.width === 50,
+                  'col-sm-4': item.width === 30,
+                  'col-sm-3': item.width === 25,
+          }">
+            @if (item.type == "PLAINTEXT") {
+              <p class="card-text">{{ item.value }}</p>
+            }
+
+            @if (item.type == "INPUT") {
+              <div>
+                <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
+                <input type="text" id="{{ item.id }}" class="form-control" placeholder="{{ item.placeHolder }}">
+                <div id="{{ item.id }}-help" class="form-text note">
+                  {{ item.help }}
+                </div>
+              </div>
+            }
+
+            @if (item.type == "TEXTAREA") {
+            <div>
+              <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
+              <textarea id="{{ item.id }}" class="form-control" rows="{{ item.rows }}" placeholder="{{ item.placeHolder }}"></textarea>
+              <div id="{{ item.id }}-help" class="form-text note">
+                {{ item.help }}
+              </div>
+            </div>
+            }
+
+          </div>
+        }
+
+      </div>
+      
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-sm btn-secondary me-3">Cancel</button>
+      <button type="button" class="btn btn-sm btn-primary">Submit</button>
+    </div>
+  </div>
+
+</div>

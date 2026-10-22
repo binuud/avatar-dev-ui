@@ -13,6 +13,7 @@ import { DecimalPipe, ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
 import { BytesPipe } from "../../../shared/pipes/bytes-pipe";
 import { SingleContext } from "../../../gen/v1/conscious/memory.pb";
+import { QuantumUI } from "../../quatumUI/quantum-ui/quantum-ui";
 
 export interface MultiStateButtonConfig {
   id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
@@ -34,7 +35,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload, BytesPipe],
+  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload, BytesPipe, QuantumUI],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
