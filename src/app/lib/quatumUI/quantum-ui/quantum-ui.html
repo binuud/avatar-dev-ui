@@ -16,28 +16,30 @@
                   'col-sm-4': item.width === 30,
                   'col-sm-3': item.width === 25,
           }">
+
+            @if (item.label) {
+              <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
+            }
+            
             @if (item.type == "PLAINTEXT") {
               <p class="card-text">{{ item.value }}</p>
             }
 
             @if (item.type == "INPUT") {
-              <div>
-                <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
-                <input type="text" id="{{ item.id }}" class="form-control" placeholder="{{ item.placeHolder }}">
-                <div id="{{ item.id }}-help" class="form-text note">
-                  {{ item.help }}
-                </div>
-              </div>
+              <input type="text" id="{{ item.id }}" class="form-control" placeholder="{{ item.placeHolder }}">
             }
 
             @if (item.type == "TEXTAREA") {
-            <div>
-              <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
               <textarea id="{{ item.id }}" class="form-control" rows="{{ item.rows }}" placeholder="{{ item.placeHolder }}"></textarea>
               <div id="{{ item.id }}-help" class="form-text note">
                 {{ item.help }}
               </div>
-            </div>
+            }
+
+            @if (item.label) {
+              <div id="{{ item.id }}-help" class="form-text note">
+                {{ item.help }}
+              </div>
             }
 
           </div>
