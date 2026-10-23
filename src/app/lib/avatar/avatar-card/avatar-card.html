@@ -1,0 +1,30 @@
+<div class="card mb-3">
+  <div class="card-header">
+    <h5>{{ item().meta?.name}}</h5>
+  </div>
+  <div class="card-body">
+    <p><small>{{ item().meta?.uuid}}</small></p>
+    <p class="card-text">{{ item().meta?.description}}</p>
+    <p>Triggers: 
+      @for (tag of item().meta?.triggers; track $index) {
+        <span class="ps-2">{{ tag }}</span>
+      }
+    </p>
+
+    @let steps = item().steps;
+    @if (steps && steps.length > 0) {
+      <h6>Steps</h6>
+      <ul class="list-group mb-2">
+        @for (stepItem of steps; track $index) {
+          <li class="list-group-item">
+            <b>{{stepItem.name}}</b>
+            <p class="mt-1">{{stepItem.description}}</p>
+          </li>
+        }
+      </ul>
+    }
+
+    <a [routerLink]="['/avatar', item().meta?.name]" class="btn btn-sm btn-primary">Launch</a>
+
+  </div>
+</div>

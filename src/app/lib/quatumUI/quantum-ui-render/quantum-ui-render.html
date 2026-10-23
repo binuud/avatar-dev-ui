@@ -2,14 +2,14 @@
 <div class="responseBlock">
   <div class="card">
     <div class="card-header">
-      {{ ui.title }}
+      {{ ui().title }}
     </div>
     <div class="card-body">
-      <h5 class="card-title">{{ ui.description }}</h5>
+      <h5 class="card-title">{{ ui().description }}</h5>
 
       <div class="row g-2">
 
-        @for (item of ui.components; track $index) {
+        @for (item of ui().components; track $index) {
           <div [class]="{
                   'col-sm-12': item.width === 100,
                   'col-sm-6': item.width === 50,
@@ -55,3 +55,4 @@
   </div>
 
 </div>
+
