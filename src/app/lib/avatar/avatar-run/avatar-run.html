@@ -1,6 +1,6 @@
 <app-avatar-card [item]="avatar()"></app-avatar-card>
-@let data = avatar().ui;
-@if (data) {
-  <app-quantum-ui-render [ui]="data"></app-quantum-ui-render>
+@let ui = avatar().meta?.ui;
+@if (ui) {
+  <app-quantum-ui-render [ui]="ui"></app-quantum-ui-render>
 }
 
