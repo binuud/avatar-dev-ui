@@ -1,1 +1,6 @@
-<p>avatar-run works!</p>
+<app-avatar-card [item]="avatar()"></app-avatar-card>
+@let data = avatar().ui;
+@if (data) {
+  <app-quantum-ui-render [ui]="data"></app-quantum-ui-render>
+}
+

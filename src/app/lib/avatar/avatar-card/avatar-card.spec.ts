@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { QuantumUI } from "./quantum-ui";
+import { AvatarCard } from "./avatar-card";
 
-describe("QuantumUI", () => {
-  let component: QuantumUI;
-  let fixture: ComponentFixture<QuantumUI>;
+describe("AvatarCard", () => {
+  let component: AvatarCard;
+  let fixture: ComponentFixture<AvatarCard>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuantumUI],
+      imports: [AvatarCard],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(QuantumUI);
+    fixture = TestBed.createComponent(AvatarCard);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

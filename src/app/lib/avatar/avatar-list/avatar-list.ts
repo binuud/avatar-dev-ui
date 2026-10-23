@@ -1,10 +1,11 @@
 import { Component, inject, signal, WritableSignal } from "@angular/core";
-import { AvatarService } from "../../../core/services/avatar-service";
 import { AvatarStoreListRequest } from "../../../gen/v1/avatar/avatarStoreService.pb";
 import { Avatar } from "../../../gen/v1/avatar/avatar.pb";
+import { AvatarStoreSrv } from "../../../core/services/avatar-store-srv";
+import { AvatarCard } from "../avatar-card/avatar-card";
 
 @Component({
-  imports: [],
+  imports: [AvatarCard],
   selector: "app-avatar-list",
   styleUrl: "./avatar-list.scss",
   templateUrl: "./avatar-list.html",
@@ -14,7 +15,7 @@ export class AvatarList {
 
   avatars:  WritableSignal<Avatar[]> = signal([]);
 
-  avatarSvc = inject(AvatarService)
+  avatarStoreSvc = inject(AvatarStoreSrv)
 
   constructor() {
     this.list();
@@ -30,7 +31,7 @@ export class AvatarList {
       offset: 0
     }
     try {
-      await this.avatarSvc.list(req).then(response => {
+      await this.avatarStoreSvc.list(req).then(response => {
         console.dir(response);
         if (response.avatars) {
           this.avatars.set(response.avatars);
@@ -42,8 +43,6 @@ export class AvatarList {
     } finally {
 
     }
-
   }
-
 
 }
