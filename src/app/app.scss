@@ -1,0 +1,17 @@
+.mainHolder {
+    height: -webkit-fill-available;
+}
+
+div.main {
+    padding: 0 20px;
+}
+
+@media (min-width: 768px) { 
+    div.main {
+        margin-left: 6rem;
+    }
+}
+
+footer {
+    margin-top: 100px;
+}

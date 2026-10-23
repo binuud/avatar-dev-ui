@@ -1,0 +1,20 @@
+.sidebar {
+    height: 100vh;
+    position: fixed;
+}
+
+a {cursor: pointer;}
+
+i.brand {
+    font-size: 40px;
+}
+
+.iconMenu i {
+    width:24px;
+    height: 24px;
+    font-size: 18px;
+}
+
+.loadingAnimate {
+    --fa-beat-fade-opacity: 0.67; --fa-beat-fade-scale: 1.075;
+}
