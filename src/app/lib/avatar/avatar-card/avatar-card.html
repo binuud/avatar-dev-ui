@@ -17,12 +17,33 @@
       <ul class="list-group mb-2">
         @for (stepItem of steps; track $index) {
           <li class="list-group-item">
-            <b>{{stepItem.name}}</b>
-            <p class="mt-1">{{stepItem.description}}</p>
+            <p><b>{{stepItem.name}}</b> {{stepItem.description}}</p>
+            @if (stepItem.prompt) {
+              <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
+            }
           </li>
         }
       </ul>
     }
+
+    <div class="accordion mb-3" id="avatarContent">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#avatarFileContent" aria-expanded="true" aria-controls="collapseOne">
+            Avatar MD File content
+          </button>
+        </h2>
+        <div id="avatarFileContent" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div markdown
+              class="card-text responseText avatarMarkdown"
+              [data]="item().content"
+              [disableSanitizer]="true">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <a [routerLink]="['/avatar', item().meta?.name]" class="btn btn-sm btn-primary">Launch</a>
 

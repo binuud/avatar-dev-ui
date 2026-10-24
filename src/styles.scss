@@ -13,3 +13,20 @@ a {cursor: pointer;}
 code {
   font-size: 0.875rem !important; 
 }
+
+.avatarMarkdown > h1 {
+  font-size: 0.9rem !important;
+  margin-bottom: 1rem;
+}
+
+.avatarMarkdown > h2 {
+  font-size: 0.85rem !important;
+  margin-bottom: 0.8rem;
+}
+
+.avatarMarkdown>pre {
+  margin-bottom: 1.2rem;
+}
+.avatarMarkdown>pre>code {
+  text-wrap: auto;
+}
