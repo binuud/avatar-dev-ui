@@ -20,6 +20,12 @@
     "changeOrigin": true,
     "logLevel": "debug"
   },
+  "/api/avatar/ws": {
+    "target": "ws://host.docker.internal:9080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },  
   "/static": {
     "target": "http://host.docker.internal:9080",
     "secure": false,

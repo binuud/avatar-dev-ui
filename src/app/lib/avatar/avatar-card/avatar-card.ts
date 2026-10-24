@@ -10,5 +10,6 @@ import { MarkdownModule } from "ngx-markdown";
   templateUrl: "./avatar-card.html",
 })
 export class AvatarCard {
-  item = input.required<Avatar>();
+  avatar = input.required<Avatar>();
+  showLaunch = input.required<boolean>();
 }
