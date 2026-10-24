@@ -1,17 +1,17 @@
 <div class="card mb-3">
   <div class="card-header">
-    <h5>{{ item().meta?.name}}</h5>
+    <h5>{{ avatar().meta?.name}}</h5>
   </div>
   <div class="card-body">
-    <p><small>{{ item().meta?.uuid}}</small></p>
-    <p class="card-text">{{ item().meta?.description}}</p>
+    <p><small>{{ avatar().meta?.uuid}}</small></p>
+    <p class="card-text">{{ avatar().meta?.description}}</p>
     <p>Triggers: 
-      @for (tag of item().meta?.triggers; track $index) {
+      @for (tag of avatar().meta?.triggers; track $index) {
         <span class="ps-2">{{ tag }}</span>
       }
     </p>
 
-    @let steps = item().steps;
+    @let steps = avatar().steps;
     @if (steps && steps.length > 0) {
       <h6>Steps</h6>
       <ul class="list-group mb-2">
@@ -37,7 +37,7 @@
           <div class="accordion-body">
             <div markdown
               class="card-text responseText avatarMarkdown"
-              [data]="item().content"
+              [data]="avatar().content"
               [disableSanitizer]="true">
             </div>
           </div>
@@ -45,7 +45,10 @@
       </div>
     </div>
 
-    <a [routerLink]="['/avatar', item().meta?.name]" class="btn btn-sm btn-primary">Launch</a>
+    @if (showLaunch()) {
+      <a [routerLink]="['/avatar', avatar().meta?.name]" class="btn btn-sm btn-primary">Launch</a>
+    }
+
 
   </div>
 </div>
