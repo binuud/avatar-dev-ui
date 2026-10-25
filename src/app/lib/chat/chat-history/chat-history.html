@@ -7,4 +7,9 @@
 
   }
 </div>
-
+@if (!aiSvc.state().memory.contexts?.length) {
+  <div class="row">
+    <div class="col" style="height:30vh;">
+    </div>
+  </div>
+} 

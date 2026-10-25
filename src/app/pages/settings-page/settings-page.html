@@ -1,1 +1,19 @@
-<p>settings-page works!</p>
+<h3>Settings</h3>
+<a (click)="clear()">Clear Local Storage</a>
+<p><small>Clears the local storage in the browser.</small></p>
+
+<div class="row mt-3">
+  @for (groupItem of settingsSvc.settings().groups | keyvalue; track groupItem.key) {
+    <div class="col-sm-12 mb-3 mt-3">
+      <h5>{{ groupItem.key }}</h5>
+    </div>
+
+    @for (item of groupItem.value.configs ; track $index) {
+      <div class="col-sm-6 mb-3">
+        <app-config-entry [group]="groupItem.key" [entry]="item"></app-config-entry>
+      </div>
+    }
+  }
+</div>
+
+<p>Updation not yet implemented.</p>
