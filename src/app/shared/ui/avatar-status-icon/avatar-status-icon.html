@@ -1,0 +1,8 @@
+@if (status() == "STATUS_ACTIVE") {
+  <i class="fa-fw fa-solid fa-circle-notch fa-spin statusIcon ACTIVE"></i>
+} @else if (status() == "STATUS_SUCCESS") {
+  <i class="fa-fw fa-solid fa-check statusIcon SUCCESS"></i>
+} @else {
+  <i class="fa-fw fa-regular fa-circle-stop statusIcon "></i>
+} 
+
