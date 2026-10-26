@@ -54,4 +54,8 @@ export class AvatarRun {
     let s2 = Number(control.completedAt?.seconds);
     return (s2-s1);
   }
+
+  uiFormSubmit() {
+    
+  }
 }
