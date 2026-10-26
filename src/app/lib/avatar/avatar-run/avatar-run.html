@@ -1,13 +1,15 @@
-@let ui = avatar().meta?.ui;
+@let ui = avatarSvc.avatar().meta?.ui;
 @let control = avatarSvc.avatarControl()?.control;
 @let currentStep = control?.currentStep || 0;
+@let avatar = avatarSvc.avatar();
 
-<div class="card mb-3">
+<div class="card mb-3 centerNarrowBlock">
   <div class="card-header">
-    <h5><i class="fa-solid fa-circle statusIcon" [class]="{
-            'ACTIVE': control?.status == 'Active' ,
-            'SUCCESS': control?.status == 'Success' 
-          }"></i>{{ avatar().meta?.name}}</h5>
+    <h5>
+      @if (avatarSvc.isConnected()) {
+        <app-avatar-status-icon [status]="avatarSvc.avatarControl()?.control?.status"></app-avatar-status-icon>
+      }
+      {{ avatar.meta?.name}} - {{ avatarSvc.avatarControl()?.control?.status }}</h5>
   </div>
   <div class="card-body">
     @if (ui) {
@@ -24,7 +26,7 @@
         </h2>
         <div id="avatarSteps" class="accordion-collapse collapse show" data-bs-parent="#avatarContent">
           
-          @let steps = avatar().steps;
+          @let steps = avatar.steps;
           @if (steps && steps.length > 0) {
             <ul class="list-group">
               @for (stepItem of steps; track $index) {
@@ -32,10 +34,8 @@
                   <p> 
                     @if (control?.stepStatuses) {
                       @let stepStatus = control?.stepStatuses[$index]?.status;
-                      <i class="fa-solid fa-circle statusIcon" [class]="{
-                        'ACTIVE': stepStatus == 'Active' ,
-                        'SUCCESS': stepStatus == 'Success' 
-                      }"></i>
+                      <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
+                      
                     }
                     <b>{{stepItem.name}}</b> {{stepItem.description}}</p>
                   @if (stepItem.prompt) {
@@ -59,7 +59,7 @@
           <div class="accordion-body">
             <div markdown
               class="card-text responseText avatarMarkdown"
-              [data]="avatar().content"
+              [data]="avatar.content"
               [disableSanitizer]="true">
             </div>
           </div>
@@ -74,10 +74,10 @@
         </h2>
         <div id="avatarInfo" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
           <div class="accordion-body">
-            <p class="card-text">{{ avatar().meta?.description}}</p>
-            <p><small>UUID: {{ avatar().meta?.uuid}}</small></p>
+            <p class="card-text">{{ avatar.meta?.description}}</p>
+            <p><small>UUID: {{ avatar.meta?.uuid}}</small></p>
             <p>Triggers: 
-              @for (tag of avatar().meta?.triggers; track $index) {
+              @for (tag of avatar.meta?.triggers; track $index) {
                 <span class="ps-2">{{ tag }}</span>
               }
             </p>
@@ -86,19 +86,26 @@
       </div>
     </div>
 
-    @if (avatarSvc.isConnected()) {
-      <a  class="btn btn-sm btn-primary" (click)="start()">Start</a>
-    }
-
-    @if (control?.action) {
-      Time Taken: {{ getTimeElapsed(control) }} sec
-      Current Step: {{ control?.currentStep }}
-      @if (control?.stepStatuses) {
-        {{ control?.stepStatuses[currentStep]?.status }}
-      }
-      
-    }
-    
+    <div class="d-flex">
+      <div class="flex-grow-1 responseStats">
+        @if (control?.action) {
+          @if (control?.completedAt) {
+            <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
+          }
+          Current Step: {{ control?.currentStep }}
+          @if (control?.stepStatuses) {
+            : {{ control?.stepStatuses[currentStep]?.status }}
+          }
+        }
+      </div>
+      <div class="text-end">
+        @if (avatarSvc.isConnected()) {
+          <a  class="btn btn-sm btn-primary" (click)="start()">Run</a>
+        } @else {
+          <a  class="btn btn-sm btn-primary" (click)="avatarSvc.connect()">Connect</a>
+        }
+      </div>
+    </div>
 
   </div>
 </div>
