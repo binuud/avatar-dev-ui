@@ -12,9 +12,12 @@
       {{ avatar.meta?.name}} - {{ avatarSvc.avatarControl()?.control?.status }}</h5>
   </div>
   <div class="card-body">
-    @if (ui) {
-      <app-quantum-ui-render [ui]="ui"></app-quantum-ui-render>
+    @if (avatarSvc.avatarControl()?.control?.status === "STATUS_UI_WAITING") {
+      @if (ui) {
+        <app-quantum-ui-render [ui]="ui"></app-quantum-ui-render>
+      }
     }
+
 
     <div class="accordion  mb-3" id="avatarContent">
 
