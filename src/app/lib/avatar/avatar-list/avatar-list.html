@@ -1,4 +1,8 @@
 
+<div class="row">
 @for (item of avatars(); track $index) {
-  <app-avatar-card [avatar]="item" [showLaunch]="true"></app-avatar-card>
+  <div class="col-sm-4">
+    <app-avatar-card [avatar]="item" [showLaunch]="true"></app-avatar-card>
+  </div>
 }
+</div>

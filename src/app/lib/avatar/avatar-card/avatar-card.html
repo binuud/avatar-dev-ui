@@ -1,54 +1,19 @@
+@let a = avatar();
 <div class="card mb-3">
-  <div class="card-header">
-    <h5>{{ avatar().meta?.name}}</h5>
-  </div>
+  @if (a.meta?.image) {
+    <img [src]="a.meta?.image"  class="card-img-top" alt="{{a.meta?.name}}">
+  } @else {
+    <img src="/static/avatarStore/placeholder.png"  class="card-img-top" alt="{{a.meta?.name}}">
+  }
+
   <div class="card-body">
-    <p><small>{{ avatar().meta?.uuid}}</small></p>
-    <p class="card-text">{{ avatar().meta?.description}}</p>
-    <p>Triggers: 
-      @for (tag of avatar().meta?.triggers; track $index) {
-        <span class="ps-2">{{ tag }}</span>
-      }
-    </p>
-
-    @let steps = avatar().steps;
-    @if (steps && steps.length > 0) {
-      <h6>Steps</h6>
-      <ul class="list-group mb-2">
-        @for (stepItem of steps; track $index) {
-          <li class="list-group-item">
-            <p><b>{{stepItem.name}}</b> {{stepItem.description}}</p>
-            @if (stepItem.prompt) {
-              <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
-            }
-          </li>
-        }
-      </ul>
-    }
-
-    <div class="accordion mb-3" id="avatarContent">
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#avatarFileContent" aria-expanded="true" aria-controls="collapseOne">
-            Avatar MD File content
-          </button>
-        </h2>
-        <div id="avatarFileContent" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <div markdown
-              class="card-text responseText avatarMarkdown"
-              [data]="avatar().content"
-              [disableSanitizer]="true">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <p><b>{{ a.meta?.name}}</b></p>
+    <!-- (<small>{{ a.meta?.uuid}}</small>) -->
+    <p class="card-text description">{{ a.meta?.description}}</p>
 
     @if (showLaunch()) {
-      <a [routerLink]="['/avatar', avatar().meta?.name]" class="btn btn-sm btn-primary">Launch</a>
+      <a [routerLink]="['/avatar', a.meta?.name]" class="btn btn-sm btn-primary">Launch</a>
     }
-
 
   </div>
 </div>
