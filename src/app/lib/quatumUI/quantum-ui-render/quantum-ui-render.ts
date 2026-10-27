@@ -1,49 +1,50 @@
-import { Component, input } from "@angular/core";
+import { Component, inject, input, OnInit, output, signal } from "@angular/core";
 import { QuantumUI, UiComponentUiType } from "../../../gen/v1/quantumUI/quantumUI.pb";
+import { CommonModule } from "@angular/common";
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 
 
 @Component({
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   selector: "app-quantum-ui-render",
   styleUrl: "./quantum-ui-render.scss",
   templateUrl: "./quantum-ui-render.html",
 })
-export class QuantumUiRender {
+export class QuantumUiRender implements OnInit {
+
+  fb = inject(FormBuilder);
 
   ui = input.required<QuantumUI>();
+  uiSubmitEvent = output<string>(); 
+
+  dynamicForm: FormGroup = new FormGroup({});
 
   componentTypes = UiComponentUiType;
-  // ui: QuantumUI = {
-  // "components": [
-  //   {
-  //   "id": "firstName",
-  //   "label": "First Name",
-  //   "placeHolder": "Enter your first name",
-  //   "type": UiComponentUiType.INPUT,
-  //   "width": 50
-  //   },
-  //   {
-  //   "id": "lastName",
-  //   "label": "Last Name",
-  //   "placeHolder": "Enter your last name",
-  //   "type": UiComponentUiType.INPUT,
-  //   "width": 50
-  //   },
-  //   {
-  //   "id": "prompt",
-  //   "label": "Prompt",
-  //   "placeHolder": "Prompt",
-  //   "type": UiComponentUiType.TEXTAREA,
-  //   "width": 100
-  //   },
-  //   {
-  //   "type": UiComponentUiType.PLAINTEXT,
-  //   "value": "lorem ipsum dolor sit amet consectetur adipiscing elit optio ducimus temporibus ullamco ipsum dolor omnis aut et fugiat fugiat et voluptas et vero est autem minim possimus et libero facere imperdiet nihil consequatur eiusmod nostrud voluptas vero aliquip possimus duis qui dolorum et cupiditate elit minus quas ea voluptas consequatur",
-  //   "width": 100
-  //   }
-  // ],
-  // "description": "This is a test pane",
-  // "name": "First Pane",
-  // "title": "Avatar Pane"
-  // }
+
+
+  ngOnInit(): void {
+    // Initialize form controls based on the config array
+    let components = this.ui().components;
+    if (!components) return;
+    // let myForm: FormGroup =  new FormGroup({});
+    components.forEach(item => {
+      if (item.id) {
+        this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (this.dynamicForm.valid) {
+      const data = this.dynamicForm.value;
+      console.log('Form Submitted:', data);
+      const rawFormValues = this.dynamicForm.getRawValue();
+      // Convert the JavaScript object into a clean, formatted JSON string
+      const jsonOutput = JSON.stringify(rawFormValues, null, 2);
+      this.uiSubmitEvent.emit(jsonOutput);
+    }
+  }
+
+
+
 }

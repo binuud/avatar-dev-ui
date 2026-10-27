@@ -9,15 +9,19 @@
       @if (avatarSvc.isConnected()) {
         <app-avatar-status-icon [status]="avatarSvc.avatarControl()?.control?.status"></app-avatar-status-icon>
       }
-      {{ avatar.meta?.name}} - {{ avatarSvc.avatarControl()?.control?.status }}</h5>
+      {{ avatar.meta?.name}} 
+      @if (avatarSvc.avatarControl()?.control?.status) {
+        - {{ avatarSvc.avatarControl()?.control?.status }}
+      }
+    </h5>
   </div>
   <div class="card-body">
+    
     @if (avatarSvc.avatarControl()?.control?.status === "STATUS_UI_WAITING") {
       @if (ui) {
-        <app-quantum-ui-render [ui]="ui"></app-quantum-ui-render>
+        <app-quantum-ui-render [ui]="ui" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
       }
     }
-
 
     <div class="accordion  mb-3" id="avatarContent">
 
@@ -89,6 +93,12 @@
       </div>
     </div>
 
+    @if (control?.response) {
+      <div class="row">
+        <p> Final Response: {{ control?.response }}</p>
+      </div>
+    }
+
     <div class="d-flex">
       <div class="flex-grow-1 responseStats">
         @if (control?.action) {
@@ -99,7 +109,7 @@
           @if (control?.stepStatuses) {
             : {{ control?.stepStatuses[currentStep]?.status }}
           }
-        }
+        }{{ control?.currentStep }} :: {{ currentStep }}
       </div>
       <div class="text-end">
         @if (avatarSvc.isConnected()) {

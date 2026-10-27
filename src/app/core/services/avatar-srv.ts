@@ -28,7 +28,7 @@ export class AvatarSrv {
     } 
     try {
       AvatarService.Get(req, this.initReq).then(response => {
-        console.dir(response);
+        // console.dir(response);
         if (response.avatar) {
           this.avatar.set(response.avatar);
         }
@@ -46,17 +46,17 @@ export class AvatarSrv {
         "action": action
       }
     }
-    this.control(req);
+    this.sendControl(req);
   }
 
   /**
-   * control()
+   * sendControl()
    * bidirectional stream is not supported on generated code
    * so using websocket here
    * sends message via websocket
    * @param req 
    */
-  control(req: ControlRequest) {
+  sendControl(req: ControlRequest) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       const msg: string = JSON.stringify(req);
       this.ws.send(msg);
