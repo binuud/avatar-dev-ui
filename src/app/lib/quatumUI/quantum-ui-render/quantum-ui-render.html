@@ -1,9 +1,11 @@
 
 <div class="responseBlock">
+  <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
+
   <div class="card">
-    <div class="card-header">
-      {{ ui().title }}
-    </div>
+    <!-- <div class="card-header">
+      {{ ui().title }} title
+    </div> -->
     <div class="card-body">
       <h5 class="card-title">{{ ui().description }}</h5>
 
@@ -25,8 +27,10 @@
               <p class="card-text">{{ item.value }}</p>
             }
 
-            @if (item.type == "INPUT") {
-              <input type="text" id="{{ item.id }}" class="form-control" placeholder="{{ item.placeHolder }}">
+            @if (item.type == "INPUT" && item.id) {
+              <input type="text" [id]="item.id" class="form-control" 
+                [formControlName]="item.id"
+                placeholder="{{ item.placeHolder }}">
             }
 
             @if (item.type == "TEXTAREA") {
@@ -50,9 +54,9 @@
     </div>
     <div class="card-footer">
       <button type="button" class="btn btn-sm btn-secondary me-3">Cancel</button>
-      <button type="button" class="btn btn-sm btn-primary">Submit</button>
+      <button type="submit" class="btn btn-sm btn-primary">Submit</button>
     </div>
   </div>
-
+  </form>
 </div>
 
