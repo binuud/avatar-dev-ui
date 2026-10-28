@@ -1,4 +1,4 @@
-import { Component,inject, input } from "@angular/core";
+import { Component,effect,inject, input } from "@angular/core";
 import { AvatarControl, AvatarControlAvatarAction, AvatarStatus } from "../../../gen/v1/avatar/avatar.pb";
 import { AvatarSrv } from "../../../core/services/avatar-srv";
 import { ActivatedRoute } from "@angular/router";
@@ -8,6 +8,8 @@ import { AvatarStatusIcon } from "../../../shared/ui/avatar-status-icon/avatar-s
 import { ControlRequest } from "../../../gen/v1/avatar/avatarService.pb";
 
 declare var bootstrap: any; 
+
+
 
 @Component({
   imports: [QuantumUiRender, MarkdownModule, AvatarStatusIcon],
@@ -42,12 +44,13 @@ export class AvatarRun {
     this.avatarSvc.get(this.name);
   }
 
-  start() {
-    // const bsCollapse = new bootstrap.Collapse('#avatarInfoContent', {
-    //   toggle: true
-    // })
-    this.avatarSvc.sendAction(AvatarControlAvatarAction.RUN)
-
+  connectAndStart() {
+    if (this.avatarSvc.isConnected()) {
+      this.avatarSvc.sendInit();
+    } else {
+      // connect first and then start
+      this.avatarSvc.connect();
+    }
   }
 
   getTimeElapsed(control: AvatarControl): number {

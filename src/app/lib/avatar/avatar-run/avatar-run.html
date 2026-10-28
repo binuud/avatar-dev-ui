@@ -7,7 +7,7 @@
   <div class="card-header">
     <h5>
       @if (avatarSvc.isConnected()) {
-        <app-avatar-status-icon [status]="avatarSvc.avatarControl()?.control?.status"></app-avatar-status-icon>
+        <app-avatar-status-icon [status]="control?.status"></app-avatar-status-icon>
       }
       {{ avatar.meta?.name}} 
       @if (avatarSvc.avatarControl()?.control?.status) {
@@ -101,6 +101,7 @@
 
     <div class="d-flex">
       <div class="flex-grow-1 responseStats">
+        Connected: {{ avatarSvc.isConnected() }}
         @if (control?.action) {
           @if (control?.completedAt) {
             <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
@@ -109,13 +110,13 @@
           @if (control?.stepStatuses) {
             : {{ control?.stepStatuses[currentStep]?.status }}
           }
-        }{{ control?.currentStep }} :: {{ currentStep }}
+        }
       </div>
       <div class="text-end">
-        @if (avatarSvc.isConnected()) {
-          <a  class="btn btn-sm btn-primary" (click)="start()">Run</a>
-        } @else {
-          <a  class="btn btn-sm btn-primary" (click)="avatarSvc.connect()">Connect</a>
+        @if (!avatarSvc.isConnected()) {
+            <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
+        } @else if (control?.status != "STATUS_ACTIVE" && control?.status != "STATUS_UI_WAITING") {
+            <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
         }
       </div>
     </div>
