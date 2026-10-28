@@ -7,13 +7,10 @@ import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalStorageService } from "../../../core/services/local-storage-service";
-import { SystemMetrics } from "../../../gen/v1/conscious/metrics.pb";
 import { SystemMetricsService } from "../../../core/services/system-metrics-service";
 import { DecimalPipe, ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
 import { BytesPipe } from "../../../shared/pipes/bytes-pipe";
-import { SingleContext } from "../../../gen/v1/conscious/memory.pb";
-
 
 
 export interface MultiStateButtonConfig {
@@ -45,15 +42,15 @@ export interface ChatPromptInputState {
 export class ChatPromptInput {
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  
   localStorageSvc = inject(LocalStorageService);
   scroller = inject(ViewportScroller);
-  
+  aiSvc = inject(ConsciousService);
+  metricsSvc = inject(SystemMetricsService);
+
   public  static STORAGE_KEY = "ChatPromptInput";
 
   chatModes = ContextMesssageContextType;
-
-  aiSvc = inject(ConsciousService);
-  metricsSvc = inject(SystemMetricsService);
 
   defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
 
@@ -65,7 +62,7 @@ export class ChatPromptInput {
     ["submitted",         { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
   ]);
 
-  metrics: WritableSignal<SystemMetrics> = signal({});
+
   state: WritableSignal<ChatPromptInputState> = signal({
     userPrompt: "",
     model: "",
@@ -75,11 +72,6 @@ export class ChatPromptInput {
     showFileUpload: false,
   });
 
-  currentContext: WritableSignal<SingleContext> = signal({
-    in: {},
-    out: {}
-  });
-
   btnStateSig: WritableSignal<string> = signal("new");
   btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
 
@@ -87,7 +79,7 @@ export class ChatPromptInput {
 
   constructor() {
     this.loadState();
-    this.getMetricsStream();
+    this.metricsSvc.streamMetrics();
   }
 
   loadState() {
@@ -111,7 +103,7 @@ export class ChatPromptInput {
   }
 
   closeCurrentChat() {
-    this.addToHistory();
+    this.aiSvc.addToHistory();
   }
 
   toggleFileUpload() {
@@ -120,13 +112,6 @@ export class ChatPromptInput {
 
   updateCurrentChat(newState: Partial<ChatEntity>) {
     this.currentChat.update(state => ({ 
-      ...state, 
-      ...newState
-    }));
-  }
-
-  updateCurrentContext(newState: Partial<SingleContext>) {
-    this.currentContext.update(state => ({ 
       ...state, 
       ...newState
     }));
@@ -181,30 +166,7 @@ export class ChatPromptInput {
   }
 
   scrollToId(id: string) {
-
     this.scroller.scrollToAnchor("chatPromptBlock");
-  }
-
-  
-  /**
-   *  this.loading = false;
-   *  update history
-   *  clear the current chat entity
-   */
-  addToHistory() {
-
-    this.scrollToBottom();
-    // add current context to memory
-    this.aiSvc.appendContextToMemory(this.currentContext());
-
-    // emtpy the current context
-    this.updateCurrentContext({
-      in: {},
-      out: {}
-    })
-    this.setMode(this.state().mode);
-    this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
-    this.updateState({userPrompt: ""});
   }
 
 
@@ -217,22 +179,32 @@ export class ChatPromptInput {
   async submit() {
 
     this.scrollToId("currentContext");
+    const req = this.createNewContextMessage();
+    this.aiSvc.updateCurrentContext({
+      in: req,
+      out: {}
+    })
+    this.emptyCurrentPrompt();
+
     const mode = this.state().mode;
     if (mode == ContextMesssageContextType.LLM_QUERY ) {
       console.log("New Chat Completion");
-      this.getChatResponse();
+      this.aiSvc.generateRequest(req);
       this.btnStateSig.set("submitted");
     } else if (mode == ContextMesssageContextType.IMAGE_GENERATION ) {
       console.log("New image generation");
-      this.generateImage();
+      this.aiSvc.inRequest(req);
       this.btnStateSig.set("submitted");
     } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
       console.log("Describe image request");
-      this.describeFile();
+      this.aiSvc.inRequest(req);
       this.btnStateSig.set("submitted");
     }
     
     this.scrollToBottom();
+    this.setMode(this.state().mode);
+    this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
+    this.updateState({userPrompt: ""});
 
   }
 
@@ -243,158 +215,6 @@ export class ChatPromptInput {
       model: this.state().model,
       type: this.state().mode,
       data: this.state().fileName
-    }
-  }
-
-
-
-  async getChatResponse(): Promise<void> {
-
-    const req = this.createNewContextMessage();
-    this.updateCurrentContext({
-      in: req,
-      out: {}
-    })
-    this.emptyCurrentPrompt();
-    // this.currentChat.set(AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model));
-    // let newChatEntity = AiInterfaces.NewChatEntity(this.state().userPrompt, this.state().model);
-    // newChatEntity.fileName = this.currentChat().fileName;
-    // this.currentChat.set(newChatEntity);
-
-    try {
-      // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
-      await this.aiSvc.generateRequest(req, this.chatStreamCallback);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.addToHistory();
-    }
-
-  }
-
-  /**
-   * chatStreamCallback()
-   * callback function, for streaming llm chat completions
-   * when streaming call is done, this callback needs to be called
-   * to update the ui
-   * @param resp 
-   */  
-  chatStreamCallback = (response: ContextMesssage) => {
-    // Append the newly arrived word to our signal string instantly
-
-    if (response.responseImage) {
-      response.responseImage =  "/static/" + response.responseImage;
-      this.updateCurrentContext({
-        out: response 
-      })
-    } else {
-      let outContext = this.currentContext().out;
-      if (outContext && outContext.response) {
-        // if the streaming is completed, we send the complete stream in the response
-        if (!response.completedAt) {
-          response.response = outContext.response + response.response;
-        }
-      }
-      this.updateCurrentContext({
-        out: response 
-      })
-    }
-  };
-
-  /**
-   * metricsStreamCallback()
-   * callback function, for streaming llm chat completions
-   * when streaming call is done, this callback needs to be called
-   * to update the ui
-   * @param resp 
-   */  
-  metricsStreamCallback = (resp: SystemMetrics) => {
-    // Append the newly arrived word to our signal string instantly
-
-    this.metrics.set(resp);
-  };
-
-  /**
-   * getMetricsStream()
-   * get cpu usage, gpu usage metrics from server
-   */ 
-  async getMetricsStream() {
-  
-    try {
-      await this.metricsSvc.streamMetrics(this.metricsStreamCallback);
-    } catch (error) {
-      alert(error);
-      console.log("metrics server closed connection");
-      console.error(error);
-      
-    } finally {
-      console.log("metrics server closed connection");
-    }
-
-  }
-
-  /**
-   * generateImage()
-   * to generate an image using the image generation feature of conscious server
-   */ 
-  async generateImage() {
-
-    const req = this.createNewContextMessage();
-    this.updateCurrentContext({
-      in: req,
-      out: {}
-    })
-    this.emptyCurrentPrompt();
-  
-    try {
-      await this.aiSvc.inRequest(req).then(response => {
-        this.updateCurrentChat({
-          responseImage: "/static/" + response.responseImage
-        });
-        console.dir(response);
-      });
-    } catch (error) {
-      alert(error);
-      console.error(error);
-      this.updateCurrentChat({
-        response: 'Failed to generate image. Check console for details.'
-      });
-      this.addToHistory();
-    } finally {
-      this.addToHistory();
-    }
-
-  }
-
-  /**
-   * describeFile()
-   * ask llm to query the uploaded image
-   */ 
-  async describeFile() {
-
-    const req = this.createNewContextMessage();
-    this.updateCurrentContext({
-      in: req,
-      out: {}
-    })
-    this.emptyCurrentPrompt();
-
-    try {
-      await this.aiSvc.inRequest(req).then(result => {
-        this.updateCurrentChat({
-          response: result.response
-        });
-        console.dir(result);
-      });
-    } catch (error) {
-      alert(error);
-      console.error(error);
-      this.updateCurrentChat({
-        response: 'Failed to generate image. Check console for details.'
-      });
-      this.addToHistory();
-    } finally {
-      this.addToHistory();
     }
   }
 
