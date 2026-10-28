@@ -1,9 +1,24 @@
-import { inject, Service, signal, WritableSignal } from "@angular/core";
+import { effect, inject, Service, signal, WritableSignal } from "@angular/core";
 import { InitReq } from "../../gen/fetch.pb";
 import { LocalStorageService } from "./local-storage-service";
 import { AvatarService, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
-import { Avatar, AvatarControlAvatarAction } from "../../gen/v1/avatar/avatar.pb";
+import { Avatar, AvatarControlAvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatar.pb";
 
+
+// AvatarSrv
+
+// Avatar State Transition
+
+// New Runs
+// UI -> Run Button -> Avatar(Conenction Open)
+// UI -> WebSocket-Connect -> Avatar
+// Avatar (ConnectionOpen) -> UI -> Avatar(INIT)
+
+// Subsequent Runs
+// UI -> Run Button -> Avatar(INIT)
+// Avatar -> UI (INIT)
+// UI -> Avatar (RUN)
+// Avatar -> UI (interrupt) -> Handle (Interrupt) -> Avatar (Run-stepnumber)
 
 @Service()
 export class AvatarSrv {
@@ -17,6 +32,22 @@ export class AvatarSrv {
   public avatarControl: WritableSignal<ControlResponse> = signal({});
   public isConnected: WritableSignal<boolean> = signal(false);
   public avatar:  WritableSignal<Avatar> = signal({});
+
+  constructor() {
+    
+    const eff = effect(() => {
+      // handle states of avatar
+      if (this.isConnected()) {
+        if (this.avatarControl()) {
+          // triggered when we receive data from server
+          if (this.avatarControl().control?.status == AvatarStatus.STATUS_INIT) {
+            console.log("Avatar status changed to init");
+            this.sendStart();
+          } 
+        }
+      }
+    });
+  }
 
   initReq: InitReq = {
       pathPrefix: "/api"
@@ -40,6 +71,7 @@ export class AvatarSrv {
   }
 
   sendAction(action: AvatarControlAvatarAction) {
+    console.log("Sending action " + action + " to avatar");
     const req: ControlRequest = {
       "control": {
         "meta": this.avatar().meta,
@@ -47,6 +79,14 @@ export class AvatarSrv {
       }
     }
     this.sendControl(req);
+  }
+
+  sendStart() {
+    this.sendAction(AvatarControlAvatarAction.RUN);
+  }
+
+  sendInit() {
+    this.sendAction(AvatarControlAvatarAction.INIT)
   }
 
   /**
@@ -78,13 +118,13 @@ export class AvatarSrv {
       // send the avatar initialize action on connet
       // so the server is ready to accept commands
       console.log('WebSocket connection to Avatar opened:', event);
-      this.sendAction(AvatarControlAvatarAction.INIT)
+      this.sendInit();
     };
 
     // we got an incoming message
     this.ws.onmessage = (event) => {
       const data:ControlResponse = JSON.parse(event.data);
-      this.avatarControl.set(data)
+      this.avatarControl.set(data);
     };
 
     this.ws.onerror = (error) => {
