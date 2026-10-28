@@ -8,3 +8,9 @@
 div.note {
   font-size: 0.7rem;;
 }
+
+video {
+  /* Use this instead if you only want a traditional horizontal selfie mirror: */
+  transform: scaleX(-1); 
+  margin: 0 auto;
+}

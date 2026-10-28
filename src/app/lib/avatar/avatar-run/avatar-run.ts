@@ -1,5 +1,5 @@
 import { Component,effect,inject, input } from "@angular/core";
-import { AvatarControl, AvatarControlAvatarAction, AvatarStatus } from "../../../gen/v1/avatar/avatar.pb";
+import { AvatarControl, AvatarControlAvatarAction, AvatarStatus, StepStatusResponseType } from "../../../gen/v1/avatar/avatar.pb";
 import { AvatarSrv } from "../../../core/services/avatar-srv";
 import { ActivatedRoute } from "@angular/router";
 import { QuantumUiRender } from "../../quatumUI/quantum-ui-render/quantum-ui-render";
@@ -59,6 +59,16 @@ export class AvatarRun {
     return (s2-s1);
   }
 
+  isImageDataURL(str: string) {
+    if (typeof str !== 'string') return false;
+    
+    // Matches "data:image/ANY_TYPE;base64,DATA" or "data:image/ANY_TYPE,DATA"
+    const regex = /^data:image\/(png|jpeg|jpg|webp|gif|svg\+xml);base64,[A-Za-z0-9+/=]+$/;
+    
+    return regex.test(str);
+  }
+
+
   /**
    * uiFormEvent
    * @param data 
@@ -66,17 +76,27 @@ export class AvatarRun {
    * send it back to the avatar server using the control structure
    * set the response in step status array
    */
-  uiFormEvent(data:any) {
+  uiFormEvent(data: string) {
     console.log("got data from form")
     console.dir(data);
+    
     let currentStep = this.avatarSvc.avatarControl().control?.currentStep || 0;
     // now send this back to avatar
     let req: ControlRequest = {
       "control": this.avatarSvc.avatarControl().control,
     }
+
+
+
     if (req.control) {
       if (req.control.stepStatuses && req.control.stepStatuses[currentStep]) {
-        req.control.stepStatuses[currentStep].response = data;
+        // check if data is image data
+        if (this.isImageDataURL(data)) {
+          req.control.stepStatuses[currentStep].responseType = StepStatusResponseType.IMAGEDATA;
+        } else {
+          req.control.stepStatuses[currentStep].responseType = StepStatusResponseType.TEXT;
+        }
+         req.control.stepStatuses[currentStep].response = data;
         req.control.stepStatuses[currentStep].status = AvatarStatus.STATUS_SUCCESS
       }
       req.control.currentStep = currentStep;
@@ -84,7 +104,6 @@ export class AvatarRun {
       this.avatarSvc.sendControl(req);
       console.log("Sent continue control request to avatar")
     }
-
 
   }
 }

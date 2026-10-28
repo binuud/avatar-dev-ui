@@ -2,7 +2,9 @@
 @let control = avatarSvc.avatarControl()?.control;
 @let currentStep = control?.currentStep || 0;
 @let avatar = avatarSvc.avatar();
-
+      <!-- @if (ui) {
+        <app-quantum-ui-render [ui]="ui" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
+      } -->
 <div class="card mb-3 centerNarrowBlock">
   <div class="card-header">
     <h5>

@@ -1,5 +1,6 @@
 
 <div class="responseBlock">
+
   <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
 
   <div class="card">
@@ -38,6 +39,15 @@
               <div id="{{ item.id }}-help" class="form-text note">
                 {{ item.help }}
               </div>
+            }
+
+            @if (item.type == "WEBCAM") {
+              <div>
+                <video #videoElement autoplay playsinline width="640" height="480" class="mx-auto"></video>
+                <canvas #canvasElement width="640" height="480" style="display:none;"></canvas>
+                <img [src]="webCamImageUrl()"/>
+              </div>
+               <button (click)="capture()" class="btn btn-sm btn-primary">Capture</button>
             }
 
             @if (item.help) {
