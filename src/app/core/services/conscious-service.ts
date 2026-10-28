@@ -48,6 +48,11 @@ export class ConsciousService {
     messageHistory: [],
   });
 
+  currentContext: WritableSignal<SingleContext> = signal({
+    in: {},
+    out: {}
+  });
+
   constructor() {
     this.loadState();
     this.getModels();
@@ -79,6 +84,13 @@ export class ConsciousService {
     this.saveState();
   }
 
+  updateCurrentContext(newState: Partial<SingleContext>) {
+    this.currentContext.update(state => ({ 
+      ...state, 
+      ...newState
+    }));
+  }
+
   /**
    * 
    */
@@ -98,14 +110,86 @@ export class ConsciousService {
     });
   }
 
-  
-  inRequest(req: ContextMesssage): Promise <ContextMesssage> {
-    return Conscious.In(req, this.initReq);
+    
+  /**
+   *  this.loading = false;
+   *  update history
+   *  clear the current chat entity
+   */
+  addToHistory() {
+    
+    // add current context to memory
+    this.appendContextToMemory(this.currentContext());
+
+    // emtpy the current context
+    this.updateCurrentContext({
+      in: {},
+      out: {}
+    })
+
   }
   
-  generateRequest(req: ContextMesssage, myCallback: (resp: ContextMesssage) => void) {
-    return Conscious.Generate(req, myCallback, this.initReq);
+  async inRequest(req: ContextMesssage) {
+     try {
+      await Conscious.In(req, this.initReq).then(response => {
+        // this.updateCurrentChat({
+        //   responseImage: "/static/" + response.responseImage
+        // });
+        console.dir(response);
+      });
+    } catch (error) {
+      alert(error);
+      console.error(error);
+      // this.updateCurrentChat({
+      //   response: 'Failed to generate response. Check console for details.'
+      // });
+      this.addToHistory();
+    } finally {
+      this.addToHistory();
+    }
   }
+  
+
+  async generateRequest(req: ContextMesssage) {
+    try {
+      // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
+      await Conscious.Generate(req, this.chatStreamCallback, this.initReq);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.addToHistory();
+    }
+  }
+
+  /**
+   * chatStreamCallback()
+   * callback function, for streaming llm chat completions
+   * when streaming call is done, this callback needs to be called
+   * to update the ui
+   * @param resp 
+   */  
+  chatStreamCallback = (response: ContextMesssage) => {
+    // Append the newly arrived word to our signal string instantly
+
+    if (response.responseImage) {
+      response.responseImage =  "/static/" + response.responseImage;
+      this.updateCurrentContext({
+        out: response 
+      })
+    } else {
+      let outContext = this.currentContext().out;
+      if (outContext && outContext.response) {
+        // if the streaming is completed, we send the complete stream in the response
+        if (!response.completedAt) {
+          response.response = outContext.response + response.response;
+        }
+      }
+      this.updateCurrentContext({
+        out: response 
+      })
+    }
+  };
+
 
   inStreamRequest(req: ContextMesssage, myCallback: (resp: ContextMesssage) => void) {
     return Conscious.InStream(req, myCallback, this.initReq);
