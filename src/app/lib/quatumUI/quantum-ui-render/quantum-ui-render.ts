@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output, signal } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, inject, input, OnDestroy, OnInit, output, signal, ViewChild, WritableSignal } from "@angular/core";
 import { QuantumUI, UiComponentUiType } from "../../../gen/v1/quantumUI/quantumUI.pb";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -10,7 +10,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
   styleUrl: "./quantum-ui-render.scss",
   templateUrl: "./quantum-ui-render.html",
 })
-export class QuantumUiRender implements OnInit {
+export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
 
   fb = inject(FormBuilder);
 
@@ -21,6 +21,39 @@ export class QuantumUiRender implements OnInit {
 
   componentTypes = UiComponentUiType;
 
+  webCamImageUrl : WritableSignal<string> = signal("");
+
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
+  private stream?: MediaStream;
+
+  async ngAfterViewInit() {
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      this.videoElement.nativeElement.srcObject = this.stream;
+    } catch (err) {
+      console.error('Camera access denied or unavailable:', err);
+    }
+  }
+
+  capture() {
+    const video = this.videoElement.nativeElement;
+    const canvas = this.canvasElement.nativeElement;
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageDataUrl = canvas.toDataURL('image/png');
+      console.log(imageDataUrl); // Use or save base64 image data
+      this.webCamImageUrl.set(imageDataUrl);
+      this.uiSubmitEvent.emit(imageDataUrl);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+    }
+  }
 
   ngOnInit(): void {
     // Initialize form controls based on the config array
