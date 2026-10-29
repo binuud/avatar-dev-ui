@@ -118,14 +118,25 @@
     }
 
     @if (control?.response) {
-      <div class="mt-3 responseBlock">
-        <div markdown
-          class="card-text responseText"
-          [data]="control?.response"
-          [disableSanitizer]="true">
+      @let outContext = control.response;
+      @if (outContext.response) {
+        <div class="col-sm-12 mt-3 responseBlock">
+          <div markdown
+            class="card-text responseText"
+            [data]="outContext.response"
+            [disableSanitizer]="true">
+          </div>
         </div>
-      </div>
+      }
+      @if (outContext.responseImage) {
+        <div class="col-sm-12 mt-3 responseBlock">
+          <div class="">
+            <img [src]="'/static' + outContext.responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
+          </div>
+        </div>
+      }
     }
+
 
   </div>
   
