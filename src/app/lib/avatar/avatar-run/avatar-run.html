@@ -25,75 +25,102 @@
       }
     }
 
-    <div class="accordion  mb-3" id="avatarContent">
-
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarSteps" aria-expanded="false" aria-controls="avatarSteps">
-            Steps
-          </button>
-        </h2>
-        <div id="avatarSteps" class="accordion-collapse collapse show" data-bs-parent="#avatarContent">
-          
-          @let steps = avatar.steps;
-          @if (steps && steps.length > 0) {
-            <ul class="list-group">
-              @for (stepItem of steps; track $index) {
-                <li class="list-group-item">
-                  <p> 
-                    @if (control?.stepStatuses) {
-                      @let stepStatus = control?.stepStatuses[$index]?.status;
-                      <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
-                      
-                    }
-                    <b>{{stepItem.name}}</b> {{stepItem.description}}</p>
-                  @if (stepItem.prompt) {
-                    <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
-                  }
-                </li>
+    <div id="avatarStepsStatuses" class="mb-3">
+      
+      @let steps = avatar.steps;
+      @if (steps && steps.length > 0) {
+        <ul class="list-group">
+          @for (stepItem of steps; track $index) {
+            <li class="list-group-item">
+              <p> 
+                @if (control?.stepStatuses) {
+                  @let stepStatus = control?.stepStatuses[$index]?.status;
+                  <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
+                  
+                }
+                <b>{{stepItem.name}}</b> {{stepItem.description}}</p>
+              @if (stepItem.prompt) {
+                <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
               }
-            </ul>
+            </li>
           }
-          
-        </div>
-      </div>
+        </ul>
+      }
+      
+    </div>
 
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarFileContent" aria-expanded="false" aria-controls="avatarFileContent">
-            Avatar MD File content
-          </button>
-        </h2>
-        <div id="avatarFileContent" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
-          <div class="accordion-body">
-            <div markdown
-              class="card-text responseText avatarMarkdown"
-              [data]="avatar.content"
-              [disableSanitizer]="true">
+    @if (showDetails()) {
+      <div class="accordion  mb-3" id="avatarContent">
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarSteps" aria-expanded="false" aria-controls="avatarSteps">
+              Steps
+            </button>
+          </h2>
+          <div id="avatarSteps" class="accordion-collapse collapse show" data-bs-parent="#avatarContent">
+            
+            @let steps = avatar.steps;
+            @if (steps && steps.length > 0) {
+              <ul class="list-group">
+                @for (stepItem of steps; track $index) {
+                  <li class="list-group-item">
+                    <p> 
+                      @if (control?.stepStatuses) {
+                        @let stepStatus = control?.stepStatuses[$index]?.status;
+                        <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
+                        
+                      }
+                      <b>{{stepItem.name}}</b> {{stepItem.description}}</p>
+                    @if (stepItem.prompt) {
+                      <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarFileContent" aria-expanded="false" aria-controls="avatarFileContent">
+              Avatar MD File content
+            </button>
+          </h2>
+          <div id="avatarFileContent" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
+            <div class="accordion-body">
+              <div markdown
+                class="card-text responseText avatarMarkdown"
+                [data]="avatar.content"
+                [disableSanitizer]="true">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarInfo" aria-expanded="false" aria-controls="avatarInfo">
+              Info
+            </button>
+          </h2>
+          <div id="avatarInfo" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
+            <div class="accordion-body">
+              <p class="card-text">{{ avatar.meta?.description}}</p>
+              <p><small>UUID: {{ avatar.meta?.uuid}}</small></p>
+              <p>Triggers: 
+                @for (tag of avatar.meta?.triggers; track $index) {
+                  <span class="ps-2">{{ tag }}</span>
+                }
+              </p>
             </div>
           </div>
         </div>
       </div>
+    }
 
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarInfo" aria-expanded="false" aria-controls="avatarInfo">
-            Info
-          </button>
-        </h2>
-        <div id="avatarInfo" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
-          <div class="accordion-body">
-            <p class="card-text">{{ avatar.meta?.description}}</p>
-            <p><small>UUID: {{ avatar.meta?.uuid}}</small></p>
-            <p>Triggers: 
-              @for (tag of avatar.meta?.triggers; track $index) {
-                <span class="ps-2">{{ tag }}</span>
-              }
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
 
     @if (control?.response) {
       <div class="row">

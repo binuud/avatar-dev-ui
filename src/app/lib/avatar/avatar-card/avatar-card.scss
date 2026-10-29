@@ -22,3 +22,8 @@ h1, h2, h3 {
   line-height: 1.5em;       /* Adjust to match your project font theme */
   height: calc(1.5em * 3);  /* (line-height * number of lines) */
 }
+
+.card-img-top {
+  max-width: 400px;
+  margin: 0 auto;
+}

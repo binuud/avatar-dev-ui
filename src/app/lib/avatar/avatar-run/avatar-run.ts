@@ -23,6 +23,8 @@ export class AvatarRun {
   avatarSvc = inject(AvatarSrv)
 
   id = input.required<string>(); 
+  showDetails = input<boolean>(false);
+
   name: string = "";
 
   constructor() {
