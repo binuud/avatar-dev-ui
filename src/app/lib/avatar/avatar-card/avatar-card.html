@@ -1,5 +1,10 @@
 @let a = avatar();
 <div class="card mb-3">
+  @if (showDetails()) {
+    <div class="card-header">
+      <b>{{ a.meta?.name}}</b>
+    </div>
+  }
   @if (a.meta?.image) {
     <img [src]="a.meta?.image"  class="card-img-top" alt="{{a.meta?.name}}">
   } @else {
@@ -7,13 +12,92 @@
   }
 
   <div class="card-body">
-    <p><b>{{ a.meta?.name}}</b></p>
-    <!-- (<small>{{ a.meta?.uuid}}</small>) -->
-    <p class="card-text description">{{ a.meta?.description}}</p>
+     @if (!showDetails()) {
+      <p><b>{{ a.meta?.name}}</b></p>
+      <!-- (<small>{{ a.meta?.uuid}}</small>) -->
+      <p class="card-text description">{{ a.meta?.description}}</p>
+     }
+    
+     @if (showDetails()) {
+      <div class="accordion  mb-3" id="avatarContent">
 
-    @if (showLaunch()) {
-      <a [routerLink]="['/avatar', a.meta?.name]" class="btn btn-sm btn-primary">Launch</a>
-    }
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarSteps" aria-expanded="false" aria-controls="avatarSteps">
+              Steps
+            </button>
+          </h2>
+          <div id="avatarSteps" class="accordion-collapse collapse show" data-bs-parent="#avatarContent">
+            
+            @let steps = a.steps;
+            @if (steps && steps.length > 0) {
+              <ul class="list-group">
+                @for (stepItem of steps; track $index) {
+                  <li class="list-group-item">
+                    <p> 
+                      <b>{{stepItem.name}}</b> {{stepItem.description}}
+                    </p>
+                    @if (stepItem.prompt) {
+                      <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarFileContent" aria-expanded="false" aria-controls="avatarFileContent">
+              Avatar MD File content
+            </button>
+          </h2>
+          <div id="avatarFileContent" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
+            <div class="accordion-body">
+              <div markdown
+                class="card-text responseText avatarMarkdown"
+                [data]="a.content"
+                [disableSanitizer]="true">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#avatarInfo" aria-expanded="false" aria-controls="avatarInfo">
+              Info
+            </button>
+          </h2>
+          <div id="avatarInfo" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
+            <div class="accordion-body">
+              <p class="card-text">{{ a.meta?.description}}</p>
+              <p><small>UUID: {{ a.meta?.uuid}}</small></p>
+              <p>Triggers: 
+                @for (tag of a.meta?.triggers; track $index) {
+                  <span class="ps-2">{{ tag }}</span>
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    } 
+    
+    <div class="row">
+      <div class="col">
+        @if (!showDetails()) {
+          <a [routerLink]="['/avatarDetails', a.meta?.name]" class="btn btn-sm btn-primary">Details</a>
+        }  
+      </div>
+      <div class="col text-end">
+        @if (showLaunch()) {
+          <a [routerLink]="['/avatar', a.meta?.name]" class="btn btn-sm btn-primary">Launch</a>
+        }
+      </div>
+    </div>
 
   </div>
 </div>
