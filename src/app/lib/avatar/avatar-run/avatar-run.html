@@ -117,13 +117,6 @@
       </div>
     }
 
-
-    @if (control?.response) {
-      <div class="row">
-        <p> Final Response: {{ control?.response }}</p>
-      </div>
-    }
-
     @if (control?.response) {
       <div class="mt-3 responseBlock">
         <div markdown
@@ -144,7 +137,9 @@
           @if (control?.completedAt) {
             <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
           }
-          Current Step: {{ control?.currentStep }}
+          @if (control?.currentStep) {
+            Current Step: {{ control?.currentStep + 1 }}
+          }
           @if (control?.stepStatuses) {
             : {{ control?.stepStatuses[currentStep]?.status }}
           }
