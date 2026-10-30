@@ -42,3 +42,4 @@ run-shell-angular: ## run shell on angular
 exec: ## get terminal access to container
 	docker exec -it $(APP) sh
 
+##FILE_STORE_PATH=./dataVolume go run cmd/conscious/main.go

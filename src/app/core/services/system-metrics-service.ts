@@ -11,12 +11,16 @@ export class SystemMetricsService {
   }
 
   metrics: WritableSignal<SystemMetrics> = signal({});
+  isAvailable: WritableSignal<boolean> = signal(false);
 
   async streamMetrics()  {
     const req: GetSystemMetricsRequest = {}
     try {
-      await Metrics.GetSystemMetrics(req, this.metricsStreamCallback, this.initReq);
+      await Metrics.GetSystemMetrics(req, this.metricsStreamCallback, this.initReq).then(()=>{
+        this.isAvailable.set(true);
+      });
     } catch (error) {
+      this.isAvailable.set(false);
       alert(error);
       console.log("metrics server closed connection");
       console.error(error);
