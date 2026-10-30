@@ -11,8 +11,9 @@
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
   }
 
-  @let metrics = metricsSvc.metrics();
-  @if (metrics) {
+
+  @if (metricsSvc.isAvailable()) {
+    @let metrics = metricsSvc.metrics();
     <table class="table metrics" style="width:100%;">
       <tr>
         <td style="width: 30px;">CPU</td><td class="text-start">{{ metrics.cpuUsage | number : '1.2-2'}} %</td>
