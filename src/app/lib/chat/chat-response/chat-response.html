@@ -1,24 +1,24 @@
-<div class="row">
-  <div class="cols-sm-12">
-    <div class="d-flex  mt-3 mb-3 responseBlock justify-content-end">
-        <!-- Prompt Card -->
-        <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
-          <div class="fw-semibold text-white-50 userName">
-            @if (type() == 'ACTIVE') {
-              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-            } 
-            You
-          </div>
-          <div class="message-content">
-            {{ context().in?.prompt }}
-          </div>
+
+
+  <div class="d-flex  mt-3 mb-3 justify-content-end">
+      <!-- Prompt Card -->
+      <div class="bg-primary text-white p-3 rounded-3 shadow-sm ms-auto text-end" style="max-width: 75%;">
+        <div class="fw-semibold text-white-50 userName">
+          @if (type() == 'ACTIVE') {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          } 
+          You
         </div>
-    </div>
+        <div class="message-content">
+          {{ context().in?.prompt }}
+        </div>
+      </div>
   </div>
 
 
+
   <!-- @if (chatEntity().reasoning) {
-    <div class="col-sm-12 mt-3 responseBlock">
+    <div class="mt-3">
       <div markdown
         class="card-text responseText"
         [data]="chatEntity().reasoning"
@@ -30,7 +30,7 @@
   @let out = context().out;
   @if (out) {
     @if (out.response) {
-      <div class="col-sm-12 mt-3 responseBlock">
+      <div class="mt-3">
         <div markdown
           class="card-text responseText"
           [data]="out.response"
@@ -39,28 +39,25 @@
       </div>
     }
     @if (out.responseImage) {
-      <div class="col-sm-12 mt-3 responseBlock">
-        <div class="">
-          <img [src]="out.responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
-        </div>
+      <div class="mt-3">
+        <img [src]="out.responseImage" class="d-block mx-auto rounded img-fluid" alt="AI Generated Graphic" />
       </div>
     }
 
     @if (out.completedAt) {
-      <div class="cols-sm-12 responseBlock">
-        <div class="row responseStats">
-          <div class="col-sm-10">
-            Model: {{ out.model }}
-          </div>
-          <div class="col-sm-2 text-end">
-            <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
-          </div>
+
+      <div class="row responseStats">
+        <div class="col-sm-10">
+          Model: {{ out.model }}
+        </div>
+        <div class="col-sm-2 text-end">
+          <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
         </div>
       </div>
+
     }
 
   }
 
 
 
-</div>
