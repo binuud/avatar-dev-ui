@@ -212,21 +212,22 @@ export class ConsciousService {
 
   /**
    * clearMemory()
-   * clears the memory, subsequent chat request
-   * do not send the saved history or previous chat messagse
-   * but messages can still be displayed for user
+   * clears the memory from consious server
+   * display history is maintained
    */
   clearMemory() {
+
+    Conscious.ClearMemory({}, this.initReq);
     this.updateState({
       messageHistory: [],
     })
   }
 
   /**
-   * clearChatHistory()
-   * clears the memory, and history used for displaying previous chat messages
+   * clearDisplayHistory()
+   * clears chat display history alone
    */
-  clearChatHistory() {
+  clearDisplayHistory() {
     this.updateState({
       memory: {},
       messageHistory: [],
