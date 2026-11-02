@@ -143,6 +143,7 @@ export class AvatarSrv {
     if (this.ws) {
       this.ws.close();
       this.isConnected.set(false);
+      this.ws = null;
     }
   }
 

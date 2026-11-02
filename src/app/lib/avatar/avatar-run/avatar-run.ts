@@ -1,4 +1,4 @@
-import { Component,effect,inject, input } from "@angular/core";
+import { Component,effect,inject, input, OnDestroy } from "@angular/core";
 import { AvatarControl, AvatarControlAvatarAction, AvatarStatus, StepStatusResponseType } from "../../../gen/v1/avatar/avatar.pb";
 import { AvatarSrv } from "../../../core/services/avatar-srv";
 import { ActivatedRoute } from "@angular/router";
@@ -17,7 +17,7 @@ declare var bootstrap: any;
   styleUrl: "./avatar-run.scss",
   templateUrl: "./avatar-run.html",
 })
-export class AvatarRun {
+export class AvatarRun implements OnDestroy {
   
   private route = inject(ActivatedRoute);
   avatarSvc = inject(AvatarSrv)
@@ -36,6 +36,9 @@ export class AvatarRun {
       // reset the avatar control status
       this.avatarSvc.avatarControl.set({});
     }
+  }
+  ngOnDestroy(): void {
+    this.avatarSvc.close();
   }
 
   /**
