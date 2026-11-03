@@ -21,18 +21,27 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
 
   componentTypes = UiComponentUiType;
 
+  isWebCamNeeded : WritableSignal<boolean> = signal(false);
   webCamImageUrl : WritableSignal<string> = signal("");
 
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
   private stream?: MediaStream;
 
+  /**
+   * ngAfterViewInit
+   * if web cam needs to be rendered by the ui, then
+   * enable webcam and get the media url
+   * this prevents browser asking for web cam permission needlessly
+   */
   async ngAfterViewInit() {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      this.videoElement.nativeElement.srcObject = this.stream;
-    } catch (err) {
-      console.error('Camera access denied or unavailable:', err);
+    if (this.isWebCamNeeded()) {
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        this.videoElement.nativeElement.srcObject = this.stream;
+      } catch (err) {
+        console.error('Camera access denied or unavailable:', err);
+      }
     }
   }
 
@@ -62,6 +71,9 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
     // let myForm: FormGroup =  new FormGroup({});
     components.forEach(item => {
       if (item.id) {
+        if (item.type == "WEBCAM") {
+          this.isWebCamNeeded.set(true);
+        }
         this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
       }
     });
@@ -70,7 +82,7 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
   onSubmit(): void {
     if (this.dynamicForm.valid) {
       const data = this.dynamicForm.value;
-      console.log('Form Submitted:', data);
+      // console.log('Form Submitted:', data);
       const rawFormValues = this.dynamicForm.getRawValue();
       // Convert the JavaScript object into a clean, formatted JSON string
       const jsonOutput = JSON.stringify(rawFormValues, null, 2);

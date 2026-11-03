@@ -1,4 +1,4 @@
-import { Component,effect,inject, input, OnDestroy } from "@angular/core";
+import { Component,computed,effect,inject, input, OnDestroy, Signal, signal, WritableSignal } from "@angular/core";
 import { AvatarControl, AvatarControlAvatarAction, AvatarStatus, StepStatusResponseType } from "../../../gen/v1/avatar/avatar.pb";
 import { AvatarSrv } from "../../../core/services/avatar-srv";
 import { ActivatedRoute } from "@angular/router";
@@ -9,7 +9,7 @@ import { ControlRequest } from "../../../gen/v1/avatar/avatarService.pb";
 
 declare var bootstrap: any; 
 
-
+const RUNNING_STATUSES: string[] = [AvatarStatus.STATUS_ACTIVE, AvatarStatus.STATUS_INIT, AvatarStatus.STATUS_IO_WAITING, AvatarStatus.STATUS_UI_WAITING];
 
 @Component({
   imports: [QuantumUiRender, MarkdownModule, AvatarStatusIcon],
@@ -24,8 +24,26 @@ export class AvatarRun implements OnDestroy {
 
   id = input.required<string>(); 
   showDetails = input<boolean>(false);
-
   name: string = "";
+
+  showDebug: WritableSignal<boolean> = signal(false);
+
+  isConnectionLost: Signal<boolean> = computed(() => {
+    console.log("Checking if connection lost");
+    const connected = this.avatarSvc.isConnected();
+    const status = this.avatarSvc.avatarControl().control?.status;
+    // if we have a valid avatar status (which means the avatar was started)
+    // and connection is down, it means the connection was lost in middle
+    if (status && !connected) {
+      if (RUNNING_STATUSES.includes(status)) {
+        return true;
+      } else {
+        return false;
+      }
+    } 
+    return false;
+  });
+
 
   constructor() {
     const param = this.route.snapshot.paramMap.get('id')
@@ -36,7 +54,14 @@ export class AvatarRun implements OnDestroy {
       // reset the avatar control status
       this.avatarSvc.avatarControl.set({});
     }
+
   }
+
+  /**
+   * ngOnDestroy
+   * close the websocket
+   * #TBD this needs revisit, where user can go away from screen and return back
+   */
   ngOnDestroy(): void {
     this.avatarSvc.close();
   }
@@ -50,6 +75,7 @@ export class AvatarRun implements OnDestroy {
   }
 
   connectAndStart() {
+    this.avatarSvc.avatarControl.set({});
     if (this.avatarSvc.isConnected()) {
       this.avatarSvc.sendInit();
     } else {

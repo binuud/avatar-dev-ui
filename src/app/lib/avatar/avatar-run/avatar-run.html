@@ -5,16 +5,13 @@
       <!-- @if (ui) {
         <app-quantum-ui-render [ui]="ui" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
       } -->
-<div class="card mb-3 centerNarrowBlock">
+<div class="card mb-3 centerNarrowBlock avatarRun">
   <div class="card-header">
     <h5>
       @if (avatarSvc.isConnected()) {
         <app-avatar-status-icon [status]="control?.status"></app-avatar-status-icon>
       }
       {{ avatar.meta?.name}} 
-      @if (avatarSvc.avatarControl()?.control?.status) {
-        - {{ avatarSvc.avatarControl()?.control?.status }}
-      }
     </h5>
   </div>
   <div class="card-body">
@@ -29,18 +26,22 @@
       
       @let steps = avatar.steps;
       @if (steps && steps.length > 0) {
-        <ul class="list-group">
+        <ul class="list-group list-group-flush">
           @for (stepItem of steps; track $index) {
             <li class="list-group-item">
               <p> 
-                @if (control?.stepStatuses) {
+                @if (control?.stepStatuses && avatarSvc.isConnected()) {
                   @let stepStatus = control?.stepStatuses[$index]?.status;
                   <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
                   
                 }
-                <b>{{stepItem.name}}</b> {{stepItem.description}}</p>
-              @if (stepItem.prompt) {
-                <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
+                {{stepItem.name}} 
+                @if (showDebug()){
+                  {{stepItem.description}}
+                }
+              </p>
+              @if (stepItem.prompt && showDebug()) {
+                <p class="mt-0"><b>Prompt:</b> {{stepItem.prompt}}</p>
               }
             </li>
           }
@@ -69,7 +70,7 @@
                       <b>{{stepItem.name}}</b> {{stepItem.description}}
                     </p>
                     @if (stepItem.prompt) {
-                      <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
+                      <p class="mt-0"><b>Prompt:</b> {{stepItem.prompt}}</p>
                     }
                   </li>
                 }
@@ -140,29 +141,42 @@
 
   </div>
   
-  <div class="card-footer">
-    <div class="d-flex">
-      <div class="flex-grow-1 responseStats">
-        Connected: {{ avatarSvc.isConnected() }}
-        @if (control?.action) {
-          @if (control?.completedAt) {
-            <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
-          }
-          @if (control?.currentStep) {
-            Current Step: {{ control?.currentStep + 1 }}
-          }
-          @if (control?.stepStatuses) {
-            : {{ control?.stepStatuses[currentStep]?.status }}
-          }
-        }
-      </div>
-      <div class="text-end">
-        @if (!avatarSvc.isConnected()) {
-            <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
-        } @else if (control?.status != "STATUS_ACTIVE" && control?.status != "STATUS_UI_WAITING") {
-            <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
-        }
+  @if (isConnectionLost()) {
+    <div class="card-footer">
+      <div class="row">
+        <div class="col-sm-8">
+          <small class="error">!! Warning Connection Lost</small>
+        </div>
+        <div class="col-sm-4 text-end">
+          <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
+        </div>
       </div>
     </div>
-  </div>
+  } @else {
+    <div class="card-footer">
+      <div class="d-flex">
+        <div class="flex-grow-1 responseStats">
+          @if (control?.action) {
+            @if (control?.completedAt) {
+              <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
+            }
+            @if (control?.currentStep) {
+              Current Step: {{ control?.currentStep + 1 }}
+            }
+            @if (control?.stepStatuses) {
+              : {{ control?.stepStatuses[currentStep]?.status }}
+            }
+          }
+        </div>
+        <div class="text-end">
+          @if (!avatarSvc.isConnected()) {
+              <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
+          } @else if (control?.status != "STATUS_ACTIVE" && control?.status != "STATUS_UI_WAITING") {
+              <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
 </div>
