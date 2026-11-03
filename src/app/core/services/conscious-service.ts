@@ -69,7 +69,7 @@ export class ConsciousService {
     
     // connection state has to be from live data
     // this.updateState({connected: false});
-    console.dir(this.state);
+    // console.dir(this.state);
   }
 
   saveState() {
