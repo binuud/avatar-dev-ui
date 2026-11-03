@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
+import { Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ChatResponse } from "../chat-response/chat-response";
 import { ContextMesssage, ContextMesssageContextType } from "../../../gen/v1/conscious/contextMessage.pb";
@@ -79,7 +79,6 @@ export class ChatPromptInput {
 
   constructor() {
     this.loadState();
-    this.metricsSvc.streamMetrics();
   }
 
   loadState() {
@@ -89,7 +88,6 @@ export class ChatPromptInput {
       this.updateState(JSON.parse(value));
     } 
     this.setMode(this.state().mode);
-    console.dir(this.state);
   }
 
   emptyCurrentPrompt() {
