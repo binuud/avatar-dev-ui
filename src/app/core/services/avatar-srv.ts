@@ -1,7 +1,7 @@
 import { effect, inject, Service, signal, WritableSignal } from "@angular/core";
 import { InitReq } from "../../gen/fetch.pb";
 import { LocalStorageService } from "./local-storage-service";
-import { AvatarService, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
+import { AvatarService, BuildRequest, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
 import { Avatar, AvatarControlAvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatar.pb";
 
 
@@ -50,7 +50,7 @@ export class AvatarSrv {
   }
 
   initReq: InitReq = {
-      pathPrefix: "/api"
+    pathPrefix: "/api"
   }
 
   get(name: string) {
@@ -63,6 +63,24 @@ export class AvatarSrv {
         if (response.avatar) {
           this.avatar.set(response.avatar);
         }
+      });
+    } catch (error) {
+      alert(error);
+      console.error(error);
+    } finally {}
+  }
+
+  build(name: string) {
+    const req: BuildRequest = {
+      name: name,
+    } 
+    try {
+      AvatarService.Build(req, this.initReq).then(response => {
+        // console.dir(response);
+        if (response.avatar) {
+          this.avatar.set(response.avatar);
+        }
+        alert("Build Success");
       });
     } catch (error) {
       alert(error);

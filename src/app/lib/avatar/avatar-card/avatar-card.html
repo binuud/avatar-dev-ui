@@ -90,7 +90,9 @@
       <div class="col">
         @if (!showDetails()) {
           <a [routerLink]="['/avatarDetails', a.meta?.name]" class="btn btn-sm btn-primary">Details</a>
-        }  
+        } @else {
+          <a (click)="build()" class="btn btn-sm btn-primary">Build</a>
+        } 
       </div>
       <div class="col text-end">
         @if (showLaunch()) {

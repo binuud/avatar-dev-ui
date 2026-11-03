@@ -35,5 +35,9 @@ export class AvatarDetails {
   async get() {
     this.avatarSvc.get(this.name);
   }
+
+  build($event: string) {
+    this.avatarSvc.build(this.name);
+  }
   
 }

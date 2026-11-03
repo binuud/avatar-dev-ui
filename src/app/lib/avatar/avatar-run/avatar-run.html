@@ -33,12 +33,11 @@
                 @if (control?.stepStatuses && avatarSvc.isConnected()) {
                   @let stepStatus = control?.stepStatuses[$index]?.status;
                   <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
-                  
                 }
                 {{stepItem.name}} 
-                @if (showDebug()){
-                  {{stepItem.description}}
-                }
+                
+                {{stepItem.description}}
+                
               </p>
               @if (stepItem.prompt && showDebug()) {
                 <p class="mt-0"><b>Prompt:</b> {{stepItem.prompt}}</p>
