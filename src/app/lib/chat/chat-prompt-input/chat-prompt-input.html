@@ -11,19 +11,6 @@
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
   }
 
-
-  @if (metricsSvc.isAvailable()) {
-    @let metrics = metricsSvc.metrics();
-    <table class="table metrics" style="width:100%;">
-      <tr>
-        <td style="width: 30px;">CPU</td><td class="text-start">{{ metrics.cpuUsage | number : '1.2-2'}} %</td>
-        <td style="width: 30px;">GPU</td><td class="text-start">{{ metrics.gpuUsage | number : '1.2-2'}} %</td>
-        <td style="width: 30px;">RAM</td><td class="text-start">{{ metrics.ramUsage | number : '1.2-2'}} %</td>
-        <td style="width: 50px;">GPU MEM</td><td class="text-start">{{ metrics.gpuMemUsed | bytes }}</td>
-      </tr>
-    </table>
-  }
-
   <textarea [(ngModel)]="state().userPrompt" (keyup.enter)="submit()"  
     class="form-control mb-3 auto-expand" 
     id="aiPrompt" 
