@@ -57,6 +57,7 @@ export class ChatPromptInput {
   btnConfigMap = new Map<string, MultiStateButtonConfig>([
     ["Query",             { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
     ["Image",             { id: "Image", iconClass: "fa-solid fa-image", disabled: false }],
+    ["ImageEdit",         { id: "Image", iconClass: "fa-solid fa-palette", disabled: false }],
     ["ImageQuery",        { id: "ImageQuery", iconClass: "fa-solid fa-circle-question", disabled: false }],
     ["submitted_wait",    { id: "submitted_wait", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
     ["submitted",         { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
@@ -140,6 +141,8 @@ export class ChatPromptInput {
       this.btnStateSig.set('Query');
     } else if (mode == ContextMesssageContextType.IMAGE_GENERATION) {
       this.btnStateSig.set('Image');
+    } else if (mode == ContextMesssageContextType.IMAGE_EDIT) {
+      this.btnStateSig.set('ImageEdit');
     } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE) {
       this.btnStateSig.set('ImageQuery');
     }
@@ -195,6 +198,10 @@ export class ChatPromptInput {
       this.btnStateSig.set("submitted");
     } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
       console.log("Describe image request");
+      this.aiSvc.inRequest(req);
+      this.btnStateSig.set("submitted");
+    } else if (mode == ContextMesssageContextType.IMAGE_EDIT ) {
+      console.log("Edit image request");
       this.aiSvc.inRequest(req);
       this.btnStateSig.set("submitted");
     }

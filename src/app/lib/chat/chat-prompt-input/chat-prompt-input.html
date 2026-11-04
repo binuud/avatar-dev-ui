@@ -37,9 +37,10 @@
         <i class="fa-solid fa-plus"></i>
       </button>
       <ul class="dropdown-menu">
-        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Generate Chat</a></li>
+        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Chat</a></li>
         <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
         <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_IMAGE_DESCRIBE)">Describe Image</a></li>
+        <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_EDIT)">Edit Image</a></li>
         <li><a class="dropdown-item" (click)="toggleFileUpload()">Attach Image</a></li>
       </ul>
 
