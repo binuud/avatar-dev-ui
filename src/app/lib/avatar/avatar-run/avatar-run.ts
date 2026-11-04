@@ -6,6 +6,7 @@ import { QuantumUiRender } from "../../quatumUI/quantum-ui-render/quantum-ui-ren
 import { MarkdownModule } from "ngx-markdown";
 import { AvatarStatusIcon } from "../../../shared/ui/avatar-status-icon/avatar-status-icon";
 import { ControlRequest } from "../../../gen/v1/avatar/avatarService.pb";
+import { QuantumUI, UiComponent } from "../../../gen/v1/quantumUI/quantumUI.pb";
 
 declare var bootstrap: any; 
 
@@ -99,6 +100,25 @@ export class AvatarRun implements OnDestroy {
     return regex.test(str);
   }
 
+  /**
+   * getUiComponentById
+   * avatar runner, sends the ui component id, to be rendered to the user in the current running step
+   * @param currentStep 
+   * @returns QuantumUI with matching name as selected by llm
+   */
+  getUiComponentById(currentStep: number): QuantumUI | undefined {
+    const uiArray = this.avatarSvc.avatar().uiCollection?.ui;
+    const currentStepObj = this.avatarSvc.avatarControl()?.control;
+
+    // now get the ui-component-id 
+    if (currentStepObj?.stepStatuses && uiArray) {
+      const componentId = currentStepObj?.stepStatuses[currentStep].response;
+      console.log("Trying to open ui component with id "+componentId);
+      const targetComponent = uiArray.find(item => item.name === componentId); 
+      return targetComponent;
+    }
+    return undefined
+  }
 
   /**
    * uiFormEvent
@@ -116,8 +136,6 @@ export class AvatarRun implements OnDestroy {
     let req: ControlRequest = {
       "control": this.avatarSvc.avatarControl().control,
     }
-
-
 
     if (req.control) {
       if (req.control.stepStatuses && req.control.stepStatuses[currentStep]) {
