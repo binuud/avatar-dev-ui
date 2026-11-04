@@ -1,4 +1,3 @@
-@let ui = avatarSvc.avatar().uiCollection?.ui || null;
 @let control = avatarSvc.avatarControl()?.control;
 @let currentStep = control?.currentStep || 0;
 @let avatar = avatarSvc.avatar();
@@ -17,8 +16,11 @@
   <div class="card-body">
     
     @if (avatarSvc.avatarControl()?.control?.status === "STATUS_UI_WAITING") {
-      @if (ui && ui[0]) {
-        <app-quantum-ui-render [ui]="ui[0]" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
+      @let currentUiComponent = getUiComponentById(currentStep);
+      @if (currentUiComponent) {
+        <app-quantum-ui-render [ui]="currentUiComponent" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
+      } @else {
+        <p class="error">UI Component not found</p>
       }
     }
 
