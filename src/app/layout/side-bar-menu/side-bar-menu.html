@@ -19,7 +19,25 @@
         </a>
       </li>
     </ul>
+
     <ul class="nav nav-pills nav-flush flex-column text-center iconMenu">
+      @if (metricsSvc.isAvailable()) {
+        @let metrics = metricsSvc.metrics();
+        <li class="metrics border-top">
+          <div class="row ps-1">
+            <div class="col-2 text-left">CPU</div>
+            <div class="col-8 text-end">{{ metrics.gpuUsage | number : '1.0-0'}}%</div>
+            <div class="col-2 text-left">GPU</div>
+            <div class="col-8 text-end">{{ metrics.gpuUsage | number : '1.0-0'}}%</div>
+            <div class="col-2 text-left">RAM</div>
+            <div class="col-8 text-end">{{ metrics.ramUsage | number : '1.0-0'}}%</div>
+          </div>
+        </li>
+        <li class="metrics border-top">
+          <div class="text-left border-top small">Gpu Mem</div>
+          <div class="text-end pe-1">{{ metrics.gpuMemUsed | bytes}} </div>
+        </li>
+      }
       <li>
         <a routerLink="/settings" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-link py-3 rounded-0 border-top" title="Settings"  container="body" placement="right">
           <i class="fa-solid fa-gear"></i>

@@ -7,10 +7,8 @@ import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalStorageService } from "../../../core/services/local-storage-service";
-import { SystemMetricsService } from "../../../core/services/system-metrics-service";
-import { DecimalPipe, ViewportScroller } from "@angular/common";
+import { ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
-import { BytesPipe } from "../../../shared/pipes/bytes-pipe";
 
 
 export interface MultiStateButtonConfig {
@@ -33,7 +31,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse, DecimalPipe, FileUpload, BytesPipe],
+  imports: [FormsModule, ChatResponse, FileUpload],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
@@ -46,7 +44,6 @@ export class ChatPromptInput {
   localStorageSvc = inject(LocalStorageService);
   scroller = inject(ViewportScroller);
   aiSvc = inject(ConsciousService);
-  metricsSvc = inject(SystemMetricsService);
 
   public  static STORAGE_KEY = "ChatPromptInput";
 
