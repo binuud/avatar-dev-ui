@@ -83,6 +83,23 @@
             </div>
           </div>
         </div>
+
+        @for (ui of a.uiCollection?.ui; track $index) {
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ui-{ui.name}" aria-expanded="false" aria-controls="ui-{ui.name}">
+                UI : {{ ui.name }}
+              </button>
+            </h2>
+            <div id="ui-{ui.name}" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
+              <div class="accordion-body">
+                <p><small>A view of the actual form, which will be rendered when running the Avatar</small></p>
+                <app-quantum-ui-render [ui]="ui"></app-quantum-ui-render>
+              </div>
+            </div>
+          </div>
+        }
+
       </div>
     } 
     
