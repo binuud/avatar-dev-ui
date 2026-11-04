@@ -132,9 +132,13 @@ export class ConsciousService {
   async inRequest(req: ContextMesssage) {
      try {
       await Conscious.In(req, this.initReq).then(response => {
-        // this.updateCurrentChat({
-        //   responseImage: "/static/" + response.responseImage
-        // });
+        if (response.responseImage) {
+          console.dir("got image as ai response");
+          response.responseImage =  "/static/" + response.responseImage;
+        } 
+        this.updateCurrentContext({
+          out: response 
+        });
         console.dir(response);
       });
     } catch (error) {
