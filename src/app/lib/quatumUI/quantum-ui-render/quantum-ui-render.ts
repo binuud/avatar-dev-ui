@@ -79,6 +79,14 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  selectImage(imageItem: string) {
+    const data = {
+      'select-dress': imageItem
+    }
+    const jsonOutput = JSON.stringify(data, null, 2);
+    this.uiSubmitEvent.emit(jsonOutput);
+  }
+
   onSubmit(): void {
     if (this.dynamicForm.valid) {
       const data = this.dynamicForm.value;
