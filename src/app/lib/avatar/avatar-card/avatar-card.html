@@ -35,7 +35,11 @@
                 @for (stepItem of steps; track $index) {
                   <li class="list-group-item">
                     <p> 
-                      <b>{{stepItem.name}}</b> {{stepItem.description}}
+                      <b>{{stepItem.name}}</b>
+                      @if (stepItem.type) {
+                        ( {{ stepItem.type }} )
+                      }
+                      {{stepItem.description}}
                     </p>
                     @if (stepItem.prompt) {
                       <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
@@ -75,6 +79,11 @@
             <div class="accordion-body">
               <p class="card-text">{{ a.meta?.description}}</p>
               <p><small>UUID: {{ a.meta?.uuid}}</small></p>
+              <p>Allowed Tools: 
+                @for (toolName of a.meta?.aiAllowedTools; track $index) {
+                  <span class="ps-2">{{ toolName }}</span>
+                }
+              </p>
               <p>Triggers: 
                 @for (tag of a.meta?.triggers; track $index) {
                   <span class="ps-2">{{ tag }}</span>
