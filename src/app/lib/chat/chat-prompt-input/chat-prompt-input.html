@@ -5,7 +5,7 @@
 
 }
 
-<div class="inputBlock mt-3" id="chatPromptBlock">
+<div class="inputBlock mt-3 mb-1" id="chatPromptBlock">
 
   @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE || state().showFileUpload) {
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
@@ -19,24 +19,31 @@
 
   <div class="row">
     <div class="col-sm-1">
-
-      <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Chat</a></li>
-        <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
-        <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_IMAGE_DESCRIBE)">Describe Image</a></li>
-        <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_EDIT)">Edit Image</a></li>
-        <li><a class="dropdown-item" (click)="toggleFileUpload()">Attach Image</a></li>
-      </ul>
-
+      <div class="dropdown">
+        <button class="btn btn-link dropdown-toggle no-underline" 
+          type="button" 
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_QUERY)">Chat</a></li>
+          <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_GENERATION)">Generate Image</a></li>
+          <li><a class="dropdown-item" (click)="setMode(chatModes.LLM_IMAGE_DESCRIBE)">Describe Image</a></li>
+          <li><a class="dropdown-item" (click)="setMode(chatModes.IMAGE_EDIT)">Edit Image</a></li>
+          <li><a class="dropdown-item" (click)="toggleFileUpload()">Attach Image</a></li>
+        </ul>
+      </div>
     </div>
+
     <div class="col-sm-11">
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <div class="d-flex mb-0 justify-content-md-end">
 
         <div class="dropdown">
-          <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn btn-link dropdown-toggle no-underline" 
+            type="button" 
+            data-bs-toggle="dropdown"  
+            aria-expanded="false">
             
             @if (state().model == "") {
               Select Model
@@ -46,12 +53,10 @@
           
           </button>
 
-          <ul class="dropdown-menu">
-
+          <ul class="dropdown-menu dropdown-menu-scrollable">
             @for (item of aiSvc.state().modelList; track item.id) {
               <li><a class="dropdown-item" (click)="selectModel(item)">{{ item.id }}</a></li>
             }
-
           </ul>
         </div>
         
