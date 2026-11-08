@@ -52,7 +52,7 @@
                 @for (imageItem of item.items; track $index) {
                   <div class="col-sm-4">
                     <a (click)="selectImage(imageItem)">
-                    <img src="/static{{imageItem}}" class="img-fluid pointer"  alt="dress-item-{{$index}}">
+                    <img src="{{imageItem}}" class="img-fluid pointer"  alt="dress-item-{{$index}}">
                     </a>
                   </div>
                 }
