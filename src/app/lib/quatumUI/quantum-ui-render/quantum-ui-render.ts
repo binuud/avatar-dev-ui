@@ -45,16 +45,52 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  trimImageToSquare(img: HTMLVideoElement): Promise<string> {
+    return new Promise((resolve, reject) => {
+
+      const size = Math.min(img.width, img.height);
+      const startX = (img.width - size) / 2;
+      const startY = (img.height - size) / 2;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, startX, startY, size, size, 0, 0, size, size);
+        resolve(canvas.toDataURL('image/png'));
+      } else {
+        reject('Canvas context not available');
+      }
+
+    });
+  }
+
+  /**
+   * capture()
+   * captures the web camera
+   * crops the sides to make the image squarish
+   * and sends the same to backend avatar process
+   */
   capture() {
     const video = this.videoElement.nativeElement;
     const canvas = this.canvasElement.nativeElement;
     const context = canvas.getContext('2d');
     if (context) {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageDataUrl = canvas.toDataURL('image/png');
-      console.log(imageDataUrl); // Use or save base64 image data
-      this.webCamImageUrl.set(imageDataUrl);
-      this.uiSubmitEvent.emit(imageDataUrl);
+      this.trimImageToSquare(video).then((imageDataUrl)=>{
+        this.webCamImageUrl.set(imageDataUrl);
+        this.uiSubmitEvent.emit(imageDataUrl);
+        console.log("Image resized");
+      }).catch(error => {
+        console.error("cannot resize image "+ error)
+      })
+
+      // context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // const imageDataUrl = canvas.toDataURL('image/png');
+      // console.log(imageDataUrl); // Use or save base64 image data
+      // this.webCamImageUrl.set(imageDataUrl);
+      // this.uiSubmitEvent.emit(imageDataUrl);
     }
   }
 
