@@ -1,5 +1,5 @@
 import { Component,computed,effect,inject, input, OnDestroy, Signal, signal, WritableSignal } from "@angular/core";
-import { AvatarControl, AvatarControlAvatarAction, AvatarStatus, StepStatusResponseType } from "../../../gen/v1/avatar/avatar.pb";
+
 import { AvatarSrv } from "../../../core/services/avatar-srv";
 import { ActivatedRoute } from "@angular/router";
 import { QuantumUiRender } from "../../quatumUI/quantum-ui-render/quantum-ui-render";
@@ -7,10 +7,11 @@ import { MarkdownModule } from "ngx-markdown";
 import { AvatarStatusIcon } from "../../../shared/ui/avatar-status-icon/avatar-status-icon";
 import { ControlRequest } from "../../../gen/v1/avatar/avatarService.pb";
 import { QuantumUI, UiComponent } from "../../../gen/v1/quantumUI/quantumUI.pb";
+import { AvatarAction, AvatarControl, AvatarResult, AvatarStatus, StepStatusResponseType } from "../../../gen/v1/avatar/avatarControl.pb";
 
 declare var bootstrap: any; 
 
-const RUNNING_STATUSES: string[] = [AvatarStatus.STATUS_ACTIVE, AvatarStatus.STATUS_INIT, AvatarStatus.STATUS_IO_WAITING, AvatarStatus.STATUS_UI_WAITING];
+const RUNNING_STATUSES: string[] = [AvatarStatus.STATUS_ACTIVE, AvatarStatus.STATUS_INIT];
 
 @Component({
   imports: [QuantumUiRender, MarkdownModule, AvatarStatusIcon],
@@ -25,6 +26,11 @@ export class AvatarRun implements OnDestroy {
 
   id = input.required<string>(); 
   showDetails = input<boolean>(false);
+
+  statusEnum = AvatarStatus;
+  actionEnum = AvatarAction;
+  resultEnum = AvatarResult;
+
   name: string = "";
 
   showDebug: WritableSignal<boolean> = signal(false);
@@ -120,6 +126,27 @@ export class AvatarRun implements OnDestroy {
     return undefined
   }
 
+  reRunStep(stepNum: number) {
+    // now send this back to avatar
+    console.log("Trying to rerun step " + stepNum);
+    let req: ControlRequest = {
+      "control": structuredClone(this.avatarSvc.avatarControl().control),
+    }
+    
+    if (req.control) {
+      if (req.control.stepStatuses && req.control.stepStatuses[stepNum]) {
+        req.control.stepStatuses[stepNum].status = AvatarStatus.STATUS_IGNORE;
+        // check if data is image data
+      }
+      req.control.currentStep = stepNum;
+      req.control.action = AvatarAction.ACTION_BEGIN;
+      this.avatarSvc.sendControl(req);
+      console.log("Sent continue control request to avatar")
+    }
+
+  }
+  
+
   /**
    * uiFormEvent
    * @param data 
@@ -129,12 +156,12 @@ export class AvatarRun implements OnDestroy {
    */
   uiFormEvent(data: string) {
     console.log("got data from form")
-    console.dir(data);
+    console.dir(data.slice(0, 100));
     
     let currentStep = this.avatarSvc.avatarControl().control?.currentStep || 0;
     // now send this back to avatar
     let req: ControlRequest = {
-      "control": this.avatarSvc.avatarControl().control,
+      "control": structuredClone(this.avatarSvc.avatarControl().control),
     }
 
     if (req.control) {
@@ -145,11 +172,12 @@ export class AvatarRun implements OnDestroy {
         } else {
           req.control.stepStatuses[currentStep].responseType = StepStatusResponseType.TEXT;
         }
-         req.control.stepStatuses[currentStep].response = data;
-        req.control.stepStatuses[currentStep].status = AvatarStatus.STATUS_SUCCESS
+        req.control.stepStatuses[currentStep].response = data;
+        req.control.stepStatuses[currentStep].status = AvatarStatus.STATUS_COMPLETED;
+        req.control.stepStatuses[currentStep].result = AvatarResult.RESULT_SUCCESS;
       }
       req.control.currentStep = currentStep;
-      req.control.action = AvatarControlAvatarAction.RUN;
+      req.control.action = AvatarAction.ACTION_BEGIN;
       this.avatarSvc.sendControl(req);
       console.log("Sent continue control request to avatar")
     }

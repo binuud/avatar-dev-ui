@@ -60,11 +60,16 @@
           </h2>
           <div id="avatarFileContent" class="accordion-collapse collapse" data-bs-parent="#avatarContent">
             <div class="accordion-body">
-              <div markdown
-                class="card-text responseText avatarMarkdown"
-                [data]="a.content"
-                [disableSanitizer]="true">
-              </div>
+              @if (a.content) {
+                <div markdown
+                  class="card-text responseText avatarMarkdown"
+                  [data]="a.content"
+                  [disableSanitizer]="true">
+                </div>
+              } @else {
+                <p>No Content. Steps might have been provided directly in <b>{{a.meta?.name}}-steps.yaml</b> file</p>
+              }
+
             </div>
           </div>
         </div>
