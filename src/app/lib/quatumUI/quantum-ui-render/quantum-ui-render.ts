@@ -79,9 +79,9 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
     const context = canvas.getContext('2d');
     if (context) {
       this.trimImageToSquare(video).then((imageDataUrl)=>{
+        console.log("Image resized");
         this.webCamImageUrl.set(imageDataUrl);
         this.uiSubmitEvent.emit(imageDataUrl);
-        console.log("Image resized");
       }).catch(error => {
         console.error("cannot resize image "+ error)
       })

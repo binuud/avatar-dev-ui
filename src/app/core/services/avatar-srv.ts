@@ -2,7 +2,8 @@ import { effect, inject, Service, signal, WritableSignal } from "@angular/core";
 import { InitReq } from "../../gen/fetch.pb";
 import { LocalStorageService } from "./local-storage-service";
 import { AvatarService, BuildRequest, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
-import { Avatar, AvatarControlAvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatar.pb";
+import { Avatar, } from "../../gen/v1/avatar/avatar.pb";
+import { AvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatarControl.pb";
 
 
 // AvatarSrv
@@ -88,23 +89,24 @@ export class AvatarSrv {
     } finally {}
   }
 
-  sendAction(action: AvatarControlAvatarAction) {
+  sendAction(action: AvatarAction) {
     console.log("Sending action " + action + " to avatar");
     const req: ControlRequest = {
-      "control": {
-        "meta": this.avatar().meta,
-        "action": action
+      control: {
+        name: this.avatar().meta?.name,
+        avatarUuid: this.avatar().meta?.uuid,
+        action: action
       }
     }
     this.sendControl(req);
   }
 
   sendStart() {
-    this.sendAction(AvatarControlAvatarAction.RUN);
+    this.sendAction(AvatarAction.ACTION_BEGIN);
   }
 
   sendInit() {
-    this.sendAction(AvatarControlAvatarAction.INIT)
+    this.sendAction(AvatarAction.ACTION_INIT)
   }
 
   /**

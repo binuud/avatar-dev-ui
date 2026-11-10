@@ -15,7 +15,7 @@
   </div>
   <div class="card-body">
     
-    @if (avatarSvc.avatarControl()?.control?.status === "STATUS_UI_WAITING") {
+    @if (avatarSvc.avatarControl()?.control?.status === statusEnum.STATUS_WAITING) {
       @let currentUiComponent = getUiComponentById(currentStep);
       @if (currentUiComponent) {
         <app-quantum-ui-render [ui]="currentUiComponent" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
@@ -36,7 +36,10 @@
                   @let stepStatus = control?.stepStatuses[$index]?.status;
                   <app-avatar-status-icon [status]="stepStatus"></app-avatar-status-icon>
                 }
-                {{stepItem.name}} 
+                @if (control?.status == statusEnum.STATUS_COMPLETED) {
+                  <a (click)="reRunStep($index)" class="btn btn-primary  btn-sm">Rerun</a>
+                }
+                {{stepItem.name}}
                 
                 {{stepItem.description}}
                 
@@ -165,14 +168,14 @@
               Current Step: {{ control?.currentStep + 1 }}
             }
             @if (control?.stepStatuses) {
-              : {{ control?.stepStatuses[currentStep]?.status }}
+              : {{ control?.stepStatuses[currentStep]?.status }}, {{control?.action}}
             }
           }
         </div>
         <div class="text-end">
           @if (!avatarSvc.isConnected()) {
               <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
-          } @else if (control?.status != "STATUS_ACTIVE" && control?.status != "STATUS_UI_WAITING") {
+          } @else if (control?.status != "STATUS_ACTIVE" && control?.status != statusEnum.STATUS_WAITING) {
               <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
           }
         </div>
