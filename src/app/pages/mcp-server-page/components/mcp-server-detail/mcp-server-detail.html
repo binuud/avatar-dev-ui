@@ -1,0 +1,24 @@
+  <div class="card mb-3">
+    <div class="card-header">
+      {{ mcpConfig().name }} ( {{ mcpConfig().transport }} )
+    </div>
+    <div class="card-body">
+      @if (mcpConfig().command) {
+        <p>{{ mcpConfig().command }}</p>
+      }
+      @if (mcpConfig().url) {
+        <p>{{ mcpConfig().url }}</p>
+      }
+      @let instance = mcpInstance();
+      @if (instance && instance.tools ) {
+        <h5>Tool List</h5>
+        <ul>
+          @for (tool of instance.tools ; track $index) {
+            <li> {{ tool.name }} </li>
+          }
+        </ul>
+       
+      }
+      <button class="btn btn-primary" (click)="get(mcpConfig().uuid)">Check</button>
+    </div>
+  </div>

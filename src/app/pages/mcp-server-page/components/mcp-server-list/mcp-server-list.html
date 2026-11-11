@@ -1,0 +1,4 @@
+@let servers = mcpManagerSvc.mcpServers().servers;
+@for (item of servers ; track $index) {
+  <app-mcp-server-detail [mcpConfig]="item"></app-mcp-server-detail>
+}
