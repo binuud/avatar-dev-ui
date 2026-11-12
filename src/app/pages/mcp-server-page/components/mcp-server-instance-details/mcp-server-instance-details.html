@@ -1,0 +1,17 @@
+<div class="mt-3 pt-3 border-top ">
+  <h5>Tool List</h5>
+  <ul>
+    @for (tool of mcpInstance().tools ; track $index) {
+      <li> {{ tool.name }} </li>
+    }
+  </ul>
+</div>
+@if (mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_HTTP || mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_SSE) {
+  <div class="mt-3 pt-3 border-top ">
+    <h5>Protected Resource Metadata Discovery</h5>
+    <pre>
+{{ mcpInstance().prmDoc  }}
+    </pre>
+  </div>
+}
+

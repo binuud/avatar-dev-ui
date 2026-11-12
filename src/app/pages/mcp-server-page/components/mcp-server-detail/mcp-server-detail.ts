@@ -1,9 +1,12 @@
 import { Component, inject, input, signal, WritableSignal } from "@angular/core";
-import { GetResponse, MCPServerConfig, MCPServerInstance } from "../../../../gen/v1/mcpManager/mcpManager.pb";
+import { MCPServerConfig, MCPServerInstance } from "../../../../gen/v1/mcpManager/mcpManager.pb";
 import { McpManagerSrv } from "../../../../core/services/mcp-manager-srv";
+import { MarkdownModule } from "ngx-markdown";
+import { McpServerInstanceDetails } from "../mcp-server-instance-details/mcp-server-instance-details";
+
 
 @Component({
-  imports: [],
+  imports: [MarkdownModule, McpServerInstanceDetails],
   selector: "app-mcp-server-detail",
   styleUrl: "./mcp-server-detail.scss",
   templateUrl: "./mcp-server-detail.html",

@@ -4,9 +4,10 @@ import { CheckRequest, MCPServerConfig, MCPServerInstance, MCPTransportType, Reg
 import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ToastSrv } from "../../../../core/services/toast-srv";
+import { McpServerInstanceDetails } from "../mcp-server-instance-details/mcp-server-instance-details";
 
 @Component({
-  imports: [FormsModule],
+  imports: [FormsModule, McpServerInstanceDetails],
   selector: "app-add-mcp-server",
   styleUrl: "./add-mcp-server.scss",
   templateUrl: "./add-mcp-server.html",
