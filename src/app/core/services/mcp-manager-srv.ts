@@ -1,5 +1,5 @@
 import { Service, signal, WritableSignal } from "@angular/core";
-import { CheckRequest, CheckResponse, GetRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig } from "../../gen/v1/mcpManager/mcpManager.pb";
+import { CheckRequest, CheckResponse, GetRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
 import { InitReq } from "../../gen/fetch.pb";
 
 @Service()
@@ -31,20 +31,6 @@ export class McpManagerSrv {
   }
 
   /**
-   * list
-   * @param req 
-   * check the status of server without adding
-   */
-  check(req: CheckRequest) {
-    
-    // MCPManagerService.Check(req, this.initReq).then(response => {
-    //   this.mcpServers.set(response);
-    //   console.dir(response);
-    // });
-
-  }
-
-  /**
    * get
    * @param req 
    * check the status of the registered server
@@ -54,4 +40,28 @@ export class McpManagerSrv {
     return MCPManagerService.Get(req, this.initReq);
 
   }
+
+  /**
+   * check
+   * @param req 
+   * check the status of server without adding
+   */
+  check(req: CheckRequest) {
+    
+    return MCPManagerService.Check(req, this.initReq);
+
+  }
+
+  /**
+   * save
+   * @param req 
+   * save the mcp server
+   */
+  save(req: RegisterRequest) {
+    
+    return MCPManagerService.Register(req, this.initReq);
+
+  }
+
+
 }
