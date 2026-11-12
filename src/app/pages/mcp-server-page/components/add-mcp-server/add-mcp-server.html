@@ -68,19 +68,7 @@
     </div>
   }
 
-  @let instance = mcpInstance();
-  @if (instance && instance.tools ) {
-    <div class="row mt-3 pt-3 border-top">
-      <div class="col">
-        <h5>Tool List</h5>
-        <ul>
-          @for (tool of instance.tools ; track $index) {
-            <li> {{ tool.name }} </li>
-          }
-        </ul>
-      </div>
-    </div>
-  }
+  <app-mcp-server-instance-details [mcpInstance]="mcpInstance()"></app-mcp-server-instance-details>
 
   <div class="row mt-3 pt-3 border-top">
     <div class="col-sm-4">

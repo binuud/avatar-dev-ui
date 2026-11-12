@@ -9,16 +9,7 @@
       @if (mcpConfig().url) {
         <p>{{ mcpConfig().url }}</p>
       }
-      @let instance = mcpInstance();
-      @if (instance && instance.tools ) {
-        <h5>Tool List</h5>
-        <ul>
-          @for (tool of instance.tools ; track $index) {
-            <li> {{ tool.name }} </li>
-          }
-        </ul>
-       
-      }
+      <app-mcp-server-instance-details [mcpInstance]="mcpInstance()"></app-mcp-server-instance-details>
       <button class="btn btn-primary" (click)="get(mcpConfig().uuid)">Check</button>
     </div>
   </div>
