@@ -1,0 +1,96 @@
+<h3>Add MCP Server</h3>
+<div class="narrowBlock">
+
+  <div class="row mt-3">
+    <div class="col-sm-4">
+      <label for="mcpServerName" class="form-label">MCP Server Name</label>
+    </div>
+    <div class="col-sm-8">
+      <input id="mcpServerName" type="text" 
+        class="form-control" 
+        [(ngModel)]="data().name"
+        placeholder="">
+      <div class="form-text">
+        Enter the human readable name for the MCP server. Lower snake case, eg: calendar-mcp
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-sm-4">
+      <label for="mcpType" class="form-label">Type</label>
+    </div>
+    <div class="col-sm-8">
+      <select id="mcpType" class="form-select"
+        [(ngModel)]="data().mcpType"
+        aria-label="MCP Server Type">
+        <option selected>Select MCP Type</option>
+        <option [value]="mcpTypes.MCP_TYPE_HTTP">Remote</option>
+        <option [value]="mcpTypes.MCP_TYPE_STDIO">CommandLine</option>
+      </select>
+      <div class="form-text">
+        Choose the MCP Server Type. Remote/CommandLine
+      </div>
+    </div>
+  </div>
+
+  @if (data().mcpType == mcpTypes.MCP_TYPE_STDIO) {
+    <div class="row mt-3">
+      <div class="col-sm-4">
+        <label for="mcpCommand" class="form-label">Command</label>
+      </div>
+      <div class="col-sm-8">
+        <input id="mcpCommand" type="text" 
+          class="form-control" 
+          [(ngModel)]="data().command"
+          placeholder="">
+        <div class="form-text">
+          Enter the command with arguments for invoking the MCP server in command line
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (data().mcpType == mcpTypes.MCP_TYPE_HTTP) {
+    <div class="row mt-3">
+      <div class="col-sm-4">
+        <label for="mcpUrl" class="form-label">URL</label>
+      </div>
+      <div class="col-sm-8">
+        <input id="mcpUrl" type="text" 
+          class="form-control"  
+          [(ngModel)]="data().url"
+          placeholder="">
+        <div class="form-text">
+          Enter the full URL for connecting with the Remote MCP Server
+        </div>
+      </div>
+    </div>
+  }
+
+  @let instance = mcpInstance();
+  @if (instance && instance.tools ) {
+    <div class="row mt-3 pt-3 border-top">
+      <div class="col">
+        <h5>Tool List</h5>
+        <ul>
+          @for (tool of instance.tools ; track $index) {
+            <li> {{ tool.name }} </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  <div class="row mt-3 pt-3 border-top">
+    <div class="col-sm-4">
+      <button class="btn btn-secondary">Cancel</button>
+    </div>
+    <div class="col-sm-8 text-end">
+      <button class="btn btn-info me-2" (click)="check()">Check</button>
+      <button class="btn btn-primary" (click)="submit()">Submit</button>
+    </div>
+  </div>
+
+</div>
+

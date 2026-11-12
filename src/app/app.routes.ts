@@ -6,6 +6,7 @@ import { AvatarRun } from './lib/avatar/avatar-run/avatar-run';
 import { SettingsPage } from './pages/settings-page/settings-page';
 import { AvatarDetails } from './lib/avatar/avatar-details/avatar-details';
 import { McpServerPage } from './pages/mcp-server-page/mcp-server-page';
+import { AddMcpServer } from './pages/mcp-server-page/components/add-mcp-server/add-mcp-server';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/chat', pathMatch: 'full' },
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: 'chat', component: AiChatPage },
   { path: 'avatars', component: AvatarPage },
   { path: 'mcpServers', component: McpServerPage },
+  { path: 'mcpServers/new', component: AddMcpServer },
   { path: 'avatarDetails/:id', component: AvatarDetails },
   { path: 'avatar/:id', component: AvatarRun },
   { path: 'settings', component: SettingsPage },
