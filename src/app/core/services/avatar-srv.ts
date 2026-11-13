@@ -4,6 +4,7 @@ import { LocalStorageService } from "./local-storage-service";
 import { AvatarService, BuildRequest, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
 import { Avatar, } from "../../gen/v1/avatar/avatar.pb";
 import { AvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatarControl.pb";
+import { ToastSrv } from "./toast-srv";
 
 
 // AvatarSrv
@@ -23,7 +24,8 @@ import { AvatarAction, AvatarStatus } from "../../gen/v1/avatar/avatarControl.pb
 
 @Service()
 export class AvatarSrv {
-  
+
+  toastService = inject(ToastSrv);
   localStorageSvc = inject(LocalStorageService);
   public  static STORAGE_KEY = "AvatarSrv";
   private ws: WebSocket | null = null;
@@ -71,22 +73,21 @@ export class AvatarSrv {
     } finally {}
   }
 
-  build(name: string) {
+  async build(name: string): Promise<any> {
     const req: BuildRequest = {
       name: name,
     } 
     try {
-      AvatarService.Build(req, this.initReq).then(response => {
+      return AvatarService.Build(req, this.initReq).then(response => {
         // console.dir(response);
         if (response.avatar) {
           this.avatar.set(response.avatar);
         }
-        alert("Build Success");
+        this.toastService.notifySuccess("Build Success");
       });
     } catch (error) {
-      alert(error);
-      console.error(error);
-    } finally {}
+      this.toastService.notifyError("error");
+    }  finally {}
   }
 
   sendAction(action: AvatarAction) {
