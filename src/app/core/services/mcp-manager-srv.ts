@@ -1,5 +1,5 @@
 import { Service, signal, WritableSignal } from "@angular/core";
-import { CheckRequest, CheckResponse, GetRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
+import { CheckRequest, CheckResponse, GetRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest, ToggleRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
 import { InitReq } from "../../gen/fetch.pb";
 
 @Service()
@@ -38,6 +38,17 @@ export class McpManagerSrv {
   get(req: GetRequest) {
     
     return MCPManagerService.Get(req, this.initReq);
+
+  }
+
+  /**
+   * toggle
+   * @param req 
+   * check the status of the registered server
+   */
+  toggle(req: ToggleRequest) {
+    
+    return MCPManagerService.Toggle(req, this.initReq);
 
   }
 
