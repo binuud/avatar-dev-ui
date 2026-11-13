@@ -1,0 +1,10 @@
+ <button
+    [class]="buttonClass()"
+    [disabled]="isLoading() || disabled()"
+    (click)="executeAction()">
+      @if (isLoading()) {
+        <span>{{ loadingText() }}</span>
+      } @else {
+        <ng-content>Submit</ng-content>
+      }
+</button>

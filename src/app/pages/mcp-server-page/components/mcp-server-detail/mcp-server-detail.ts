@@ -3,10 +3,12 @@ import { MCPServerConfig, MCPServerInstance } from "../../../../gen/v1/mcpManage
 import { McpManagerSrv } from "../../../../core/services/mcp-manager-srv";
 import { MarkdownModule } from "ngx-markdown";
 import { McpServerInstanceDetails } from "../mcp-server-instance-details/mcp-server-instance-details";
+import { ActionButton } from "../../../../core/components/action-button/action-button";
+import { GetResponse } from "../../../../gen/v1/avatar/avatarService.pb";
 
 
 @Component({
-  imports: [MarkdownModule, McpServerInstanceDetails],
+  imports: [ActionButton, MarkdownModule, McpServerInstanceDetails],
   selector: "app-mcp-server-detail",
   styleUrl: "./mcp-server-detail.scss",
   templateUrl: "./mcp-server-detail.html",
@@ -19,9 +21,9 @@ export class McpServerDetail {
 
   mcpInstance:  WritableSignal<MCPServerInstance> = signal({})
 
-  get(uuid: string | undefined) {
+  async get(uuid: string | undefined): Promise<void | GetResponse> {
     if (uuid) {
-      this.mcpManagerSvc.get({uuid: uuid}).then(response => {
+      return this.mcpManagerSvc.get({uuid: uuid}).then(response => {
         if (response && response.instance) {
           this.mcpInstance.set(response.instance);
         }

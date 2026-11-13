@@ -44,9 +44,16 @@ export class ToastSrv {
     this.toasts.update((current) => current.filter((t) => t.id !== id));
   }
 
+  notifyInfo(msg: string): void {
+    this.show(msg, {
+      title: 'Info',
+      type: 'info',
+      delay: 4000,
+    });
+  }
+
   notifySuccess(msg: string): void {
     this.show(msg, {
-      title: 'Success',
       type: 'success',
       delay: 4000,
     });
