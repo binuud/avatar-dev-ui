@@ -122,7 +122,13 @@
         @if (!showDetails()) {
           <a [routerLink]="['/avatarDetails', a.meta?.name]" class="btn btn-sm btn-primary">Details</a>
         } @else {
-          <a (click)="build()" class="btn btn-sm btn-primary">Build</a>
+          <app-action-button
+            class="me-2"
+            buttonClass="btn btn-sm btn-primary"
+            [action]="() => build(a.meta?.name)"
+            loadingText="Building...">
+            Build
+          </app-action-button>
         } 
       </div>
       <div class="col text-end">
