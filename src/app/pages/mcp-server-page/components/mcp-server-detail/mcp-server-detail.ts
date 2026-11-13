@@ -31,4 +31,15 @@ export class McpServerDetail {
     }
   }
 
+  /**
+   * toggle
+   * toggle MCP server for the main chat interface
+   * @param toggle 
+   */
+  toggle(uuid: string | undefined ) {
+    if (uuid) {
+      this.mcpManagerSvc.toggle({uuid: uuid});
+    }
+  }
+
 }

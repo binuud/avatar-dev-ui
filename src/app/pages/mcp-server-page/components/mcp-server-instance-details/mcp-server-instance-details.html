@@ -4,15 +4,16 @@
     <div id="toolsAccordion" class="accordion accordion-flush">
       
       @for (tool of mcpInstance().tools ; track $index) {
+        @let accordionId = "accordion-" + mcpInstance().config?.uuid + "-ind" + $index;
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
-              [attr.data-bs-target]="'#tools-accordion-'+$index" 
-              aria-expanded="false" aria-controls="tools-accordion-{{$index}}">
-              {{ tool.name }} {{$index}}
+              [attr.data-bs-target]="'#'+accordionId" 
+              aria-expanded="false" aria-controls="{{accordionId}}">
+              {{ tool.name }}
             </button>
           </h2>
-          <div id="tools-accordion-{{$index}}" class="accordion-collapse collapse" 
+          <div id="{{accordionId}}" class="accordion-collapse collapse" 
             data-bs-parent="#toolsAccordion">
             <div class="accordion-body">
               {{ tool.description }}
