@@ -3,7 +3,11 @@
     [disabled]="isLoading() || disabled()"
     (click)="executeAction()">
       @if (isLoading()) {
-        <span>{{ loadingText() }}</span>
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> 
+        @if (loadingText()) {
+          <span class="ps-2">{{ loadingText() }}</span>
+        }
+        
       } @else {
         <ng-content>Submit</ng-content>
       }

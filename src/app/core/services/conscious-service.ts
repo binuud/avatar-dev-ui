@@ -5,6 +5,7 @@ import { InitReq } from "../../gen/fetch.pb";
 import { Model } from "../../gen/v1/conscious/common.pb";
 import { LocalStorageService } from "./local-storage-service";
 import { Memory, SingleContext } from "../../gen/v1/conscious/memory.pb";
+import { ToastSrv } from "./toast-srv";
 
 
 export interface ConsciousServiceState {
@@ -31,6 +32,7 @@ export interface ConsciousServiceState {
 @Service()
 export class ConsciousService {
 
+  toastService = inject(ToastSrv);
   localStorageSvc = inject(LocalStorageService);
   public  static STORAGE_KEY = "ConsciousService";
 
@@ -129,9 +131,16 @@ export class ConsciousService {
 
   }
   
-  async inRequest(req: ContextMesssage) {
+  /**
+   * inRequest
+   * non streaming call for image request, describe image
+   * model routing etc
+   * @param req 
+   * @returns 
+   */
+  async inRequest(req: ContextMesssage): Promise<any> {
      try {
-      await Conscious.In(req, this.initReq).then(response => {
+      return  Conscious.In(req, this.initReq).then(response => {
         if (response.responseImage) {
           console.dir("got image as ai response");
           response.responseImage =  "/static/" + response.responseImage;
@@ -139,29 +148,29 @@ export class ConsciousService {
         this.updateCurrentContext({
           out: response 
         });
-        console.dir(response);
+      }).catch(error => {
+        this.toastService.notifyError(error['message']);
+        this.addToHistory();
+      }).finally(() => {
+        this.addToHistory()
       });
     } catch (error) {
-      alert(error);
       console.error(error);
-      // this.updateCurrentChat({
-      //   response: 'Failed to generate response. Check console for details.'
-      // });
-      this.addToHistory();
-    } finally {
-      this.addToHistory();
-    }
+    } 
   }
   
 
-  async generateRequest(req: ContextMesssage) {
+  async generateRequest(req: ContextMesssage): Promise<any> {
     try {
       // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
-      await Conscious.Generate(req, this.chatStreamCallback, this.initReq);
+      return Conscious.Generate(req, this.chatStreamCallback, this.initReq).finally(() => {
+        console.log("finally triggered on generateRequest");
+        this.addToHistory()
+      });
     } catch (error) {
-      console.error(error);
+      this.toastService.notifyError("error while generateRequest");
     } finally {
-      this.addToHistory();
+      // this.addToHistory();
     }
   }
 
@@ -225,6 +234,7 @@ export class ConsciousService {
     this.updateState({
       messageHistory: [],
     })
+    this.toastService.notifySuccess("Cleared Memory");
   }
 
   /**
