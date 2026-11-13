@@ -75,8 +75,22 @@
       <button class="btn btn-secondary">Cancel</button>
     </div>
     <div class="col-sm-8 text-end">
-      <button class="btn btn-info me-2" (click)="check()">Check</button>
-      <button class="btn btn-primary" (click)="submit()">Submit</button>
+      <app-action-button
+        class="me-2"
+        buttonClass="btn btn-info"
+        [action]="() => check()"
+        loadingText="Fetching...">
+        Show Tools
+      </app-action-button>
+      
+      <app-action-button
+        class="me-2"
+        buttonClass="btn btn-primary"
+        [action]="() => submit()"
+        loadingText="Saving...">
+        Submit
+      </app-action-button>
+      
     </div>
   </div>
 

@@ -10,6 +10,12 @@
         <p>{{ mcpConfig().url }}</p>
       }
       <app-mcp-server-instance-details [mcpInstance]="mcpInstance()"></app-mcp-server-instance-details>
-      <button class="btn btn-primary" (click)="get(mcpConfig().uuid)">Check</button>
+
+      <app-action-button
+        buttonClass="btn btn-primary"
+        [action]="() => get(mcpConfig().uuid)"
+        loadingText="Fetching...">
+        Show Tools
+      </app-action-button>
     </div>
   </div>

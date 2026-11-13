@@ -1,17 +1,39 @@
-<div class="mt-3 pt-3 border-top ">
-  <h5>Tool List</h5>
-  <ul>
-    @for (tool of mcpInstance().tools ; track $index) {
-      <li> {{ tool.name }} </li>
-    }
-  </ul>
-</div>
-@if (mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_HTTP || mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_SSE) {
+@if (mcpInstance().tools) {
   <div class="mt-3 pt-3 border-top ">
-    <h5>Protected Resource Metadata Discovery</h5>
-    <pre>
-{{ mcpInstance().prmDoc  }}
-    </pre>
+    <h5>Tool List</h5>
+    <div id="toolsAccordion" class="accordion accordion-flush">
+      
+      @for (tool of mcpInstance().tools ; track $index) {
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+              [attr.data-bs-target]="'#tools-accordion-'+$index" 
+              aria-expanded="false" aria-controls="tools-accordion-{{$index}}">
+              {{ tool.name }} {{$index}}
+            </button>
+          </h2>
+          <div id="tools-accordion-{{$index}}" class="accordion-collapse collapse" 
+            data-bs-parent="#toolsAccordion">
+            <div class="accordion-body">
+              {{ tool.description }}
+              <h6 class="mt-3">Input Schema</h6> 
+              <pre>{{ tool.inputSchema }} </pre>
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+
   </div>
+  @if (mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_HTTP || mcpInstance().config?.mcpType == mcpTypes.MCP_TYPE_SSE) {
+    <div class="mt-3 pt-3 border-top ">
+      <h5>Protected Resource Metadata Discovery</h5>
+      <pre>
+  {{ mcpInstance().prmDoc  }}
+      </pre>
+    </div>
+  }
 }
+
 

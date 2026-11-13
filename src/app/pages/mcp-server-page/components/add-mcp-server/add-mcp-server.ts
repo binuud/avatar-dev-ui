@@ -5,9 +5,10 @@ import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ToastSrv } from "../../../../core/services/toast-srv";
 import { McpServerInstanceDetails } from "../mcp-server-instance-details/mcp-server-instance-details";
+import { ActionButton } from "../../../../core/components/action-button/action-button";
 
 @Component({
-  imports: [FormsModule, McpServerInstanceDetails],
+  imports: [ActionButton, FormsModule, McpServerInstanceDetails],
   selector: "app-add-mcp-server",
   styleUrl: "./add-mcp-server.scss",
   templateUrl: "./add-mcp-server.html",
@@ -36,7 +37,7 @@ export class AddMcpServer {
     return true;
   }
 
-  check() {
+  async check(): Promise<any> {
     console.log("validation " + this.validateData());
     if (!this.validateData()) {
       this.toastService.notifyError("data validation failed");
@@ -47,18 +48,18 @@ export class AddMcpServer {
       config: this.data()
     }
     
-    this.mcpManagerSvc.check(req).then(response => {
+    return this.mcpManagerSvc.check(req).then(response => {
       if (response && response.instance) {
         this.mcpInstance.set(response.instance);
       }
-      this.toastService.notifySuccess("checked successfully");
+      this.toastService.notifySuccess("fetched mcp tools from server");
     }).catch(error => {
       this.toastService.notifyError(error['message']);
     });
 
   }
 
-  submit() {
+  async submit(): Promise<any> {
 
     if (!this.validateData()) {
       this.toastService.notifyError("data validation failed");
@@ -69,7 +70,7 @@ export class AddMcpServer {
       config: this.data()
     }
     
-    this.mcpManagerSvc.save(req).then(response => {
+    return this.mcpManagerSvc.save(req).then(response => {
       if (response && response.instance) {
         this.mcpInstance.set(response.instance);
       }
