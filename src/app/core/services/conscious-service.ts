@@ -163,7 +163,9 @@ export class ConsciousService {
   async generateRequest(req: ContextMesssage): Promise<any> {
     try {
       // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
-      return Conscious.Generate(req, this.chatStreamCallback, this.initReq).finally(() => {
+      return Conscious.Generate(req, this.chatStreamCallback, this.initReq).catch(error => {
+        this.toastService.notifyError(error['message']);
+      }).finally(() => {
         console.log("finally triggered on generateRequest");
         this.addToHistory()
       });
