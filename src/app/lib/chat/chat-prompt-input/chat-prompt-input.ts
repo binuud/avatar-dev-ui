@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { LocalStorageService } from "../../../core/services/local-storage-service";
 import { ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
+import { ActionButton } from "../../../core/components/action-button/action-button";
 
 
 export interface MultiStateButtonConfig {
@@ -31,7 +32,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [FormsModule, ChatResponse, FileUpload],
+  imports: [ActionButton, FormsModule, ChatResponse, FileUpload],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
@@ -174,7 +175,7 @@ export class ChatPromptInput {
    * checks the current mode, if it is query, then invoke chat completion
    * if the mode is image generation, calls the image generate function
    */
-  async submit() {
+  async submit(): Promise<any> {
 
     this.scrollToId("currentContext");
     const req = this.createNewContextMessage();
@@ -185,28 +186,24 @@ export class ChatPromptInput {
     this.emptyCurrentPrompt();
 
     const mode = this.state().mode;
-    if (mode == ContextMesssageContextType.LLM_QUERY ) {
-      console.log("New Chat Completion");
-      this.aiSvc.generateRequest(req);
-      this.btnStateSig.set("submitted");
-    } else if (mode == ContextMesssageContextType.IMAGE_GENERATION ) {
-      console.log("New image generation");
-      this.aiSvc.inRequest(req);
-      this.btnStateSig.set("submitted");
-    } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
-      console.log("Describe image request");
-      this.aiSvc.inRequest(req);
-      this.btnStateSig.set("submitted");
-    } else if (mode == ContextMesssageContextType.IMAGE_EDIT ) {
-      console.log("Edit image request");
-      this.aiSvc.inRequest(req);
-      this.btnStateSig.set("submitted");
-    }
-    
     this.scrollToBottom();
-    this.setMode(this.state().mode);
+    // this.setMode(this.state().mode);
     this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
     this.updateState({userPrompt: ""});
+    // this.btnStateSig.set("submitted");
+    if (mode == ContextMesssageContextType.LLM_QUERY ) {
+      console.log("New Chat Completion");
+      return this.aiSvc.generateRequest(req);
+    } else if (mode == ContextMesssageContextType.IMAGE_GENERATION ) {
+      console.log("New image generation");
+      return this.aiSvc.inRequest(req);
+    } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
+      console.log("Describe image request");
+      return this.aiSvc.inRequest(req);
+    } else if (mode == ContextMesssageContextType.IMAGE_EDIT ) {
+      console.log("Edit image request");
+      return this.aiSvc.inRequest(req);
+    }
 
   }
 

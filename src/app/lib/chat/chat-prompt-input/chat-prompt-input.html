@@ -11,9 +11,9 @@
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
   }
 
-  <textarea [(ngModel)]="state().userPrompt" (keyup.enter)="submit()"  
+  <textarea id="aiPrompt" [(ngModel)]="state().userPrompt" 
+    /* (keyup.enter)="submit()"   */
     class="form-control mb-3 auto-expand" 
-    id="aiPrompt" 
     placeholder="Prompt the AI" 
     rows="1"></textarea>
 
@@ -72,9 +72,13 @@
 
         </div>
         
-        <button (click)="submit()" type="button" class="btn btn-primary rounded-circle" [disabled]="btnConfigSig().disabled">
+        <app-action-button
+          buttonClass="btn btn-primary rounded-circle"
+          [action]="() => submit()"
+          loadingText="">
           <i [class]="btnConfigSig().iconClass"></i>
-        </button> 
+        </app-action-button>
+
       </div>
     </div>
   </div>
