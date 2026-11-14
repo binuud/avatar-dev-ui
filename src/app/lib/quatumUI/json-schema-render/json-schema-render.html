@@ -1,0 +1,44 @@
+<div class="responseBlock">
+
+  <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()">
+    <div class="card">
+      <div class="card-header">
+        {{ formTitle() }}
+      </div>
+      <div class="card-body">
+
+          @for (key of propertyKeys; track $index) {
+
+            @let propId =  key;
+            <div class="row mb-3">
+              <div class="col-sm-5">
+                <label for="{{ propId }}" class="form-label">{{ key }}</label>
+              </div>
+              <div class="col-sm-7">
+                @if (properties[key].type == "string") {
+                  <input type="text" [id]="propId" class="form-control" 
+                    [formControlName]="propId">
+                }
+                @if (properties[key].description) {
+                  <div id="{{ key }}-{{ $index }}-help" class="form-text note">
+                    {{ properties[key].description }}
+                  </div>
+                }
+              </div>
+            </div>
+
+          }
+
+      </div>
+
+      @if (showSubmit() === true) {
+        <div class="card-footer">
+          <button type="button" class="btn btn-sm btn-secondary me-3">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+        </div>
+      }
+
+    </div>
+  </form>
+
+</div>
