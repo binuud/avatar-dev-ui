@@ -1,10 +1,12 @@
 import { Component, inject, input, output } from "@angular/core";
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { JsonSchema7 } from "../../../core/external/jsonSchema7";
 import { CommonModule } from "@angular/common";
+import { JsonSchemaArrayInput } from "./components/json-schema-array-input/json-schema-array-input";
+import { JsonSchemaFormService } from "./service/json-schema-form-service";
 
 @Component({
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, JsonSchemaArrayInput],
   selector: "app-json-schema-render",
   styleUrl: "./json-schema-render.scss",
   templateUrl: "./json-schema-render.html",
@@ -12,19 +14,21 @@ import { CommonModule } from "@angular/common";
 
 export class JsonSchemaRender {
 
+  dynamicForm: FormGroup = new FormGroup({});
+  schemaService = inject(JsonSchemaFormService);
   fb = inject(FormBuilder);
   schema = input.required<string>();
   formTitle = input.required<string>();
   showSubmit = input.required<boolean>();
   uiSubmitEvent = output<string>(); 
-  dynamicForm: FormGroup = new FormGroup({});
+
 
   propertyKeys :string[] = [];
   properties: { [property: string]: JsonSchema7 }  = {};
-  //computed(() => Object.keys(this.properties()));
+
   
   constructor() {
-    console.log(this.schema);  
+    // console.log(this.schema);  
   }
 
   ngOnInit(): void {
@@ -40,9 +44,13 @@ export class JsonSchemaRender {
 
     let myForm: FormGroup =  new FormGroup({});
     this.propertyKeys.forEach((propName) => {
-      this.dynamicForm.setControl(propName, new FormControl('', [Validators.required]));
-      console.log(propName);
+      // this.dynamicForm.setControl(propName, new FormControl('', [Validators.required]));
+      this.dynamicForm.setControl(propName, this.schemaService.buildControl(this.properties[propName]));
     });
+  }
+
+  getFormArray(controlName: string): FormArray {
+    return this.dynamicForm.get(controlName) as FormArray;
   }
 
   onSubmit() {
@@ -52,7 +60,10 @@ export class JsonSchemaRender {
       const rawFormValues = this.dynamicForm.getRawValue();
       // Convert the JavaScript object into a clean, formatted JSON string
       const jsonOutput = JSON.stringify(rawFormValues, null, 2);
+      console.dir(jsonOutput);
       this.uiSubmitEvent.emit(jsonOutput);
     }
   }
+
+
 }

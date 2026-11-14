@@ -1,0 +1,31 @@
+<div class="array-field">
+  <label>{{ schema().title || 'Items' }}</label>
+
+  @for (control of formArray.controls; track $index) {
+    <div class="array-row">
+      <input [formControl]="$any(control)" placeholder="Enter item..." />
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="removeItem($index)"
+        [disabled]="formArray.controls.length == 1">
+        Remove
+      </button>
+    </div>
+  }
+  <button
+    type="button"
+    class="btn btn-primary btn-sm"
+    (click)="addItem()"
+    [disabled]="schema().maxItems !== undefined">
+    + Add Item
+  </button>
+
+  <!-- Validation Feedback -->
+  @if (formArray.errors?.['minItems']) {
+    <small class="error">Minimum {{ schema().minItems }} item(s) required.</small>
+  }
+  @if (formArray.errors?.['uniqueItems']) {
+    <small class="error">Duplicate items are not allowed.</small>
+  }
+</div>
