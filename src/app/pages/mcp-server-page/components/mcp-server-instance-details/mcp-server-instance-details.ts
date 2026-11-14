@@ -16,6 +16,7 @@ export class McpServerInstanceDetails {
   toastService = inject(ToastSrv);
   mcpManagerSvc = inject(McpManagerSrv);
   mcpInstance = model.required<MCPServerInstance>();
+  showToolForm = input.required<boolean>();
   
   mcpTypes = MCPTransportType;
 
