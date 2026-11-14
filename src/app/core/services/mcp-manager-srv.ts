@@ -1,5 +1,5 @@
 import { Service, signal, WritableSignal } from "@angular/core";
-import { CheckRequest, CheckResponse, GetRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest, ToggleRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
+import { CheckRequest, CheckResponse, GetRequest, HandleToolRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest, ToggleRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
 import { InitReq } from "../../gen/fetch.pb";
 
 @Service()
@@ -60,6 +60,17 @@ export class McpManagerSrv {
   check(req: CheckRequest) {
     
     return MCPManagerService.Check(req, this.initReq);
+
+  }
+
+  /**
+   * check
+   * @param req 
+   * check the status of server without adding
+   */
+  handleTool(req: HandleToolRequest) {
+    
+    return MCPManagerService.HandleTool(req, this.initReq);
 
   }
 

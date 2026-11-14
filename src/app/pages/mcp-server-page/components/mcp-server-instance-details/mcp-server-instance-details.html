@@ -17,10 +17,11 @@
             data-bs-parent="#toolsAccordion">
             <div class="accordion-body">
               {{ tool.description }}
-              <h6 class="mt-3">Input Schema</h6> 
+              
               @if (tool.inputSchema && tool.name) {
                 <div class="row">
                   <div class="col-sm-6">
+                    <h6 class="mt-3">Input Schema</h6> 
                     <pre>{{ tool.inputSchema }} </pre>
                   </div>
                   <div class="col-sm-6 border-start">
@@ -28,7 +29,17 @@
                       [schema]="tool.inputSchema" 
                       [formTitle]="tool.name"
                       [showSubmit]="true"
-                      (uiSubmitEvent)="submit($event)"></app-json-schema-render>
+                      (uiSubmitEvent)="submit($index,tool.name, $event)">
+                    </app-json-schema-render>
+                    <p class="small mt-1">Click on Submit, after entering values, to interact with the MCP server directly.</p>
+                    <p class="small">If MCP Server requires auth, make sure you have configured the correct auth tokens.</p>
+
+                    @if (tool.response) {
+                      <pre style="white-space: pre-line;">
+{{ tool.response | json }}
+                      </pre>
+                    }
+
                   </div>
                 </div>
               }         

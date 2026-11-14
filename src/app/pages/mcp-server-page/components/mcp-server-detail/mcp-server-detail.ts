@@ -15,9 +15,10 @@ import { GetResponse } from "../../../../gen/v1/avatar/avatarService.pb";
 })
 
 export class McpServerDetail {
-
-  mcpConfig = input.required<MCPServerConfig>();
+  
   mcpManagerSvc = inject(McpManagerSrv);
+  mcpConfig = input.required<MCPServerConfig>();
+
 
   mcpInstance:  WritableSignal<MCPServerInstance> = signal({})
 
