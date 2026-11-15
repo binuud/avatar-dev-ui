@@ -1,4 +1,4 @@
-import { effect, inject, Service, signal, WritableSignal } from "@angular/core";
+import { computed, effect, inject, Service, Signal, signal, WritableSignal } from "@angular/core";
 import { InitReq } from "../../gen/fetch.pb";
 import { LocalStorageService } from "./local-storage-service";
 import { AvatarService, BuildRequest, ControlRequest, ControlResponse, GetRequest, GetResponse } from "../../gen/v1/avatar/avatarService.pb";
@@ -35,6 +35,17 @@ export class AvatarSrv {
   public avatarControl: WritableSignal<ControlResponse> = signal({});
   public isConnected: WritableSignal<boolean> = signal(false);
   public avatar:  WritableSignal<Avatar> = signal({});
+
+  public currentStep: Signal<number> = computed(() => {
+    const myAvatarControl = this.avatarControl();
+    console.dir(myAvatarControl.control);
+    const myStep = myAvatarControl.control?.currentStep;
+    console.log("Current step changed " + myStep)
+    if (myAvatarControl && myStep && myStep >= 0) {
+      return myStep;
+    }
+    return 0;
+  });
 
   constructor() {
     
@@ -145,6 +156,7 @@ export class AvatarSrv {
     // we got an incoming message
     this.ws.onmessage = (event) => {
       const data:ControlResponse = JSON.parse(event.data);
+      console.log("Event from server --> control")
       this.avatarControl.set(data);
     };
 

@@ -51,6 +51,10 @@ export class AvatarRun implements OnDestroy {
     return false;
   });
 
+  currentUiComponent: Signal<QuantumUI | undefined> = computed(() => {
+    const currentStep = this.avatarSvc.currentStep();
+    return this.getUiComponentById(currentStep);
+  });
 
   constructor() {
     const param = this.route.snapshot.paramMap.get('id')
@@ -113,6 +117,9 @@ export class AvatarRun implements OnDestroy {
    * @returns QuantumUI with matching name as selected by llm
    */
   getUiComponentById(currentStep: number): QuantumUI | undefined {
+    
+    if (currentStep == -1) return undefined;
+
     const uiArray = this.avatarSvc.avatar().uiCollection?.ui;
     const currentStepObj = this.avatarSvc.avatarControl()?.control;
 
