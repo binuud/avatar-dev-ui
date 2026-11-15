@@ -119,7 +119,7 @@ export class AvatarRun implements OnDestroy {
   getUiComponentById(currentStep: number): QuantumUI | undefined {
     
     if (currentStep == -1) return undefined;
-
+    console.log(`getUiComponentById ${currentStep}`)
     const uiArray = this.avatarSvc.avatar().uiCollection?.ui;
     const currentStepObj = this.avatarSvc.avatarControl()?.control;
 

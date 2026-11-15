@@ -12,21 +12,43 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 })
 export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
 
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
+
   fb = inject(FormBuilder);
 
   ui = input.required<QuantumUI>();
   uiSubmitEvent = output<string>(); 
 
+  isWebCamNeeded : WritableSignal<boolean> = signal(false);
+  webCamImageUrl : WritableSignal<string> = signal("");
+
   dynamicForm: FormGroup = new FormGroup({});
 
   componentTypes = UiComponentUiType;
 
-  isWebCamNeeded : WritableSignal<boolean> = signal(false);
-  webCamImageUrl : WritableSignal<string> = signal("");
-
-  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
   private stream?: MediaStream;
+
+  ngOnDestroy() {
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+    }
+  }
+
+  ngOnInit(): void {
+    // Initialize form controls based on the config array
+    let components = this.ui().components;
+    if (!components) return;
+    // let myForm: FormGroup =  new FormGroup({});
+    components.forEach(item => {
+      if (item.id) {
+        if (item.type == "WEBCAM") {
+          this.isWebCamNeeded.set(true);
+        }
+        this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
+      }
+    });
+  }
 
   /**
    * ngAfterViewInit
@@ -43,6 +65,18 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
         console.error('Camera access denied or unavailable:', err);
       }
     }
+        // Initialize form controls based on the config array
+    let components = this.ui().components;
+    if (!components) return;
+    // let myForm: FormGroup =  new FormGroup({});
+    components.forEach(item => {
+      if (item.id) {
+        if (item.type == "WEBCAM") {
+          this.isWebCamNeeded.set(true);
+        }
+        this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
+      }
+    });
   }
 
   trimImageToSquare(img: HTMLVideoElement): Promise<string> {
@@ -94,26 +128,7 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-    }
-  }
 
-  ngOnInit(): void {
-    // Initialize form controls based on the config array
-    let components = this.ui().components;
-    if (!components) return;
-    // let myForm: FormGroup =  new FormGroup({});
-    components.forEach(item => {
-      if (item.id) {
-        if (item.type == "WEBCAM") {
-          this.isWebCamNeeded.set(true);
-        }
-        this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
-      }
-    });
-  }
 
   selectImage(imageItem: string) {
     const data = {
@@ -125,9 +140,11 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
 
   onSubmit(): void {
     console.log("Quantum ui for sumbitted")
+    const data = this.dynamicForm.value;
+    console.log('Form Submitted:', data);
     if (this.dynamicForm.valid) {
       const data = this.dynamicForm.value;
-      // console.log('Form Submitted:', data);
+      console.log('Form Submitted:', data);
       const rawFormValues = this.dynamicForm.getRawValue();
       // Convert the JavaScript object into a clean, formatted JSON string
       const jsonOutput = JSON.stringify(rawFormValues, null, 2);
