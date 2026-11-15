@@ -162,7 +162,7 @@
               <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
             }
             @if (control?.currentStep) {
-              Current Step: {{ control?.currentStep }}
+              Current Step: {{ control?.currentStep + 1}}
             }
             @if (control?.stepStatuses) {
               : {{ control?.stepStatuses[avatarSvc.currentStep()]?.status }}, {{control?.action}}

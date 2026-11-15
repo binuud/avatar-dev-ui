@@ -39,7 +39,10 @@ export class AvatarSrv {
   public currentStep: Signal<number> = computed(() => {
     const myAvatarControl = this.avatarControl();
     console.dir(myAvatarControl.control);
-    const myStep = myAvatarControl.control?.currentStep;
+    let myStep = myAvatarControl.control?.currentStep;
+    if (typeof myStep === "undefined") {
+      myStep = 0;
+    }
     console.log("Current step changed " + myStep)
     if (myAvatarControl && myStep && myStep >= 0) {
       return myStep;
@@ -107,7 +110,8 @@ export class AvatarSrv {
       control: {
         name: this.avatar().meta?.name,
         avatarUuid: this.avatar().meta?.uuid,
-        action: action
+        action: action,
+        currentStep: 0,
       }
     }
     this.sendControl(req);
