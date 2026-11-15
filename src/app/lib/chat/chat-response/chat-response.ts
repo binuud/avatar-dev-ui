@@ -1,12 +1,11 @@
 import { Component, input } from "@angular/core";
-
 import { MarkdownModule } from "ngx-markdown";
-import { ChatEntity } from "../../../core/models/ai-interfaces";
 import { SingleContext } from "../../../gen/v1/conscious/memory.pb";
+import { CopyToClipboard } from "../../../core/directives/copy-to-clipboard";
 
 
 @Component({
-  imports: [MarkdownModule],
+  imports: [MarkdownModule, CopyToClipboard],
   selector: "app-chat-response",
   styleUrl: "./chat-response.scss",
   templateUrl: "./chat-response.html",

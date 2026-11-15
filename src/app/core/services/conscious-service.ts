@@ -143,7 +143,7 @@ export class ConsciousService {
       return  Conscious.In(req, this.initReq).then(response => {
         if (response.responseImage) {
           console.dir("got image as ai response");
-          response.responseImage =  "/static/" + response.responseImage;
+          response.responseImage =  "/static" + response.responseImage;
         } 
         this.updateCurrentContext({
           out: response 
@@ -187,7 +187,7 @@ export class ConsciousService {
     // Append the newly arrived word to our signal string instantly
 
     if (response.responseImage) {
-      response.responseImage =  "/static/" + response.responseImage;
+      response.responseImage =  "/static" + response.responseImage;
       this.updateCurrentContext({
         out: response 
       })
