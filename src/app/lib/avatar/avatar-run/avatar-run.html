@@ -1,24 +1,21 @@
 @let control = avatarSvc.avatarControl()?.control;
-@let currentStep = control?.currentStep || 0;
 @let avatar = avatarSvc.avatar();
-      <!-- @if (ui) {
-        <app-quantum-ui-render [ui]="ui" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
-      } -->
+
 <div class="card mb-3 centerNarrowBlock avatarRun">
   <div class="card-header">
     <h5>
       @if (avatarSvc.isConnected()) {
         <app-avatar-status-icon [status]="control?.status"></app-avatar-status-icon>
       }
-      {{ avatar.meta?.name}} 
+      {{ avatar.meta?.name}}
     </h5>
   </div>
   <div class="card-body">
     
     @if (avatarSvc.avatarControl()?.control?.status === statusEnum.STATUS_WAITING) {
-      @let currentUiComponent = getUiComponentById(currentStep);
-      @if (currentUiComponent) {
-        <app-quantum-ui-render [ui]="currentUiComponent" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
+      @let myUiComponent = currentUiComponent();
+      @if (myUiComponent) {
+        <app-quantum-ui-render [ui]="myUiComponent" (uiSubmitEvent)="uiFormEvent($event)"></app-quantum-ui-render>
       } @else {
         <p class="error">UI Component not found</p>
       }
@@ -158,21 +155,21 @@
     </div>
   } @else {
     <div class="card-footer">
-      <div class="d-flex">
-        <div class="flex-grow-1 responseStats">
+      <div class="row">
+        <div class="col-sm-8">
           @if (control?.action) {
             @if (control?.completedAt) {
               <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed(control) }} sec.
             }
             @if (control?.currentStep) {
-              Current Step: {{ control?.currentStep + 1 }}
+              Current Step: {{ control?.currentStep }}
             }
             @if (control?.stepStatuses) {
-              : {{ control?.stepStatuses[currentStep]?.status }}, {{control?.action}}
+              : {{ control?.stepStatuses[avatarSvc.currentStep()]?.status }}, {{control?.action}}
             }
           }
         </div>
-        <div class="text-end">
+        <div class="col-sm-4 text-end">
           @if (!avatarSvc.isConnected()) {
               <a  class="btn btn-sm btn-primary" (click)="connectAndStart()">Run</a>
           } @else if (control?.status != "STATUS_ACTIVE" && control?.status != statusEnum.STATUS_WAITING) {

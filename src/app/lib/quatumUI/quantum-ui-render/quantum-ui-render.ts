@@ -124,6 +124,7 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSubmit(): void {
+    console.log("Quantum ui for sumbitted")
     if (this.dynamicForm.valid) {
       const data = this.dynamicForm.value;
       // console.log('Form Submitted:', data);
