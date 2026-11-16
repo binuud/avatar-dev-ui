@@ -238,7 +238,7 @@ export class ConsciousService {
     })
     this.toastService.notifySuccess("Cleared Memory");
   }
-
+  
   /**
    * clearDisplayHistory()
    * clears chat display history alone
@@ -249,5 +249,15 @@ export class ConsciousService {
       messageHistory: [],
     })
   }
-
+  
+  /**
+   * reloadTools()
+   * reload the tools for the current memory session
+   */
+  async reloadTools() {
+    await Conscious.ReloadTools({}, this.initReq).then(()=>{
+      this.toastService.notifySuccess("Tools Reloaded");
+    })
+    
+  }
 }
