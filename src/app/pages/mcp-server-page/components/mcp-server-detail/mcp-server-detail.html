@@ -1,13 +1,28 @@
+  @let uuid = mcpConfig().uuid || "";
   <div class="card mb-3">
 
     <div class="card-header">
-      <div class="form-check form-switch">
-        <input id="enableMCPServer" title="Enable/Disable MCP Server" 
-          [checked]="mcpConfig().enabled"
-          (change)="toggle(mcpConfig().uuid)"
-          class="form-check-input" type="checkbox" role="switch" >
-        <label class="form-check-label" for="switchCheckDefault">{{ mcpConfig().name }}</label>
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-check form-switch">
+            <input id="enableMCPServer" title="Enable/Disable MCP Server" 
+              [(ngModel)]="mcpConfig().enabled"
+              (change)="this.mcpManagerSvc.toggle({uuid: uuid})"
+              class="form-check-input" type="checkbox" role="switch" >
+            <label class="form-check-label" for="switchCheckDefault">{{ mcpConfig().name }}</label>
+          </div>
+        </div>
+        <div class="col-sm-4 text-end">
+          @if (mcpConfig().enabled !== true) {
+            <button class="btn btn-link btn-small iconBtn"
+              (click)="mcpManagerSvc.delete({uuid: uuid})"
+              title="delete MCP Server">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          }
+        </div>
       </div>
+
     </div>
 
     <div class="card-body">
