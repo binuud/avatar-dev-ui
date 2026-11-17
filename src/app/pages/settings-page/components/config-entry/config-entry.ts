@@ -1,8 +1,9 @@
-import { Component, inject, input } from "@angular/core";
+import { Component, input } from "@angular/core";
 import { Config, ConfigType } from "../../../../gen/v1/settings/settings.pb";
+import { FormsModule } from "@angular/forms";
 
 @Component({
-  imports: [],
+  imports: [FormsModule],
   selector: "app-config-entry",
   styleUrl: "./config-entry.scss",
   templateUrl: "./config-entry.html",
