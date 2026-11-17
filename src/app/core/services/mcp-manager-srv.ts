@@ -1,5 +1,5 @@
 import { Service, signal, WritableSignal } from "@angular/core";
-import { CheckRequest, CheckResponse, GetRequest, HandleToolRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest, ToggleRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
+import { CheckRequest, CheckResponse, DeleteRequest, GetRequest, HandleToolRequest, ListRequest, ListResponse, MCPManagerService, MCPServerConfig, RegisterRequest, ToggleRequest } from "../../gen/v1/mcpManager/mcpManager.pb";
 import { InitReq } from "../../gen/fetch.pb";
 
 @Service()
@@ -51,6 +51,23 @@ export class McpManagerSrv {
     return MCPManagerService.Toggle(req, this.initReq);
 
   }
+
+  /**
+   * delete
+   * @param req 
+   * check the status of the registered server
+   */
+  delete(req: DeleteRequest) {
+    
+    return MCPManagerService.Delete(req, this.initReq).then(()=>{
+      
+      // get the new list after deletion was done
+      this.list({});
+      
+    });
+
+  }
+
 
   /**
    * check

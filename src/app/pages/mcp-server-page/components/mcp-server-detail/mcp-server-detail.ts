@@ -5,10 +5,11 @@ import { MarkdownModule } from "ngx-markdown";
 import { McpServerInstanceDetails } from "../mcp-server-instance-details/mcp-server-instance-details";
 import { ActionButton } from "../../../../core/components/action-button/action-button";
 import { GetResponse } from "../../../../gen/v1/avatar/avatarService.pb";
+import { FormsModule } from "@angular/forms";
 
 
 @Component({
-  imports: [ActionButton, MarkdownModule, McpServerInstanceDetails],
+  imports: [ActionButton, FormsModule, MarkdownModule, McpServerInstanceDetails],
   selector: "app-mcp-server-detail",
   styleUrl: "./mcp-server-detail.scss",
   templateUrl: "./mcp-server-detail.html",
