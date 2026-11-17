@@ -1,6 +1,6 @@
 import { Component, inject, signal, WritableSignal } from "@angular/core";
 import { McpManagerSrv } from "../../../../core/services/mcp-manager-srv";
-import { CheckRequest, MCPServerConfig, MCPServerInstance, MCPTransportType, RegisterRequest } from "../../../../gen/v1/mcpManager/mcpManager.pb";
+import { CheckRequest, MCPAuthType, MCPServerConfig, MCPServerInstance, MCPTransportType, RegisterRequest } from "../../../../gen/v1/mcpManager/mcpManager.pb";
 import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ToastSrv } from "../../../../core/services/toast-srv";
@@ -24,6 +24,15 @@ export class AddMcpServer {
   mcpInstance:  WritableSignal<MCPServerInstance> = signal({})
   
   mcpTypes = MCPTransportType;
+  mcpAuthTypes = MCPAuthType;
+
+  // constructor() {
+  //   this.data.set({
+  //     auth:{
+  //       token:""
+  //     }
+  //   })
+  // }
 
   validateData(): boolean {
     if (this.data().mcpType == this.mcpTypes.MCP_TYPE_STDIO) {
