@@ -7,7 +7,10 @@
           @if (type() == 'ACTIVE') {
             <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
           } 
-          You <i class="fa-regular fa-copy pointer" appCopyToClipboard="{{ context().in?.prompt }}"></i>
+          You 
+          <i class="fa-regular fa-copy pointer" 
+            title="click to copy user prompt"
+            appCopyToClipboard="{{ context().in?.prompt }}"></i>
         </div>
         <div class="message-content" >
           {{ context().in?.prompt }}
@@ -53,7 +56,9 @@
         <div class="col-sm-2 text-end">
           <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
           @if (out.responseImage) {
-            <i class="fa-regular fa-copy pointer" appCopyToClipboard="{{ out.responseImage }}"></i>
+            <i class="fa-regular fa-copy pointer" 
+              title="click to copy image path" 
+              appCopyToClipboard="{{ out.responseImage }}"></i>
           }
         </div>
       </div>
