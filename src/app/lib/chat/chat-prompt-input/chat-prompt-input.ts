@@ -168,6 +168,36 @@ export class ChatPromptInput {
     this.scroller.scrollToAnchor("chatPromptBlock");
   }
 
+  /**
+   * onEnter
+   * this is to fix the problem of enter not triggerend event on action button
+   * since I am using action button, with a promise to the service function
+   * the promise is used for animation events, I need to jump the event on text area 
+   * to the jump button
+   * @param event 
+   * @param actionBtnComponent 
+   * @returns 
+   */
+  onEnter(event: Event, actionBtnComponent: any): void {
+    const keyboardEvent = event as KeyboardEvent;
+
+    // Allow Shift+Enter to still create a new line
+    if (keyboardEvent.shiftKey) {
+      return;
+    }
+
+    // Prevent adding a new line to the textarea
+    keyboardEvent.preventDefault();
+
+    // Find the native button inside <app-action-button> and click it
+    // Note: If actionBtnComponent is an ElementRef, use actionBtnComponent.nativeElement
+    const nativeBtn = actionBtnComponent?.elementRef?.nativeElement?.querySelector('button') 
+                  || document.querySelector('app-action-button button');
+                  
+    if (nativeBtn && !nativeBtn.disabled) {
+      (nativeBtn as HTMLButtonElement).click();
+    }
+  }
 
   /**
    * submit()
