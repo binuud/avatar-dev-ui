@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, input, OnDestroy, OnInit, output, signal, ViewChild, WritableSignal } from "@angular/core";
+import { AfterViewInit, Component, effect, ElementRef, inject, input, OnDestroy, OnInit, output, signal, ViewChild, WritableSignal } from "@angular/core";
 import { QuantumUI, UiComponentUiType } from "../../../gen/v1/quantumUI/quantumUI.pb";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -29,6 +29,13 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
 
   private stream?: MediaStream;
 
+  constructor() {
+    effect(() => {
+      console.log('Input form changed');
+      this.rebuildForm();
+    });
+  }
+
   ngOnDestroy() {
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());
@@ -36,7 +43,14 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+  }
+
+  rebuildForm() {
+    
     // Initialize form controls based on the config array
+    this.dynamicForm = new FormGroup({});
+    console.log(`Building Quantum Form ${this.ui().name}`)
     let components = this.ui().components;
     if (!components) return;
     // let myForm: FormGroup =  new FormGroup({});
@@ -45,11 +59,11 @@ export class QuantumUiRender implements OnInit, AfterViewInit, OnDestroy {
         if (item.type == "WEBCAM") {
           this.isWebCamNeeded.set(true);
         }
+        console.log(`Initializing Quantum UI Item ${item.id}`)
         this.dynamicForm.setControl(item.id, new FormControl('', [Validators.required]));
       }
     });
   }
-
   /**
    * ngAfterViewInit
    * if web cam needs to be rendered by the ui, then
