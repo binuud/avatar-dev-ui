@@ -7,6 +7,8 @@ import { SettingsPage } from './pages/settings-page/settings-page';
 import { AvatarDetails } from './lib/avatar/avatar-details/avatar-details';
 import { McpServerPage } from './pages/mcp-server-page/mcp-server-page';
 import { AddMcpServer } from './pages/mcp-server-page/components/add-mcp-server/add-mcp-server';
+import { ManageMemoryPage } from './pages/manage-memory-page/manage-memory-page';
+import { EditMemorySettings } from './pages/manage-memory-page/components/edit-memory-settings/edit-memory-settings';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/chat', pathMatch: 'full' },
@@ -17,6 +19,8 @@ export const routes: Routes = [
   { path: 'mcpServers/new', component: AddMcpServer },
   { path: 'avatarDetails/:id', component: AvatarDetails },
   { path: 'avatar/:id', component: AvatarRun },
+  { path: 'memory', component: ManageMemoryPage },
+  { path: 'memory/:action/:id', component: EditMemorySettings },
   { path: 'settings', component: SettingsPage },
 ];
 

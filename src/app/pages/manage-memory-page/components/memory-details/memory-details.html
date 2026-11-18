@@ -1,0 +1,41 @@
+  <div class="card mb-3">
+
+    <div class="card-header">
+      <div class="row">
+        <div class="col-sm-8">
+          {{ memoryMeta().name }}
+        </div>
+        <div class="col-sm-4 text-end">
+          
+            <a class="btn btn-link btn-small iconBtn pe-2"
+              [routerLink]="['/memory/','edit', memoryMeta().name]" 
+              title="edit Memory">
+              <i class="fa-solid fa-pencil"></i>
+            </a>
+            <button class="btn btn-link btn-small iconBtn"
+              (click)="memorySvc.delete({})"
+              title="delete Memory">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-body">
+
+      @if (memoryMeta().description) {
+        <p>Description: {{ memoryMeta().description }}</p>
+      }
+
+      @if (memoryMeta().model) {
+        <p>Model: {{ memoryMeta().model }}</p>
+      }
+      <p>Seed: {{ memoryMeta().seed }}</p>
+      <p>Temperature: {{ memoryMeta().temperature }}</p>
+      <p>System Prompt: {{ memoryMeta().systemPrompt }}</p>
+    </div>
+
+  </div>
+
