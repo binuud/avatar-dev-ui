@@ -71,7 +71,7 @@ export class MemorySvc {
   delete(req: DeleteMemoryRequest) {
     
     MemoryService.Delete(req, this.initReq).then(response => {
-      console.dir(response);
+      this.list({});
     });
 
   }

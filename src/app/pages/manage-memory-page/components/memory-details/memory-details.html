@@ -13,7 +13,7 @@
               <i class="fa-solid fa-pencil"></i>
             </a>
             <button class="btn btn-link btn-small iconBtn"
-              (click)="memorySvc.delete({})"
+              (click)="memorySvc.delete({name: memoryMeta().name})"
               title="delete Memory">
               <i class="fa-solid fa-trash"></i>
             </button>

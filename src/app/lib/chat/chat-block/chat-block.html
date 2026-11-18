@@ -1,12 +1,15 @@
 <div class="centerNarrowBlock responseArea">
   <app-chat-history></app-chat-history>
 </div>
-<div class="fixed-bottom promptArea fade-entire-div">
-  <div class="centerNarrowBlock">
-    @if (aiSvc.state().connected) {
-      <app-chat-prompt-input></app-chat-prompt-input>
-    } @else {
-      <app-connection-error-message></app-connection-error-message>
-    }
+
+<div class="fixed-bottom promptArea">
+  <div class="fade-entire-div">
+    <div class="centerNarrowBlock">
+      @if (aiSvc.state().connected) {
+        <app-chat-prompt-input></app-chat-prompt-input>
+      } @else {
+        <app-connection-error-message></app-connection-error-message>
+      }
+    </div>
   </div>
 </div>

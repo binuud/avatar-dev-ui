@@ -3,11 +3,11 @@
 }
 
 .promptArea {
-  // background-color: #ffffff;
   padding-left:10px;
   padding-right:10px;
   padding-top:50px;
 }
+
 
 @media (min-width: 768px) { 
   div.promptArea {
@@ -19,7 +19,6 @@
   background-color: #ffffff;
   color: white;
   padding: 20px;
-
   /* Fades from fully visible at the top to completely transparent at the bottom */
   -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
   mask-image: linear-gradient(to top, black 80%, transparent 100%);
