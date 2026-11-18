@@ -44,6 +44,9 @@
                     @if (stepItem.prompt) {
                       <p class="mt-1"><b>Prompt:</b> {{stepItem.prompt}}</p>
                     }
+                    @if (stepItem.systemPrompt) {
+                      <p class="mt-1"><b>System Prompt:</b> {{stepItem.systemPrompt}}</p>
+                    }
                   </li>
                 }
               </ul>
