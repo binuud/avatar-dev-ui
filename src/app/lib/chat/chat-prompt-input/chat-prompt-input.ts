@@ -10,6 +10,7 @@ import { LocalStorageService } from "../../../core/services/local-storage-servic
 import { ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
 import { ActionButton } from "../../../core/components/action-button/action-button";
+import { RouterLink } from "@angular/router";
 
 
 export interface MultiStateButtonConfig {
@@ -32,7 +33,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [ActionButton, FormsModule, ChatResponse, FileUpload],
+  imports: [ActionButton, FormsModule, ChatResponse, FileUpload, RouterLink],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",

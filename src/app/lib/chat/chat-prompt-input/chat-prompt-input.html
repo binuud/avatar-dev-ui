@@ -63,7 +63,10 @@
         
         <div class="dropdown">
           
-          <button class="btn btn-link dropdown-toggle no-underline" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn btn-link dropdown-toggle no-underline" type="button" 
+            data-bs-toggle="dropdown" 
+             data-bs-display="parent"
+            aria-expanded="false">
             <i class="fa-solid fa-brain"></i>
           </button>
           <ul class="dropdown-menu">
@@ -71,7 +74,7 @@
             <li><a class="dropdown-item" (click)="aiSvc.clearDisplayHistory()">Clear Display History</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Reload Settings/Tools</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Switch Memory</a></li>
-            <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Memory Settings</a></li>
+            <li><a class="dropdown-item" routerLink="/memory">Memory Settings</a></li>
           </ul>
 
         </div>
