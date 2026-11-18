@@ -53,7 +53,10 @@ export class AvatarRun implements OnDestroy {
 
   currentUiComponent: Signal<QuantumUI | undefined> = computed(() => {
     const currentStep = this.avatarSvc.currentStep();
-    return this.getUiComponentById(currentStep);
+    const ui = this.getUiComponentById(currentStep);
+    console.log(`Computed Signal Current step ${currentStep}, UI name ${ui?.name} `)
+    console.dir(ui);
+    return ui;
   });
 
   constructor() {
