@@ -226,6 +226,19 @@ export class ConsciousService {
   }
 
   /**
+   * setModel()
+   * changes the model for the current session
+   */
+  setModel() {
+
+    Conscious.ClearMemory({}, this.initReq);
+    this.updateState({
+      messageHistory: [],
+    })
+    this.toastService.notifySuccess("Model Changed");
+  }
+
+  /**
    * clearMemory()
    * clears the memory from consious server
    * display history is maintained
