@@ -20,7 +20,7 @@
 
   <div class="row">
     <div class="col-sm-1">
-      <div class="dropdown">
+      <div class="dropup">
         <button class="btn btn-link dropdown-toggle no-underline" 
           type="button" 
           data-bs-toggle="dropdown"
@@ -70,7 +70,7 @@ data-bs-popper-config='{"strategy":"fixed"}'
             aria-expanded="false">
             <i class="fa-solid fa-brain"></i>
           </button>
-          <ul class="dropdown-menu" style="z-index:2000">
+          <ul class="dropdown-menu">
             <li><a class="dropdown-item" (click)="aiSvc.clearMemory()">Clear Memory</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.clearDisplayHistory()">Clear Display History</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Reload Settings/Tools</a></li>
