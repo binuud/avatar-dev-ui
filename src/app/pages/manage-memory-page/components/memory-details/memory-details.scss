@@ -1,0 +1,12 @@
+.systemPrompt {
+  /* Limit long text to 3 lines with an ellipsis */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+
+  /* Force exactly 3 lines of visual height for short text */
+  line-height: 1.5em;       /* Adjust to match your project font theme */
+  height: calc(1.5em * 5);  /* (line-height * number of lines) */
+}

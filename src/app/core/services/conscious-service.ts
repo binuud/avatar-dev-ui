@@ -4,8 +4,9 @@ import { ContextMesssage, UploadRequest, UploadResponse } from "../../gen/v1/con
 import { InitReq } from "../../gen/fetch.pb";
 import { Model } from "../../gen/v1/conscious/common.pb";
 import { LocalStorageService } from "./local-storage-service";
-import { Memory, SingleContext } from "../../gen/v1/conscious/memory.pb";
+import { Memory, MemoryMeta, SingleContext } from "../../gen/v1/conscious/memory.pb";
 import { ToastSrv } from "./toast-srv";
+import { MemorySvc } from "./memory-svc";
 
 
 export interface ConsciousServiceState {
@@ -25,13 +26,14 @@ export interface ConsciousServiceState {
 
   // message History is sent in each chat request
   // this allows inference to maintian status of previous chats
-  messageHistory?: string[];
+  // messageHistory?: string[];
 
 }
 
 @Service()
 export class ConsciousService {
 
+  memorySvc = inject(MemorySvc);
   toastService = inject(ToastSrv);
   localStorageSvc = inject(LocalStorageService);
   public  static STORAGE_KEY = "ConsciousService";
@@ -45,6 +47,9 @@ export class ConsciousService {
     loading: false,
     modelList: [],
     memory: {
+      meta: {
+        name: "default",
+      },
       contexts: [],
     },
     messageHistory: [],
@@ -68,7 +73,7 @@ export class ConsciousService {
       this.updateState(JSON.parse(value));
     } 
     console.log('ConsciousService service load state');
-    
+    this.reloadMemory();
     // connection state has to be from live data
     // this.updateState({connected: false});
     // console.dir(this.state);
@@ -76,6 +81,15 @@ export class ConsciousService {
 
   saveState() {
     this.localStorageSvc.setItem(ConsciousService.STORAGE_KEY, JSON.stringify(this.state()));
+  }
+
+  reloadMemory() {
+    // now load the memory
+    this.memorySvc.get({name: this.state().memory.meta?.name}).then((response) => {
+      if (response && response.memory) {
+        this.setMemory(response.memory);
+      }
+    });
   }
 
   updateState(newState: Partial<ConsciousServiceState>) {
@@ -139,11 +153,13 @@ export class ConsciousService {
    * @returns 
    */
   async inRequest(req: ContextMesssage): Promise<any> {
-     try {
+    // inject memory name
+    req.memoryName = this.state().memory.meta?.name
+    try {
       return  Conscious.In(req, this.initReq).then(response => {
         if (response.responseImage) {
           console.dir("got image as ai response");
-          response.responseImage =  "/static" + response.responseImage;
+          response.responseImage = response.responseImage;
         } 
         this.updateCurrentContext({
           out: response 
@@ -161,6 +177,8 @@ export class ConsciousService {
   
 
   async generateRequest(req: ContextMesssage): Promise<any> {
+    // inject memory name
+    req.memoryName = this.state().memory.meta?.name
     try {
       // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
       return Conscious.Generate(req, this.chatStreamCallback, this.initReq).catch(error => {
@@ -226,16 +244,15 @@ export class ConsciousService {
   }
 
   /**
-   * setModel()
-   * changes the model for the current session
+   * setMemory()
+   * hotswap the memory for the current session
    */
-  setModel() {
+  setMemory(memory: Memory) {
 
-    Conscious.ClearMemory({}, this.initReq);
     this.updateState({
-      messageHistory: [],
+      memory: memory,
     })
-    this.toastService.notifySuccess("Model Changed");
+    // this.toastService.notifySuccess("Memory Hot Swapped");
   }
 
   /**
@@ -245,23 +262,26 @@ export class ConsciousService {
    */
   clearMemory() {
 
-    Conscious.ClearMemory({}, this.initReq);
-    this.updateState({
-      messageHistory: [],
-    })
+    // Conscious.ClearMemory({}, this.initReq);
+    // this.updateState({
+    //   messageHistory: [],
+    // })
+    this.memorySvc.clear({name: this.state().memory.meta?.name}).then(()=>{
+      this.reloadMemory();
+    });
     this.toastService.notifySuccess("Cleared Memory");
   }
   
-  /**
-   * clearDisplayHistory()
-   * clears chat display history alone
-   */
-  clearDisplayHistory() {
-    this.updateState({
-      memory: {},
-      messageHistory: [],
-    })
-  }
+  // /**
+  //  * clearDisplayHistory()
+  //  * clears chat display history alone
+  //  */
+  // clearDisplayHistory() {
+  //   this.updateState({
+  //     memory: {},
+  //     // messageHistory: [],
+  //   })
+  // }
   
   /**
    * reloadTools()

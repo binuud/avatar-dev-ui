@@ -35,24 +35,34 @@ export class EditMemorySettings {
     }
     
     console.log(param);
-        console.log(action);
+    console.log(action);
+    this.name = "";
     if (param) {
       this.name = param;
-      this.memorySvc.get({name: this.name}).then((response) =>{
-        console.dir(response);
-        if (response && response.meta) {
-          this.memoryMeta.set(response.meta)
-        }
-        
-      });
     }
+    // if name is emtpy load emtpy memory, if not load existing memory
+    this.memorySvc.getMemoryMeta({name: this.name}).then((response) =>{
+      console.dir(response);
+      if (response && response.meta) {
+        this.memoryMeta.set(response.meta)
+      }
+      
+    });
   }
 
   save() {
-    this.memorySvc.update({meta: this.memoryMeta()}).then(()=>{
-      this.toastService.notifySuccess("save memory details");
-      this.router.navigate(['/memory']);
-    });
+    if (this.action() == "edit") {
+      this.memorySvc.update({meta: this.memoryMeta()}).then(()=>{
+        this.toastService.notifySuccess("save memory details");
+        this.router.navigate(['/memory']);
+      });
+    } else {
+      this.memorySvc.add({meta: this.memoryMeta()}).then(()=>{
+        this.toastService.notifySuccess("save memory details");
+        this.router.navigate(['/memory']);
+      });      
+    }
+
   }
 
 }

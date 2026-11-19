@@ -1,5 +1,5 @@
 import { Service, signal, WritableSignal } from "@angular/core";
-import { AddMemoryRequest, DeleteMemoryRequest, GetMemoryRequest, GetMemoryResponse, ListMemoryRequest, ListMemoryResponse, UpdateMemoryRequest, UpdateMemoryResponse } from "../../gen/v1/conscious/memory.pb";
+import { AddMemoryRequest, AddMemoryResponse, ClearMemoryRequest, ClearMemoryResponse, DeleteMemoryRequest, GetMemoryMetaRequest, GetMemoryMetaResponse, GetMemoryRequest, GetMemoryResponse, ListMemoryRequest, ListMemoryResponse, UpdateMemoryRequest, UpdateMemoryResponse } from "../../gen/v1/conscious/memory.pb";
 import { MemoryService } from "../../gen/v1/conscious/memoryService.pb";
 import { InitReq } from "../../gen/fetch.pb";
 
@@ -29,7 +29,18 @@ export class MemorySvc {
   /**
    * get
    * @param req 
-   * gets the memory
+   * gets the memory meta object
+   */
+  async getMemoryMeta(req: GetMemoryMetaRequest): Promise<GetMemoryMetaResponse | void> {
+    
+    return MemoryService.GetMemoryMeta(req, this.initReq);
+
+  }
+
+  /**
+   * get
+   * @param req 
+   * gets the full memory object
    */
   async get(req: GetMemoryRequest): Promise<GetMemoryResponse | void> {
     
@@ -42,9 +53,9 @@ export class MemorySvc {
    * @param req 
    * creates a new memory session
    */
-  add(req: AddMemoryRequest) {
+  add(req: AddMemoryRequest): Promise<AddMemoryResponse | void> {
     
-    MemoryService.Add(req, this.initReq).then(response => {
+    return MemoryService.Add(req, this.initReq).then(response => {
       console.dir(response);
     });
 
@@ -73,6 +84,17 @@ export class MemorySvc {
     MemoryService.Delete(req, this.initReq).then(response => {
       this.list({});
     });
+
+  }
+
+  /**
+   * clear
+   * @param req 
+   * clears the memory context, keeping the meta information intact
+   */
+  clear(req: ClearMemoryRequest): Promise<ClearMemoryResponse | void> {
+    
+    return MemoryService.ClearMemory(req, this.initReq);
 
   }
 

@@ -13,3 +13,9 @@
     </div>
   </div>
 }
+
+@if (aiSvc.currentContext().in?.prompt) {
+  <div id="currentContext">
+    <app-chat-response [context]="aiSvc.currentContext()" type="ACTIVE" #scrollContainer></app-chat-response>
+  </div>
+}
