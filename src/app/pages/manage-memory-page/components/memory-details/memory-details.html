@@ -12,11 +12,13 @@
               title="edit Memory">
               <i class="fa-solid fa-pencil"></i>
             </a>
-            <button class="btn btn-link btn-small iconBtn"
-              (click)="memorySvc.delete({name: memoryMeta().name})"
-              title="delete Memory">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+            @if (memoryMeta().name != "default") {
+              <button class="btn btn-link btn-small iconBtn"
+                (click)="memorySvc.delete({name: memoryMeta().name})"
+                title="delete Memory">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            }
           
         </div>
       </div>
@@ -25,17 +27,17 @@
 
     <div class="card-body">
 
-      @if (memoryMeta().description) {
-        <p>Description: {{ memoryMeta().description }}</p>
-      }
 
-      @if (memoryMeta().model) {
-        <p>Model: {{ memoryMeta().model }}</p>
-      }
+      <p>Description: {{ memoryMeta().description }}</p>
+
+      <p>Model: {{ memoryMeta().model }}</p>
       <p>Seed: {{ memoryMeta().seed }}</p>
       <p>Temperature: {{ memoryMeta().temperature }}</p>
-      <p>System Prompt: {{ memoryMeta().systemPrompt }}</p>
-    </div>
+      <p class="systemPrompt">System Prompt: {{ memoryMeta().systemPrompt }}</p>
 
+    </div>
+    <div class="card-footer text-end">
+      <button class="btn btn-sm btn-primary" (click)="loadMemory(memoryMeta().name)">Use This</button>
+    </div>
   </div>
 

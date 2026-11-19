@@ -3,7 +3,6 @@ import { FormsModule } from "@angular/forms";
 import { ChatResponse } from "../chat-response/chat-response";
 import { ContextMesssage, ContextMesssageContextType } from "../../../gen/v1/conscious/contextMessage.pb";
 import { ConsciousService } from "../../../core/services/conscious-service";
-import { Model } from "../../../gen/v1/conscious/common.pb";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
 import { v4 as uuidv4 } from 'uuid';
 import { LocalStorageService } from "../../../core/services/local-storage-service";
@@ -11,6 +10,7 @@ import { ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
 import { ActionButton } from "../../../core/components/action-button/action-button";
 import { RouterLink } from "@angular/router";
+
 
 
 export interface MultiStateButtonConfig {
@@ -23,8 +23,8 @@ export interface MultiStateButtonConfig {
 
 export interface ChatPromptInputState {
   userPrompt: string;
-  model: string;
   mode: ContextMesssageContextType;
+  memoryName: string;
   reasoning?: string;
   response?: string;
   disabled: boolean;
@@ -65,8 +65,8 @@ export class ChatPromptInput {
 
   state: WritableSignal<ChatPromptInputState> = signal({
     userPrompt: "",
-    model: "",
     mode: ContextMesssageContextType.LLM_QUERY,
+    memoryName: "default",
     disabled: false,
     fileName: "",
     showFileUpload: false,
@@ -88,12 +88,17 @@ export class ChatPromptInput {
       this.updateState(JSON.parse(value));
     } 
     this.setMode(this.state().mode);
+    this.updateState({memoryName: this.aiSvc.state().memory.meta?.name})
   }
 
   emptyCurrentPrompt() {
     // let prompt = this.currentChat().prompt;
     // prompt.userPrompt = "";
     this.updateState({userPrompt: ""});
+  }
+
+  clearMemory() {
+    this.aiSvc.clearMemory()
   }
 
   saveState() {
@@ -147,9 +152,9 @@ export class ChatPromptInput {
     }
   }
   
-  selectModel(model: Model) {
-    this.updateState({model: model.id});
-  }
+  // selectModel(model: Model) {
+  //   this.updateState({model: model.id});
+  // }
 
   private scrollToBottom(): void {
     console.log("Scroll to bottom");
@@ -219,7 +224,8 @@ export class ChatPromptInput {
     const mode = this.state().mode;
     this.scrollToBottom();
     // this.setMode(this.state().mode);
-    this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
+    // this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
+    this.currentChat.set(AiInterfaces.NewChatEntity("", ""));
     this.updateState({userPrompt: ""});
     // this.btnStateSig.set("submitted");
     if (mode == ContextMesssageContextType.LLM_QUERY ) {
@@ -242,7 +248,7 @@ export class ChatPromptInput {
     return {
       uuid: uuidv4(),
       prompt: this.state().userPrompt,
-      model: this.state().model,
+      // model: this.state().model,
       type: this.state().mode,
       data: this.state().fileName
     }

@@ -1,11 +1,3 @@
-@if (aiSvc.currentContext().in?.prompt) {
-  <div id="currentContext">
-    <app-chat-response [context]="aiSvc.currentContext()" type="ACTIVE" #scrollContainer></app-chat-response>
-  </div>
-
-}
-
-
 <div class="inputBlock pb-1" id="chatPromptBlock">
 
   @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE || state().showFileUpload) {
@@ -72,9 +64,7 @@ data-bs-popper-config='{"strategy":"fixed"}'
           </button>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" (click)="aiSvc.clearMemory()">Clear Memory</a></li>
-            <li><a class="dropdown-item" (click)="aiSvc.clearDisplayHistory()">Clear Display History</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Reload Settings/Tools</a></li>
-            <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Switch Memory</a></li>
             <li><a class="dropdown-item" routerLink="/memory">Memory Settings</a></li>
           </ul>
 

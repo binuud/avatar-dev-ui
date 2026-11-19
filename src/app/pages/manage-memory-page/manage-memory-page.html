@@ -6,10 +6,12 @@
 </div>
 
 <div class="row mt-3">
-  <div class="col-sm-4">
+  
   @for (item of memorySvc.memories().memories; track $index) {
-    <app-memory-details [memoryMeta]="item"></app-memory-details>
+    <div class="col-sm-4">
+      <app-memory-details [memoryMeta]="item"></app-memory-details>
+    </div>
   } 
-  </div>
+
 </div>
 
