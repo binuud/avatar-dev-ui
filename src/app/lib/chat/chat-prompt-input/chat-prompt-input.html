@@ -6,7 +6,7 @@
 }
 
 
-<div class="inputBlock mt-3 mb-1" id="chatPromptBlock">
+<div class="inputBlock pb-1" id="chatPromptBlock">
 
   @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE || state().showFileUpload) {
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
@@ -61,15 +61,16 @@
           </ul>
         </div> -->
         
-        <div class="dropdown">
+        <div class="dropup">
           
           <button class="btn btn-link dropdown-toggle no-underline" type="button" 
             data-bs-toggle="dropdown" 
-             data-bs-display="parent"
+            id="memoryDropDown"
+data-bs-popper-config='{"strategy":"fixed"}'
             aria-expanded="false">
             <i class="fa-solid fa-brain"></i>
           </button>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu" style="z-index:2000">
             <li><a class="dropdown-item" (click)="aiSvc.clearMemory()">Clear Memory</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.clearDisplayHistory()">Clear Display History</a></li>
             <li><a class="dropdown-item" (click)="aiSvc.reloadTools()">Reload Settings/Tools</a></li>

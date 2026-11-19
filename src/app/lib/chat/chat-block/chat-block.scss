@@ -5,7 +5,6 @@
 .promptArea {
   padding-left:10px;
   padding-right:10px;
-  padding-top:50px;
 }
 
 
@@ -15,11 +14,16 @@
   }
 }
 
+.promptInputArea {
+  background-color: #ffffff;
+}
+
 .fade-entire-div {
   background-color: #ffffff;
   color: white;
-  padding: 20px;
+  height: 30px;
   /* Fades from fully visible at the top to completely transparent at the bottom */
-  -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
-  mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  mask-image: linear-gradient(to top, black 20%, transparent 100%);
 }
+
