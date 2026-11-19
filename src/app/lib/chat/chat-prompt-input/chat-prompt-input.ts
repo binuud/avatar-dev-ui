@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, Signal, ViewChild, WritableSignal } from "@angular/core";
+import { Component, computed, ElementRef, inject, signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ChatResponse } from "../chat-response/chat-response";
 import { ContextMesssage, ContextMesssageContextType } from "../../../gen/v1/conscious/contextMessage.pb";
@@ -33,7 +33,7 @@ export interface ChatPromptInputState {
 }
 
 @Component({
-  imports: [ActionButton, FormsModule, ChatResponse, FileUpload, RouterLink],
+  imports: [ActionButton, FormsModule, FileUpload, RouterLink],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
