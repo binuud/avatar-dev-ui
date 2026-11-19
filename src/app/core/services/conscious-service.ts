@@ -154,7 +154,7 @@ export class ConsciousService {
    */
   async inRequest(req: ContextMesssage): Promise<any> {
     // inject memory name
-    req.memoryName = this.state().memory.meta?.name
+    req.memoryName = this.getMemoryName();
     try {
       return  Conscious.In(req, this.initReq).then(response => {
         if (response.responseImage) {
@@ -175,10 +175,17 @@ export class ConsciousService {
     } 
   }
   
+  getMemoryName(): string {
+    let name = this.state().memory.meta?.name
+    if (!name || name == "") {
+      name = "default";
+    }
+    return name;
+  }
 
   async generateRequest(req: ContextMesssage): Promise<any> {
     // inject memory name
-    req.memoryName = this.state().memory.meta?.name
+    req.memoryName = this.getMemoryName();
     try {
       // await this.aiSvc.inStreamRequest(req, this.chatStreamCallback);
       return Conscious.Generate(req, this.chatStreamCallback, this.initReq).catch(error => {
