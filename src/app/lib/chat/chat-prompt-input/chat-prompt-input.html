@@ -6,7 +6,7 @@
 }
 
 
-<div class="inputBlock mt-3 mb-1" id="chatPromptBlock">
+<div class="inputBlock pb-1" id="chatPromptBlock">
 
   @if (state().mode == chatModes.LLM_IMAGE_DESCRIBE || state().showFileUpload) {
     <app-file-upload (fileUploadedEvent)="fileUploaded($event)"></app-file-upload>
@@ -20,7 +20,7 @@
 
   <div class="row">
     <div class="col-sm-1">
-      <div class="dropdown">
+      <div class="dropup">
         <button class="btn btn-link dropdown-toggle no-underline" 
           type="button" 
           data-bs-toggle="dropdown"
@@ -61,11 +61,12 @@
           </ul>
         </div> -->
         
-        <div class="dropdown">
+        <div class="dropup">
           
           <button class="btn btn-link dropdown-toggle no-underline" type="button" 
             data-bs-toggle="dropdown" 
-             data-bs-display="parent"
+            id="memoryDropDown"
+data-bs-popper-config='{"strategy":"fixed"}'
             aria-expanded="false">
             <i class="fa-solid fa-brain"></i>
           </button>
