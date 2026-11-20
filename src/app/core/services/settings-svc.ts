@@ -30,6 +30,7 @@ export class SettingsSvc {
     fieldName: string | undefined,
     newValue: string | undefined,
   ): void {
+    if (fieldName != "LLM_PROVIDER") return;
     if (groupKey && fieldName && newValue && newValue in SettingsInterfaces) {
       const providerKey = newValue as keyof typeof SettingsInterfaces;
       const mySettings = structuredClone(this.settings());
