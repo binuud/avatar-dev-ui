@@ -1,12 +1,35 @@
 <label for="{{ entry().name }}" class="form-label">{{ entry().name }}</label>
+
 @if ( entry().type == configTypes.STRING ) {
+
   <input type="text" id="{{ entry().name }}" class="form-control" [(ngModel)]="entry().value" [placeholder]="entry().default">
+
 } @else if ( entry().type == configTypes.MULTI_LINE_STRING ) {
-  <textarea id="{{ entry().name }}" class="form-control" [(ngModel)]="entry().value" [placeholder]="entry().default"></textarea>
+
+  <textarea id="{{ entry().name }}" 
+    class="form-control" 
+    [(ngModel)]="entry().value" 
+    rows="{{entry().numLines}}"
+    [placeholder]="entry().default"></textarea>
+
+} @else if ( entry().type == configTypes.MULTI_OPTION ) {
+
+  <select id="{{ entry().name }}" class="form-control form-select"
+    [(ngModel)]="entry().value"
+    (change)="settingsSvc.onSelectChange(group(), entry().name, entry().value)"
+    aria-label="{{ entry().name }}">
+    <option selected>Select LLM Provider</option>
+    @for (item of entry().options; track $index) {
+      <option value="{{ item }}">{{ item }}</option>
+    }
+  </select>
+
 }
 
 @if (entry().description) {
+
   <div id="{{ entry().name }}-help" class="form-text note">
     {{ entry().description }}
   </div>
+  
 }
