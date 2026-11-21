@@ -24,6 +24,16 @@
     }
   </select>
 
+} @else if ( entry().type == configTypes.DATALIST ) {
+
+  <input id="{{ entry().name }}"  class="form-control" attr.list="{{ entry().name }}-options" 
+    [(ngModel)]="entry().value" [placeholder]="entry().default">
+  <datalist id="{{ entry().name }}-options">
+    @for (item of entry().options; track $index) {
+      <option value="{{ item }}">{{ item }}</option>
+    }
+  </datalist>
+
 }
 
 @if (entry().description) {
