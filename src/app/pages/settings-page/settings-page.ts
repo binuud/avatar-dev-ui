@@ -1,5 +1,5 @@
 import { Component, computed, inject } from "@angular/core";
-import { LocalStorageService } from "../../core/services/local-storage-service";
+
 import { SettingsSvc } from "../../core/services/settings-svc";
 import { ConfigEntries } from "./components/config-entries/config-entries";
 
@@ -11,10 +11,4 @@ import { ConfigEntries } from "./components/config-entries/config-entries";
 })
 export class SettingsPage {
   settingsSvc = inject(SettingsSvc);
-
-  localStorageSvc = inject(LocalStorageService);
-
-  clear() {
-    this.localStorageSvc.clear();
-  }
 }

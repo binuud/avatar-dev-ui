@@ -15,10 +15,8 @@ import {
 } from "../../gen/v1/settings/settingsService.pb";
 import { ToastSrv } from "./toast-srv";
 import { SettingsInterfaces } from "../../pages/settings-page/models/settings-interfaces";
-import {
-  LocalStorageService,
-  SignalStateService,
-} from "./local-storage-service";
+
+import { LocalStorageAbstract } from "../abstractClasses/local-storage-abstract";
 
 export interface SettingsState {
   initiaConfigurationStatus: boolean;
@@ -29,10 +27,8 @@ const Initial_SettingsState: SettingsState = {
 };
 
 @Service()
-export class SettingsSvc extends SignalStateService<SettingsState> {
+export class SettingsSvc extends LocalStorageAbstract<SettingsState> {
   toastService = inject(ToastSrv);
-  localStorageSvc = inject(LocalStorageService);
-
   public static STORAGE_KEY = "SettingsSvc";
 
   settings: WritableSignal<SettingsListResponse> = signal<SettingsListResponse>(
@@ -42,10 +38,6 @@ export class SettingsSvc extends SignalStateService<SettingsState> {
   initReq: InitReq = {
     pathPrefix: "/api",
   };
-
-  // state: WritableSignal<SettingsState> = signal({
-  //   initiaConfigurationStatus: false,
-  // });
 
   loaded = computed<boolean>(() => {
     const groups = this.settings().groups;
@@ -58,7 +50,6 @@ export class SettingsSvc extends SignalStateService<SettingsState> {
   constructor() {
     super(SettingsSvc.STORAGE_KEY, Initial_SettingsState);
     this.list({});
-    this.loadState();
   }
 
   onSelectChange(
@@ -128,5 +119,9 @@ export class SettingsSvc extends SignalStateService<SettingsState> {
         this.patchState({ initiaConfigurationStatus: false });
       }
     });
+  }
+
+  clearLocalSettings(): void {
+    localStorage.clear();
   }
 }

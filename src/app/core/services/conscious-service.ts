@@ -7,17 +7,10 @@ import {
 } from "../../gen/v1/conscious/contextMessage.pb";
 import { InitReq } from "../../gen/fetch.pb";
 import { Model } from "../../gen/v1/conscious/common.pb";
-import {
-  LocalStorageService,
-  SignalStateService,
-} from "./local-storage-service";
-import {
-  Memory,
-  MemoryMeta,
-  SingleContext,
-} from "../../gen/v1/conscious/memory.pb";
+import { Memory, SingleContext } from "../../gen/v1/conscious/memory.pb";
 import { ToastSrv } from "./toast-srv";
 import { MemorySvc } from "./memory-svc";
+import { LocalStorageAbstract } from "../abstractClasses/local-storage-abstract";
 
 export interface ConsciousServiceState {
   // if ui can connect to the backend
@@ -52,10 +45,10 @@ const Initial_ConsciousServiceState: ConsciousServiceState = {
 };
 
 @Service()
-export class ConsciousService extends SignalStateService<ConsciousServiceState> {
+export class ConsciousService extends LocalStorageAbstract<ConsciousServiceState> {
   memorySvc = inject(MemorySvc);
   toastService = inject(ToastSrv);
-  localStorageSvc = inject(LocalStorageService);
+
   public static STORAGE_KEY = "ConsciousService";
 
   initReq: InitReq = {
@@ -69,8 +62,6 @@ export class ConsciousService extends SignalStateService<ConsciousServiceState> 
 
   constructor() {
     super(ConsciousService.STORAGE_KEY, Initial_ConsciousServiceState);
-
-    this.loadState();
     this.getModels();
     this.reloadMemory();
   }

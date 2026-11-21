@@ -3,7 +3,7 @@
 <app-config-entries></app-config-entries>
 
 <div class="border-top pt-2 mb-3 pb-3">
-<a (click)="clear()" class="underline">Clear Local Storage</a>
+<a (click)="settingsSvc.clearLocalSettings()" class="underline">Clear Local Storage</a>
 <p><small>Clears the local storage in the browser.</small></p>
 <p><small>Note: Settings can be overriden by setting env variables</small></p>
 <!-- <p>Updation not yet implemented.</p> -->
