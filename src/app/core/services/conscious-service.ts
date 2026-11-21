@@ -273,7 +273,10 @@ export class ConsciousService extends LocalStorageAbstract<ConsciousServiceState
    * reload the tools for the current memory session
    */
   async reloadTools() {
-    await Conscious.ReloadTools({}, this.initReq).then(() => {
+    await Conscious.ReloadTools(
+      { name: this.state().memory.meta?.name },
+      this.initReq,
+    ).then(() => {
       this.toastService.notifySuccess("Tools Reloaded");
     });
   }
