@@ -1,0 +1,21 @@
+<div class="centerNarrowBlock">
+  <div class="mx-auto">
+    <h1 class="text-center">Welcome</h1>
+    <p>
+      Avatar is an AI harness for running your agents in controlled environments. 
+      Avatars are agents that primarily interact with real users and the physical world. It comes with an inbuild memory module, with persistant storage.
+    </p>
+    <p class="text-center">Avatar is <strong>{{ spinnerVerbsSvc.verb() }}...</strong></p>
+  </div>
+</div>
+
+<div>
+
+  @if (settingsSvc.loaded()) {
+    <h3>Please configure to start using Avatar...</h3>
+    <app-config-entries></app-config-entries>
+  } @else {
+    <p>Loading....</p>
+  }
+</div>
+

@@ -1,4 +1,11 @@
-import { inject, Service, signal, WritableSignal } from "@angular/core";
+import {
+  computed,
+  DestroyRef,
+  inject,
+  Service,
+  signal,
+  WritableSignal,
+} from "@angular/core";
 import { InitReq } from "../../gen/fetch.pb";
 import {
   SettingsListResponse,
@@ -8,11 +15,26 @@ import {
 } from "../../gen/v1/settings/settingsService.pb";
 import { ToastSrv } from "./toast-srv";
 import { SettingsInterfaces } from "../../pages/settings-page/models/settings-interfaces";
-import { ConfigList } from "../../gen/v1/settings/settings.pb";
+import {
+  LocalStorageService,
+  SignalStateService,
+} from "./local-storage-service";
+
+export interface SettingsState {
+  initiaConfigurationStatus: boolean;
+}
+
+const Initial_SettingsState: SettingsState = {
+  initiaConfigurationStatus: false,
+};
 
 @Service()
-export class SettingsSvc {
+export class SettingsSvc extends SignalStateService<SettingsState> {
   toastService = inject(ToastSrv);
+  localStorageSvc = inject(LocalStorageService);
+
+  public static STORAGE_KEY = "SettingsSvc";
+
   settings: WritableSignal<SettingsListResponse> = signal<SettingsListResponse>(
     { groups: {} },
   );
@@ -21,8 +43,22 @@ export class SettingsSvc {
     pathPrefix: "/api",
   };
 
+  // state: WritableSignal<SettingsState> = signal({
+  //   initiaConfigurationStatus: false,
+  // });
+
+  loaded = computed<boolean>(() => {
+    const groups = this.settings().groups;
+    if (groups && "_HIDDEN" in groups && groups["_HIDDEN"].configs) {
+      return true;
+    }
+    return false;
+  });
+
   constructor() {
+    super(SettingsSvc.STORAGE_KEY, Initial_SettingsState);
     this.list({});
+    this.loadState();
   }
 
   onSelectChange(
@@ -43,15 +79,6 @@ export class SettingsSvc {
     }
   }
 
-  // updateGroup(groupKey: string, newConfig: ConfigList) {
-  //   this.settings.update((currentState) => ({
-  //     groups: {
-  //       ...currentState.groups, // Keep existing keys (handles undefined safely)
-  //       [groupKey]: newConfig, // Set or overwrite the specific key
-  //     },
-  //   }));
-  // }
-
   saveSettingsSection(groupKey: string) {
     const groups = this.settings().groups;
     if (groups && groups[groupKey]) {
@@ -63,12 +90,26 @@ export class SettingsSvc {
           configs: configsToBeSaved,
         },
       };
-
+      // save settings on backend
       Settings.Save(req, this.initReq).then((response) => {
         this.toastService.notifySuccess("Settings Saved");
         console.dir(response);
+        this.list({});
       });
     }
+  }
+
+  getValue(groupKey: string, configKey: string): string | undefined {
+    const groups = this.settings().groups;
+    if (groups && groups[groupKey] && groups[groupKey].configs) {
+      const entry = groups[groupKey].configs.find(
+        (configItem) => configItem.name === configKey,
+      );
+      if (entry) {
+        return entry.value;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -79,7 +120,13 @@ export class SettingsSvc {
   list(req: SettingsListRequest) {
     Settings.List(req, this.initReq).then((response) => {
       this.settings.set(response);
-      console.dir(response);
+      const initConfigDone = this.getValue("_HIDDEN", "INITIAL_CONFIGURED");
+      // INITIAL_CONFIGURED value is a string -- remember
+      if (initConfigDone && initConfigDone == "true") {
+        this.patchState({ initiaConfigurationStatus: true });
+      } else {
+        this.patchState({ initiaConfigurationStatus: false });
+      }
     });
   }
 }

@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
-import { ContextMesssage, ContextMesssageContextType } from '../../gen/v1/conscious/contextMessage.pb';
-import { SingleContext } from '../../gen/v1/conscious/memory.pb';
+import { v4 as uuidv4 } from "uuid";
+import { ContextMesssageContextType } from "../../gen/v1/conscious/contextMessage.pb";
+import { SingleContext } from "../../gen/v1/conscious/memory.pb";
 
 // for tracking current chat inference
 export interface ChatEntity {
@@ -15,7 +15,7 @@ export interface ChatEntity {
   currentContext: SingleContext;
 }
 
-export interface PromptInterface  {
+export interface PromptInterface {
   role: string;
   mode: ChatOperation;
   userPrompt: string;
@@ -25,10 +25,10 @@ export interface PromptInterface  {
   control: string;
 }
 
-export type ChatOperation = 'Query' | 'Chat' | 'Embedding' | 'Embed' | 'Tts' | 'Image' | 'Video'; 
+export type ChatOperation =
+  "Query" | "Chat" | "Embedding" | "Embed" | "Tts" | "Image" | "Video";
 
 export interface PromptOptions {
-
   // seed sets the initial random tensor
   // use same seed for deterministic output
   seed: number;
@@ -40,9 +40,8 @@ export interface PromptOptions {
 }
 
 export class AiInterfaces {
-
   static GetEmptyPrompt(): PromptInterface {
-    return({
+    return {
       role: "user",
       mode: "Chat",
       userPrompt: "",
@@ -54,33 +53,32 @@ export class AiInterfaces {
         num_predict: 5000,
       },
       control: "",
-    });
+    };
   }
 
   static NewChatEntity(prompt: string | "", model: string): ChatEntity {
-    return({
-        uuid: uuidv4(),
-        prompt: {
-          role: "",
-          mode: "Query",
-          userPrompt: prompt,
-          systemPrompt: "",
-          model: model,
-          options: {
-            seed: 0,
-            num_predict: 0,
-            temperature: 0
-          },
-          control: ""
+    return {
+      uuid: uuidv4(),
+      prompt: {
+        role: "",
+        mode: "Query",
+        userPrompt: prompt,
+        systemPrompt: "",
+        model: model,
+        options: {
+          seed: 0,
+          num_predict: 0,
+          temperature: 0,
         },
-        mode: ContextMesssageContextType.LLM_QUERY,
-        response: "",
-        responseImage: "",
-        reasoning: "",
-        image: "",
-        fileName: "",
-        currentContext: {},
-
-    });
+        control: "",
+      },
+      mode: ContextMesssageContextType.LLM_QUERY,
+      response: "",
+      responseImage: "",
+      reasoning: "",
+      image: "",
+      fileName: "",
+      currentContext: {},
+    };
   }
 }
