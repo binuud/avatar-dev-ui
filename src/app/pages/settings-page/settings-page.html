@@ -1,32 +1,6 @@
 <h3>Settings</h3>
-<div class="row mt-3">
-  @for (groupItem of groupList(); track groupItem.key) {
-    <!-- Do not show hidden settings -->
-    @if (!groupItem.key.startsWith("_")) {
-      <div class="col-sm-12 mb-3 mt-3 border-top pt-2">
-        <div class="row">
-          <div class="col-sm-8">
-            <h5>{{ groupItem.key }}</h5>
-          </div>
-          <div class="col-sm-4 text-end">
-            <button class="btn btn-outline-primary btn-small iconBtn"
-              (click)="settingsSvc.saveSettingsSection(groupItem.key)" 
-              title="save this settings section">
-              <i class="fa-regular fa-floppy-disk"></i>
-            </button>
-        </div>
-        </div>
-        
-      </div>
-      @for (item of groupItem.value.configs ; track $index) {
-        <div class="col-sm-6 mb-3">
-          <app-config-entry [group]="groupItem.key" [entry]="item"></app-config-entry>
-        </div>
-      }
-    }
 
-  }
-</div>
+<app-config-entries></app-config-entries>
 
 <div class="border-top pt-2 mb-3 pb-3">
 <a (click)="clear()" class="underline">Clear Local Storage</a>
