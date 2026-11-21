@@ -1,24 +1,32 @@
-import { Component, computed, ElementRef, inject, signal, ViewChild, WritableSignal } from "@angular/core";
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+  WritableSignal,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { ChatResponse } from "../chat-response/chat-response";
-import { ContextMesssage, ContextMesssageContextType } from "../../../gen/v1/conscious/contextMessage.pb";
+import {
+  ContextMesssage,
+  ContextMesssageContextType,
+} from "../../../gen/v1/conscious/contextMessage.pb";
 import { ConsciousService } from "../../../core/services/conscious-service";
 import { AiInterfaces, ChatEntity } from "../../../core/models/ai-interfaces";
-import { v4 as uuidv4 } from 'uuid';
-import { LocalStorageService } from "../../../core/services/local-storage-service";
+import { v4 as uuidv4 } from "uuid";
 import { ViewportScroller } from "@angular/common";
 import { FileUpload } from "../../ux/file-upload/file-upload";
 import { ActionButton } from "../../../core/components/action-button/action-button";
 import { RouterLink } from "@angular/router";
-
-
+import { LocalStorageAbstract } from "../../../core/abstractClasses/local-storage-abstract";
 
 export interface MultiStateButtonConfig {
-  id: string;           // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
-  text?: string;        // Text to display for this state
-  iconClass: string;    // Optional CSS class for the icon (FontAwesome, Material Icons, etc.)
-  disabled: boolean;    // Whether the button should be disabled in this state
-  title?: string;       // title shown on hover
+  id: string; // Unique identifier for the state (e.g., 'idle', 'loading', 'success')
+  text?: string; // Text to display for this state
+  iconClass: string; // Optional CSS class for the icon (FontAwesome, Material Icons, etc.)
+  disabled: boolean; // Whether the button should be disabled in this state
+  title?: string; // title shown on hover
 }
 
 export interface ChatPromptInputState {
@@ -32,77 +40,96 @@ export interface ChatPromptInputState {
   showFileUpload: boolean;
 }
 
+const Initial_ChatPromptInputState: ChatPromptInputState = {
+  userPrompt: "",
+  mode: ContextMesssageContextType.LLM_QUERY,
+  memoryName: "default",
+  disabled: false,
+  fileName: "",
+  showFileUpload: false,
+};
+
 @Component({
   imports: [ActionButton, FormsModule, FileUpload, RouterLink],
   selector: "app-chat-prompt-input",
   styleUrl: "./chat-prompt-input.scss",
   templateUrl: "./chat-prompt-input.html",
 })
+export class ChatPromptInput extends LocalStorageAbstract<ChatPromptInputState> {
+  @ViewChild("scrollContainer") private scrollContainer!: ElementRef;
 
-export class ChatPromptInput {
-
-  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
-  
-  localStorageSvc = inject(LocalStorageService);
   scroller = inject(ViewportScroller);
   aiSvc = inject(ConsciousService);
 
-  public  static STORAGE_KEY = "ChatPromptInput";
+  public static STORAGE_KEY = "ChatPromptInput";
 
   chatModes = ContextMesssageContextType;
 
-  defaultBtnState: MultiStateButtonConfig ={ id: "new", iconClass: "fa-solid fa-play", disabled: false};
+  defaultBtnState: MultiStateButtonConfig = {
+    id: "new",
+    iconClass: "fa-solid fa-play",
+    disabled: false,
+  };
 
   btnConfigMap = new Map<string, MultiStateButtonConfig>([
-    ["Query",             { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
-    ["Image",             { id: "Image", iconClass: "fa-solid fa-image", disabled: false }],
-    ["ImageEdit",         { id: "Image", iconClass: "fa-solid fa-palette", disabled: false }],
-    ["ImageQuery",        { id: "ImageQuery", iconClass: "fa-solid fa-circle-question", disabled: false }],
-    ["submitted_wait",    { id: "submitted_wait", iconClass: "fa-solid fa-circle-notch fa-spin", disabled: false }],
-    ["submitted",         { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false }]
+    ["Query", { id: "new", iconClass: "fa-solid fa-play", disabled: false }],
+    ["Image", { id: "Image", iconClass: "fa-solid fa-image", disabled: false }],
+    [
+      "ImageEdit",
+      { id: "Image", iconClass: "fa-solid fa-palette", disabled: false },
+    ],
+    [
+      "ImageQuery",
+      {
+        id: "ImageQuery",
+        iconClass: "fa-solid fa-circle-question",
+        disabled: false,
+      },
+    ],
+    [
+      "submitted_wait",
+      {
+        id: "submitted_wait",
+        iconClass: "fa-solid fa-circle-notch fa-spin",
+        disabled: false,
+      },
+    ],
+    [
+      "submitted",
+      { id: "submitted", iconClass: "fa-solid fa-stop", disabled: false },
+    ],
   ]);
 
-
-  state: WritableSignal<ChatPromptInputState> = signal({
-    userPrompt: "",
-    mode: ContextMesssageContextType.LLM_QUERY,
-    memoryName: "default",
-    disabled: false,
-    fileName: "",
-    showFileUpload: false,
-  });
-
   btnStateSig: WritableSignal<string> = signal("new");
-  btnConfigSig = computed(() => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState );
+  btnConfigSig = computed(
+    () => this.btnConfigMap.get(this.btnStateSig()) ?? this.defaultBtnState,
+  );
 
-  currentChat:  WritableSignal<ChatEntity> = signal(AiInterfaces.NewChatEntity("",""));
+  currentChat: WritableSignal<ChatEntity> = signal(
+    AiInterfaces.NewChatEntity("", ""),
+  );
 
   constructor() {
-    this.loadState();
+    super(ChatPromptInput.STORAGE_KEY, Initial_ChatPromptInputState);
   }
 
-  loadState() {
-
-    const value = this.localStorageSvc.getItem(ChatPromptInput.STORAGE_KEY);
-    if (value != "undefined" && value && value?.length ) {
-      this.updateState(JSON.parse(value));
-    } 
-    this.setMode(this.state().mode);
-    this.updateState({memoryName: this.aiSvc.state().memory.meta?.name})
-  }
+  // loadState() {
+  //   const value = this.localStorageSvc.getItem(ChatPromptInput.STORAGE_KEY);
+  //   if (value != "undefined" && value && value?.length) {
+  //     this.updateState(JSON.parse(value));
+  //   }
+  //   this.setMode(this.state().mode);
+  //   this.updateState({ memoryName: this.aiSvc.state().memory.meta?.name });
+  // }
 
   emptyCurrentPrompt() {
     // let prompt = this.currentChat().prompt;
     // prompt.userPrompt = "";
-    this.updateState({userPrompt: ""});
+    this.patchState({ userPrompt: "" });
   }
 
   clearMemory() {
-    this.aiSvc.clearMemory()
-  }
-
-  saveState() {
-    this.localStorageSvc.setItem(ChatPromptInput.STORAGE_KEY, JSON.stringify(this.state()));
+    this.aiSvc.clearMemory();
   }
 
   closeCurrentChat() {
@@ -110,27 +137,19 @@ export class ChatPromptInput {
   }
 
   toggleFileUpload() {
-    this.updateState({showFileUpload: !this.state().showFileUpload});
+    this.patchState({ showFileUpload: !this.state().showFileUpload });
   }
 
   updateCurrentChat(newState: Partial<ChatEntity>) {
-    this.currentChat.update(state => ({ 
-      ...state, 
-      ...newState
+    this.currentChat.update((state) => ({
+      ...state,
+      ...newState,
     }));
-  }
-
-  updateState(newState: Partial<ChatPromptInputState>) {
-    this.state.update(state => ({ 
-      ...state, 
-      ...newState
-    }));
-    this.saveState();
   }
 
   fileUploaded(event: string) {
     console.log("received file name " + event);
-    this.updateState({fileName: event});
+    this.patchState({ fileName: event });
   }
 
   /**
@@ -140,18 +159,18 @@ export class ChatPromptInput {
    * @param mode all
    */
   setMode(mode: ContextMesssageContextType) {
-    this.updateState({mode: mode})
+    this.patchState({ mode: mode });
     if (mode == ContextMesssageContextType.LLM_QUERY) {
-      this.btnStateSig.set('Query');
+      this.btnStateSig.set("Query");
     } else if (mode == ContextMesssageContextType.IMAGE_GENERATION) {
-      this.btnStateSig.set('Image');
+      this.btnStateSig.set("Image");
     } else if (mode == ContextMesssageContextType.IMAGE_EDIT) {
-      this.btnStateSig.set('ImageEdit');
+      this.btnStateSig.set("ImageEdit");
     } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE) {
-      this.btnStateSig.set('ImageQuery');
+      this.btnStateSig.set("ImageQuery");
     }
   }
-  
+
   // selectModel(model: Model) {
   //   this.updateState({model: model.id});
   // }
@@ -166,7 +185,7 @@ export class ChatPromptInput {
     window.scrollTo({
       top: document.body.scrollHeight,
       left: 0,
-      behavior: 'smooth' // Creates a fluid animation effect
+      behavior: "smooth", // Creates a fluid animation effect
     });
   }
 
@@ -178,11 +197,11 @@ export class ChatPromptInput {
    * onEnter
    * this is to fix the problem of enter not triggerend event on action button
    * since I am using action button, with a promise to the service function
-   * the promise is used for animation events, I need to jump the event on text area 
+   * the promise is used for animation events, I need to jump the event on text area
    * to the jump button
-   * @param event 
-   * @param actionBtnComponent 
-   * @returns 
+   * @param event
+   * @param actionBtnComponent
+   * @returns
    */
   onEnter(event: Event, actionBtnComponent: any): void {
     const keyboardEvent = event as KeyboardEvent;
@@ -197,9 +216,10 @@ export class ChatPromptInput {
 
     // Find the native button inside <app-action-button> and click it
     // Note: If actionBtnComponent is an ElementRef, use actionBtnComponent.nativeElement
-    const nativeBtn = actionBtnComponent?.elementRef?.nativeElement?.querySelector('button') 
-                  || document.querySelector('app-action-button button');
-                  
+    const nativeBtn =
+      actionBtnComponent?.elementRef?.nativeElement?.querySelector("button") ||
+      document.querySelector("app-action-button button");
+
     if (nativeBtn && !nativeBtn.disabled) {
       (nativeBtn as HTMLButtonElement).click();
     }
@@ -212,13 +232,12 @@ export class ChatPromptInput {
    * if the mode is image generation, calls the image generate function
    */
   async submit(): Promise<any> {
-
     this.scrollToId("currentContext");
     const req = this.createNewContextMessage();
     this.aiSvc.updateCurrentContext({
       in: req,
-      out: {}
-    })
+      out: {},
+    });
     this.emptyCurrentPrompt();
 
     const mode = this.state().mode;
@@ -226,35 +245,30 @@ export class ChatPromptInput {
     // this.setMode(this.state().mode);
     // this.currentChat.set(AiInterfaces.NewChatEntity("", this.state().model));
     this.currentChat.set(AiInterfaces.NewChatEntity("", ""));
-    this.updateState({userPrompt: ""});
+    this.patchState({ userPrompt: "" });
     // this.btnStateSig.set("submitted");
-    if (mode == ContextMesssageContextType.LLM_QUERY ) {
+    if (mode == ContextMesssageContextType.LLM_QUERY) {
       console.log("New Chat Completion");
       return this.aiSvc.generateRequest(req);
-    } else if (mode == ContextMesssageContextType.IMAGE_GENERATION ) {
+    } else if (mode == ContextMesssageContextType.IMAGE_GENERATION) {
       console.log("New image generation");
       return this.aiSvc.inRequest(req);
-    } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE ) {
+    } else if (mode == ContextMesssageContextType.LLM_IMAGE_DESCRIBE) {
       console.log("Describe image request");
       return this.aiSvc.inRequest(req);
-    } else if (mode == ContextMesssageContextType.IMAGE_EDIT ) {
+    } else if (mode == ContextMesssageContextType.IMAGE_EDIT) {
       console.log("Edit image request");
       return this.aiSvc.inRequest(req);
     }
-
   }
 
-  createNewContextMessage():ContextMesssage {
+  createNewContextMessage(): ContextMesssage {
     return {
       uuid: uuidv4(),
       prompt: this.state().userPrompt,
       // model: this.state().model,
       type: this.state().mode,
-      data: this.state().fileName
-    }
+      data: this.state().fileName,
+    };
   }
-
 }
-
-
-

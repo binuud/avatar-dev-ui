@@ -1,5 +1,4 @@
 import { Component, computed, inject } from "@angular/core";
-import { LocalStorageService } from "../../../../core/services/local-storage-service";
 import { SettingsSvc } from "../../../../core/services/settings-svc";
 import { ConfigEntry } from "../config-entry/config-entry";
 

@@ -1,50 +1,14 @@
 import { isPlatformBrowser } from "@angular/common";
 import {
-  computed,
   inject,
   PLATFORM_ID,
-  Service,
-  signal,
-  Signal,
   WritableSignal,
+  Signal,
+  signal,
+  computed,
 } from "@angular/core";
 
-@Service()
-export class LocalStorageService {
-  private userUUID: string = "";
-
-  constructor() {}
-
-  setUser(uuid: string) {
-    this.userUUID = uuid;
-  }
-
-  key(key: string): string {
-    return this.userUUID + key;
-  }
-
-  // Set a value in local storage
-  setItem(key: string, value: string): void {
-    localStorage.setItem(this.key(key), value);
-  }
-
-  // Get a value from local storage
-  getItem(key: string): string | null {
-    return localStorage.getItem(this.key(key));
-  }
-
-  // Remove a value from local storage
-  removeItem(key: string): void {
-    localStorage.removeItem(this.key(key));
-  }
-
-  // Clear all items from local storage
-  clear(): void {
-    localStorage.clear();
-  }
-}
-
-export abstract class SignalStateService<T extends object> {
+export abstract class LocalStorageAbstract<T extends object> {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
 
@@ -53,12 +17,23 @@ export abstract class SignalStateService<T extends object> {
   /** Public read-only signal for components to consume */
   readonly state: Signal<T>;
 
+  private userUUID: string = "";
+
   constructor(
     private readonly storageKey: string,
     private readonly initialState: T,
   ) {
     this._state = signal<T>(this.initialState);
     this.state = this._state.asReadonly();
+    this.loadState();
+  }
+
+  setUser(uuid: string) {
+    this.userUUID = uuid;
+  }
+
+  private getStorageKey(): string {
+    return `${this.userUUID}-${this.storageKey}`;
   }
 
   /** Select a specific slice of state as a computed signal */
@@ -91,10 +66,10 @@ export abstract class SignalStateService<T extends object> {
 
     try {
       const serialized = JSON.stringify(this._state());
-      localStorage.setItem(this.storageKey, serialized);
+      localStorage.setItem(this.getStorageKey(), serialized);
     } catch (error) {
       console.error(
-        `Failed to save state for key "${this.storageKey}":`,
+        `Failed to save state for key "${this.getStorageKey()}":`,
         error,
       );
     }
@@ -105,7 +80,7 @@ export abstract class SignalStateService<T extends object> {
     if (!this.isBrowser) return;
 
     try {
-      const raw = localStorage.getItem(this.storageKey);
+      const raw = localStorage.getItem(this.getStorageKey());
       if (!raw) return;
 
       const parsed = JSON.parse(raw) as Partial<T>;
@@ -124,6 +99,6 @@ export abstract class SignalStateService<T extends object> {
   /** Remove persisted state from localStorage */
   clearStorage(): void {
     if (!this.isBrowser) return;
-    localStorage.removeItem(this.storageKey);
+    localStorage.removeItem(this.getStorageKey());
   }
 }
