@@ -60,7 +60,7 @@
             id="memoryDropDown"
 data-bs-popper-config='{"strategy":"fixed"}'
             aria-expanded="false">
-            <i class="fa-solid fa-brain"></i>
+            {{ this.aiSvc.state()?.memory?.meta?.name}} <i class="fa-solid fa-brain"></i>
           </button>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" (click)="aiSvc.clearMemory()">Clear Memory</a></li>
