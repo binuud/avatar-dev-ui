@@ -1,3 +1,9 @@
+@if (!aiSvc.state().memory.contexts?.length) {
+  <div class="row">
+    <div class="col" style="height:30vh;">
+    </div>
+  </div>
+}
 
 @for (item of aiSvc.state().memory.contexts; track $index) {
   
@@ -5,13 +11,6 @@
     <app-chat-response [context]="item" type="HISTORY"></app-chat-response>
   </div>
 
-}
-
-@if (!aiSvc.state().memory.contexts?.length) {
-  <div class="row">
-    <div class="col" style="height:30vh;">
-    </div>
-  </div>
 }
 
 @if (aiSvc.currentContext().in?.prompt) {
