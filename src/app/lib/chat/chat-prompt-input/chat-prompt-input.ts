@@ -32,7 +32,6 @@ export interface MultiStateButtonConfig {
 export interface ChatPromptInputState {
   userPrompt: string;
   mode: ContextMesssageContextType;
-  memoryName: string;
   reasoning?: string;
   response?: string;
   disabled: boolean;
@@ -43,7 +42,6 @@ export interface ChatPromptInputState {
 const Initial_ChatPromptInputState: ChatPromptInputState = {
   userPrompt: "",
   mode: ContextMesssageContextType.LLM_QUERY,
-  memoryName: "default",
   disabled: false,
   fileName: "",
   showFileUpload: false,
