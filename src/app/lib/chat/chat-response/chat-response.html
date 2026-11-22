@@ -31,6 +31,12 @@
   } -->
 
   @let out = context().out;
+  @if (type() == 'ACTIVE') {
+    @if (!out || !(out.response || out.responseImage)) {
+    <p>Avatar is <b>{{ spinnerVerbsSvc.verb() }}...</b></p>
+    }
+  }
+ 
   @if (out) {
     @if (out.response) {
       <div class="mt-3">
@@ -47,23 +53,23 @@
       </div>
     }
 
-    @if (out.completedAt) {
 
-      <div class="row responseStats">
-        <div class="col-sm-10">
-          Model: {{ out.model }}
-        </div>
-        <div class="col-sm-2 text-end">
-          <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
-          @if (out.responseImage) {
-            <i class="fa-regular fa-copy pointer" 
-              title="click to copy image path" 
-              appCopyToClipboard="{{ out.responseImage }}"></i>
-          }
-        </div>
+  @if (out.completedAt) {
+    <div class="row responseStats">
+      <div class="col-sm-10">
+        Model: {{ out.model }}
       </div>
+      <div class="col-sm-2 text-end">
+        <i class="fa-regular fa-clock"></i>: {{ getTimeElapsed() }} sec
+        @if (out.responseImage) {
+          <i class="fa-regular fa-copy pointer" 
+            title="click to copy image path" 
+            appCopyToClipboard="{{ out.responseImage }}"></i>
+        }
+      </div>
+    </div>
+  }
 
-    }
 
   }
 

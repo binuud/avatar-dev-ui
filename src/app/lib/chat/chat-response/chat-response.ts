@@ -1,8 +1,8 @@
-import { Component, computed, input } from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
 import { MarkdownModule } from "ngx-markdown";
 import { SingleContext } from "../../../gen/v1/conscious/memory.pb";
 import { CopyToClipboard } from "../../../core/directives/copy-to-clipboard";
-
+import { SpinnerVerbSvc } from "../../../core/services/spinner-verb-svc";
 
 @Component({
   imports: [MarkdownModule, CopyToClipboard],
@@ -11,22 +11,22 @@ import { CopyToClipboard } from "../../../core/directives/copy-to-clipboard";
   templateUrl: "./chat-response.html",
 })
 export class ChatResponse {
+  spinnerVerbsSvc = inject(SpinnerVerbSvc);
   context = input.required<SingleContext>();
-  type = input.required<'HISTORY' | 'ACTIVE'>();
+  type = input.required<"HISTORY" | "ACTIVE">();
 
   staticFile = computed(() => {
-    const file =this.context().out?.responseImage;
+    const file = this.context().out?.responseImage;
     if (file) {
       return this.getImagePath(file);
     }
     return "";
-  } );
-
+  });
 
   getTimeElapsed(): number {
     let s1 = Number(this.context().out?.createdAt?.seconds);
     let s2 = Number(this.context().out?.completedAt?.seconds);
-    return (s2-s1);
+    return s2 - s1;
   }
 
   getImagePath(file: string): string {
@@ -37,7 +37,6 @@ export class ChatResponse {
     if (!file.startsWith("/static")) {
       file = "/static" + file;
     }
-    return file
+    return file;
   }
-
 }

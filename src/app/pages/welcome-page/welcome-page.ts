@@ -12,7 +12,6 @@ import { Router } from "@angular/router";
 })
 export class WelcomePage {
   settingsSvc = inject(SettingsSvc);
-  spinnerVerbsSvc = inject(SpinnerVerbSvc);
   private router = inject(Router);
 
   constructor() {
