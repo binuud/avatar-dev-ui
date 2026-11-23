@@ -33,7 +33,7 @@
   @let out = context().out;
   @if (type() == 'ACTIVE') {
     @if (!out || !(out.response || out.responseImage)) {
-    <p>Avatar is <b>{{ spinnerVerbsSvc.verb() }}...</b></p>
+    <p><small>{{ spinnerVerbsSvc.verb() }}...</small></p>
     }
   }
  
