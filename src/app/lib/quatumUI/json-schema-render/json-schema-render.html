@@ -26,6 +26,13 @@
                     [attr.max]="properties[key]?.maximum">
 
                 }
+                @if (properties[key].type == "number") {
+                  <input [id]="propId"  type="number" class="form-control" 
+                    [formControlName]="propId"
+                    [attr.min]="properties[key]?.minimum"
+                    [attr.max]="properties[key]?.maximum">
+
+                }
                 @if (properties[key].type == "boolean") {
                   <div class="form-check form-switch">
                     <input [id]="propId" class="form-check-input" type="checkbox" role="switch" 

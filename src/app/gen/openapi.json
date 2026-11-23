@@ -2626,6 +2626,7 @@
           "PLAINTEXT",
           "BUTTON",
           "WEBCAM",
+          "AICAM",
           "IMAGECAROUSEL"
         ]
       },

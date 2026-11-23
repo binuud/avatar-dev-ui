@@ -3,15 +3,19 @@ import { ChatPromptInput } from "../chat-prompt-input/chat-prompt-input";
 import { ConnectionErrorMessage } from "../connection-error-message/connection-error-message";
 import { ChatHistory } from "../chat-history/chat-history";
 import { ConsciousService } from "../../../core/services/conscious-service";
+import { QuantumAiCamera } from "../../quatumUI/quantum-ai-camera/quantum-ai-camera";
 
 @Component({
-  imports: [ChatPromptInput, ConnectionErrorMessage, ChatHistory],
+  imports: [
+    ChatPromptInput,
+    ConnectionErrorMessage,
+    ChatHistory,
+    QuantumAiCamera,
+  ],
   selector: "app-chat-block",
   styleUrl: "./chat-block.scss",
   templateUrl: "./chat-block.html",
 })
 export class ChatBlock {
-
   aiSvc = inject(ConsciousService);
-    
 }

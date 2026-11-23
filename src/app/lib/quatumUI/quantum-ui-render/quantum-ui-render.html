@@ -24,30 +24,34 @@
               <label for="{{ item.id }}" class="form-label">{{ item.label }}</label>
             }
             
-            @if (item.type == "PLAINTEXT") {
+            @if (item.type == componentTypes.PLAINTEXT) {
               <p class="card-text">{{ item.value }}</p>
             }
 
-            @if (item.type == "INPUT" && item.id) {
+            @if (item.type == componentTypes.INPUT && item.id) {
               <input type="text" [id]="item.id" class="form-control" 
                 [formControlName]="item.id"
                 placeholder="{{ item.placeHolder }}">
             }
 
-            @if (item.type == "TEXTAREA") {
+            @if (item.type == componentTypes.TEXTAREA) {
               <textarea id="{{ item.id }}" class="form-control" rows="{{ item.rows }}" placeholder="{{ item.placeHolder }}"></textarea>
             }
 
-            @if (item.type == "WEBCAM") {
+            @if (item.type == componentTypes.WEBCAM) {
               <div>
-                <video #videoElement autoplay playsinline width="640" height="480" class="mx-auto"></video>
-                <canvas #canvasElement width="640" height="480" style="display:none;"></canvas>
+                <video #webCam autoplay playsinline width="640" height="480" class="mx-auto"></video>
+                <canvas #webCamCanvas width="640" height="480" style="display:none;"></canvas>
                 <img [src]="webCamImageUrl()"/>
               </div>
               <button (click)="capture()" class="btn btn-sm btn-primary">Capture</button>
             }
 
-            @if (item.type == "IMAGECAROUSEL") {
+            @if (item.type == componentTypes.AICAM) {
+              <app-quantum-ai-camera></app-quantum-ai-camera>
+            }
+
+            @if (item.type == componentTypes.IMAGECAROUSEL) {
               <div class="row">
                 @for (imageItem of item.items; track $index) {
                   <div class="col-sm-4">

@@ -1,0 +1,7 @@
+<div class="cameraView">
+
+    <video #webCam  autoplay muted [width]="width()" [height]="height()"></video>
+    <!-- this is used to overlay the object detectiom, pose and person detection boxes-->
+    <canvas #webCamCanvas [width]="width()" [height]="height()"></canvas>
+
+</div>
