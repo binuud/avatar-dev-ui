@@ -1665,6 +1665,7 @@ components:
         - "PLAINTEXT"
         - "BUTTON"
         - "WEBCAM"
+        - "AICAM"
         - "IMAGECAROUSEL"
     UpdateMemoryRequest:
       type: object
