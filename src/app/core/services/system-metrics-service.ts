@@ -18,7 +18,7 @@ export class SystemMetricsService {
   // number of seconds to wait, since last event to abort connection
   static INACTIVITY_TIMEOUT = 30000;
   // number of seconds to wait, before retrying connection
-  static RETRY_DELAY = 4000;
+  static RETRY_DELAY = 10000;
   metrics: WritableSignal<SystemMetrics> = signal({});
   isAvailable: WritableSignal<boolean> = signal(false);
 
@@ -28,6 +28,7 @@ export class SystemMetricsService {
 
   initReq: InitReq = {};
 
+  retryCounter = 0;
   watchdogTimer: ReturnType<typeof setTimeout> | null = null;
   isManuallyClosed = false;
 
@@ -36,10 +37,15 @@ export class SystemMetricsService {
   }
 
   reloadMetrics() {
+    // for simple backoff
+    // do no increase beyond 5 minutes.
+    if (this.retryCounter < 30) {
+      this.retryCounter++;
+    }
     this.clearWatchdog();
     setTimeout(() => {
       this.streamMetrics();
-    }, SystemMetricsService.RETRY_DELAY);
+    }, SystemMetricsService.RETRY_DELAY * this.retryCounter);
   }
 
   clearWatchdog() {
@@ -52,6 +58,7 @@ export class SystemMetricsService {
   // Resets the countdown; aborts the fetch if triggered
   resetWatchdogTimer() {
     this.clearWatchdog();
+    this.retryCounter = 0;
     this.watchdogTimer = setTimeout(() => {
       console.warn(
         `No SSE data received for ${SystemMetricsService.INACTIVITY_TIMEOUT}ms. Restarting...`,

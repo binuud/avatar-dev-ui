@@ -4,6 +4,8 @@ import { ConnectionErrorMessage } from "../connection-error-message/connection-e
 import { ChatHistory } from "../chat-history/chat-history";
 import { ConsciousService } from "../../../core/services/conscious-service";
 import { QuantumAiCamera } from "../../quatumUI/quantum-ai-camera/quantum-ai-camera";
+import { ContextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
+import { SensorEventsSvc } from "../../../core/services/sensor-events-svc";
 
 @Component({
   imports: [
@@ -18,4 +20,13 @@ import { QuantumAiCamera } from "../../quatumUI/quantum-ai-camera/quantum-ai-cam
 })
 export class ChatBlock {
   aiSvc = inject(ConsciousService);
+  aiEventsSvc = inject(SensorEventsSvc);
+
+  constructor() {
+    this.aiEventsSvc.connectSensorEvents();
+  }
+
+  sendEvent($event: ContextMesssage) {
+    this.aiEventsSvc.sendEvent($event);
+  }
 }

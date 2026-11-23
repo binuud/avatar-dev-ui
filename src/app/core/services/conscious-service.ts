@@ -257,17 +257,6 @@ export class ConsciousService extends LocalStorageAbstract<ConsciousServiceState
     this.toastService.notifySuccess("Cleared Memory");
   }
 
-  // /**
-  //  * clearDisplayHistory()
-  //  * clears chat display history alone
-  //  */
-  // clearDisplayHistory() {
-  //   this.updateState({
-  //     memory: {},
-  //     // messageHistory: [],
-  //   })
-  // }
-
   /**
    * reloadTools()
    * reload the tools for the current memory session

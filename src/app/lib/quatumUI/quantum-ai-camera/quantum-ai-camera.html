@@ -3,5 +3,5 @@
     <video #webCam  autoplay muted [width]="width()" [height]="height()"></video>
     <!-- this is used to overlay the object detectiom, pose and person detection boxes-->
     <canvas #webCamCanvas [width]="width()" [height]="height()"></canvas>
-
+    <button class="btn btn-sm btm-primary" (click)="sendData()">send</button>
 </div>

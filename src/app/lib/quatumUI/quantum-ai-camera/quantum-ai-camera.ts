@@ -4,8 +4,10 @@ import {
   ElementRef,
   input,
   OnInit,
+  output,
   ViewChild,
 } from "@angular/core";
+import { ContextMesssage } from "../../../gen/v1/conscious/contextMessage.pb";
 
 @Component({
   imports: [],
@@ -19,6 +21,8 @@ export class QuantumAiCamera implements OnInit, AfterViewInit {
 
   width = input<number>(160);
   height = input<number>(120);
+
+  onEvent = output<ContextMesssage>();
 
   private ctx!: CanvasRenderingContext2D;
   private stream?: MediaStream;
@@ -63,6 +67,10 @@ export class QuantumAiCamera implements OnInit, AfterViewInit {
       .catch((err) => {
         console.error("Error loading or sending image:", err);
       });
+  }
+
+  sendData() {
+    this.onEvent.emit({ name: "event one" });
   }
 
   async sendImageToBroker(base64data: string) {
