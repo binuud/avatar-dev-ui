@@ -1,6 +1,6 @@
 <div class="centerNarrowBlock responseArea">
   <app-chat-history></app-chat-history>
-  <app-quantum-ai-camera></app-quantum-ai-camera>
+  <app-quantum-ai-camera (onEvent)="sendEvent($event)"></app-quantum-ai-camera>
 </div>
 
 <div class="fixed-bottom promptArea">
