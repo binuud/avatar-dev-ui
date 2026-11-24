@@ -1,7 +1,7 @@
 <div class="cameraView">
-
-    <video #webCam  autoplay muted [width]="width()" [height]="height()"></video>
+    <video #webCam  autoplay playsinline muted [width]="width()" [height]="height()" class="mx-auto"></video>
     <!-- this is used to overlay the object detectiom, pose and person detection boxes-->
-    <canvas #webCamCanvas [width]="width()" [height]="height()"></canvas>
-    <button class="btn btn-sm btm-primary" (click)="sendData()">send</button>
+    <canvas #webCamCanvas style="display: none;" [width]="width()" [height]="height()"></canvas>
+    <canvas #webOverlayCanvas [width]="width()" [height]="height()"></canvas>
+    <button class="btn btn-sm btm-primary" (click)="sendImage()">send</button>
 </div>

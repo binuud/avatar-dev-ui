@@ -82,3 +82,21 @@ export class AiInterfaces {
     };
   }
 }
+
+export interface YoloResponse {
+  model: string;
+  image_size: {
+    width: number;
+    height: number;
+  };
+  count: number;
+  detections: Detection[];
+}
+
+export interface Detection {
+  box_xyxy: [number, number, number, number]; // Bounding box coordinates [x1, y1, x2, y2]
+  box_xyxy_normalized: [number, number, number, number];
+  confidence: number; // Confidence score
+  class_id: number; // Class ID
+  label: string; // Object class name
+}
