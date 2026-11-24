@@ -57,7 +57,7 @@ export class SensorEventsSvc {
     // we got an incoming message
     this.ws.onmessage = (event) => {
       const data: ContextMesssage = JSON.parse(event.data);
-      console.log("Event from server --> control");
+      console.log(`Event ${data.type} from sensor events server --> control`);
       this.sensorEvent.set(data);
     };
 
