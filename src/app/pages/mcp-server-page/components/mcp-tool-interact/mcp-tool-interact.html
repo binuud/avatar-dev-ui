@@ -1,0 +1,20 @@
+@let myTool = tool();
+@if (myTool && myTool.name && myTool.inputSchema) {
+  <app-json-schema-render 
+    [schema]="myTool.inputSchema" 
+    [formTitle]="myTool.name"
+    [showSubmit]="true"
+    (uiSubmitEvent)="submit(toolIndex(),myTool.name, $event)">
+  </app-json-schema-render>
+  <p class="small mt-1">Click on Submit, after entering values, to interact with the MCP server directly.</p>
+  <p class="small">If MCP Server requires auth, make sure you have configured the correct auth tokens.</p>
+
+  @if (toolResponse()) {
+    <div class="mt-3">
+      <div markdown
+        [data]="toolResponse() | json | language : 'json'"
+        [disableSanitizer]="true">
+      </div>
+    </div>
+  }
+}
