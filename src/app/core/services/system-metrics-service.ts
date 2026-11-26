@@ -21,7 +21,7 @@ export class SystemMetricsService {
   static RETRY_DELAY = 10000;
   metrics: WritableSignal<SystemMetrics> = signal({});
   isAvailable: WritableSignal<boolean> = signal(false);
-
+  isSupported: WritableSignal<boolean> = signal(true);
   private activeMetricsStream: any = null;
 
   controller: AbortController | null = null;
@@ -33,16 +33,18 @@ export class SystemMetricsService {
   isManuallyClosed = false;
 
   constructor() {
-    this.reloadMetrics();
+    this.streamMetrics();
   }
 
   reloadMetrics() {
+    this.clearWatchdog();
+    if (!this.isSupported()) return;
     // for simple backoff
     // do no increase beyond 5 minutes.
     if (this.retryCounter < 30) {
       this.retryCounter++;
     }
-    this.clearWatchdog();
+
     setTimeout(() => {
       this.streamMetrics();
     }, SystemMetricsService.RETRY_DELAY * this.retryCounter);
@@ -93,9 +95,15 @@ export class SystemMetricsService {
           console.log("error: metrics server closed connection");
           console.error(error);
           this.isAvailable.set(false);
+          if (error == "Error: Metrics not implemented on docker container") {
+            this.isSupported.set(false);
+            console.log("****** ERROR match");
+            this.closeMetricsStream();
+          } else {
+            this.reloadMetrics();
+          }
           // metrics server closed, server side crashed or went away
           // try reconnecting
-          this.reloadMetrics();
         });
     } catch (error) {
       console.log("try error: metrics server closed connection");
@@ -130,6 +138,6 @@ export class SystemMetricsService {
     }
     this.activeMetricsStream = null;
     this.isAvailable.set(false);
-    console.log("Client explicitly closed the metrics stream.");
+    console.log("Client explicitly closed the metrics stream. No Retries");
   }
 }
