@@ -95,7 +95,7 @@ export class SystemMetricsService {
           console.log("error: metrics server closed connection");
           console.error(error);
           this.isAvailable.set(false);
-          if (error == "Error: Metrics not implemented on docker container") {
+          if (error.includes("Metrics not implemented")) {
             this.isSupported.set(false);
             console.log("****** ERROR match");
             this.closeMetricsStream();
