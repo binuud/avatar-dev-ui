@@ -10,6 +10,7 @@ import { AddMcpServer } from "./pages/mcp-server-page/components/add-mcp-server/
 import { ManageMemoryPage } from "./pages/manage-memory-page/manage-memory-page";
 import { EditMemorySettings } from "./pages/manage-memory-page/components/edit-memory-settings/edit-memory-settings";
 import { WelcomePage } from "./pages/welcome-page/welcome-page";
+import { ManageRobotsPage } from "./pages/manage-robots-page/manage-robots-page";
 
 export const routes: Routes = [
   { path: "", redirectTo: "/welcome", pathMatch: "full" },
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: "mcpServers/new", component: AddMcpServer },
   { path: "avatarDetails/:id", component: AvatarDetails },
   { path: "avatar/:id", component: AvatarRun },
+  { path: "robots", component: ManageRobotsPage },
   { path: "memory", component: ManageMemoryPage },
   { path: "memory/:action/:id", component: EditMemorySettings },
   { path: "settings", component: SettingsPage },
