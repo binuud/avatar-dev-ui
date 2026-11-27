@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { AvatarList } from "../../lib/avatar/avatar-list/avatar-list";
+import { AvatarStoreSrv } from "../../core/services/avatar-store-srv";
 
 @Component({
   imports: [AvatarList],
@@ -7,4 +8,6 @@ import { AvatarList } from "../../lib/avatar/avatar-list/avatar-list";
   styleUrl: "./avatar-page.scss",
   templateUrl: "./avatar-page.html",
 })
-export class AvatarPage {}
+export class AvatarPage {
+  avatarStoreSvc = inject(AvatarStoreSrv);
+}

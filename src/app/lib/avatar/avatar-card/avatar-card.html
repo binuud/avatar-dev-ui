@@ -6,7 +6,7 @@
     </div>
   }
   @if (a.meta?.image) {
-    <img [src]="a.meta?.image"  class="card-img-top" alt="{{a.meta?.name}}">
+    <img [src]="'/static/avatarStore/'+ a.meta?.name + '/' + a.meta?.image"  class="card-img-top" alt="{{a.meta?.name}}">
   } @else {
     <img src="/static/avatarStore/placeholder.png"  class="card-img-top" alt="{{a.meta?.name}}">
   }
