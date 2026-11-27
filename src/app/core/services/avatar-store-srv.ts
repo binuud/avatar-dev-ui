@@ -17,4 +17,8 @@ export class AvatarStoreSrv {
   list(req: AvatarStoreListRequest): Promise<AvatarStoreListResponse> {
     return AvatarStoreService.List(req, this.initReq);
   }
+
+  async sync() {
+    await AvatarStoreService.Sync({}, this.initReq);
+  }
 }
